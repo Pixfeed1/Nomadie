@@ -90,9 +90,9 @@
                                 </div>
                             </div>
                             @if($destination->popular)
-                            <div class="absolute top-2 right-2 bg-accent/90 text-white text-xs font-bold px-2 py-1 rounded">
+                            <x-badge variant="accent" style="solid" size="sm" class="absolute top-2 right-2">
                                 Populaire
-                            </div>
+                            </x-badge>
                             @endif
                         </div>
                     </a>
@@ -211,9 +211,9 @@
                                             </p>
                                         </div>
                                     </div>
-                                    <div x-show="country.popular" class="absolute top-2 right-2 bg-accent/90 text-white text-xs font-bold px-2 py-1 rounded">
+                                    <x-badge x-show="country.popular" variant="accent" style="solid" size="sm" class="absolute top-2 right-2">
                                         Populaire
-                                    </div>
+                                    </x-badge>
                                 </div>
                             </a>
                         </template>

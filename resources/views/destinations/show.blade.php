@@ -41,9 +41,9 @@
                 <!-- Badge et statistiques -->
                 <div class="flex flex-wrap items-center gap-3 mt-4">
                     @if($destination->popular)
-                    <span class="bg-accent/90 text-white text-xs font-bold px-2 py-1 rounded">
+                    <x-badge variant="accent" style="solid" size="sm">
                         Populaire
-                    </span>
+                    </x-badge>
                     @endif
                     
                     @if($destination->rating > 0)
@@ -479,9 +479,9 @@
                             </div>
                         </div>
                         @if($similarDestination->popular)
-                        <div class="absolute top-2 right-2 bg-accent/90 text-white text-xs font-bold px-2 py-1 rounded">
+                        <x-badge variant="accent" style="solid" size="sm" class="absolute top-2 right-2">
                             Populaire
-                        </div>
+                        </x-badge>
                         @endif
                     </div>
                 </a>

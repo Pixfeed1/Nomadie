@@ -52,15 +52,15 @@
                 <!-- Badge et ratings -->
                 <div class="flex flex-wrap items-center gap-3 mt-4">
                     @if($trip->featured)
-                    <span class="bg-accent/90 text-white text-xs font-bold px-2 py-1 rounded">
+                    <x-badge variant="accent" style="solid" size="sm">
                         En vedette
-                    </span>
+                    </x-badge>
                     @endif
-                    
+
                     <!-- Badge type d'offre -->
-                    <span class="bg-white/20 text-white text-xs font-bold px-2 py-1 rounded">
+                    <x-badge variant="gray" style="solid" size="sm" class="!bg-white/20 !text-white">
                         {{ $trip->offer_type_label ?? $trip->type_text }}
-                    </span>
+                    </x-badge>
                     
                     <div class="flex items-center gap-1">
                         <x-rating-stars :rating="$trip->rating" size="md" color="text-yellow-400" emptyColor="text-white/40" />
@@ -131,79 +131,49 @@
                     <!-- Points clés adaptés selon le type -->
                     <div class="flex flex-wrap gap-4 mb-6">
                         <!-- Durée adaptée -->
-                        <div class="bg-bg-alt rounded-lg p-4 flex items-center gap-3">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                            <div>
-                                <div class="text-sm text-text-secondary">{{ $trip->duration_label }}</div>
-                                <div class="font-medium">{{ $trip->duration_formatted }}</div>
-                            </div>
-                        </div>
+                        <x-info-card
+                            icon="clock"
+                            :label="$trip->duration_label"
+                            :value="$trip->duration_formatted"
+                        />
                         
                         <!-- Capacité adaptée -->
-                        <div class="bg-bg-alt rounded-lg p-4 flex items-center gap-3">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                            </svg>
-                            <div>
-                                <div class="text-sm text-text-secondary">
-                                    @if($trip->isAccommodation())
-                                        Capacité
-                                    @else
-                                        Taille du groupe
-                                    @endif
-                                </div>
-                                <div class="font-medium">{{ $trip->capacity_text }}</div>
-                            </div>
-                        </div>
+                        <x-info-card
+                            icon="users"
+                            :label="$trip->isAccommodation() ? 'Capacité' : 'Taille du groupe'"
+                            :value="$trip->capacity_text"
+                        />
                         
                         @if($trip->physical_level)
-                        <div class="bg-bg-alt rounded-lg p-4 flex items-center gap-3">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-                            </svg>
-                            <div>
-                                <div class="text-sm text-text-secondary">Niveau physique</div>
-                                <div class="font-medium">{{ $trip->physical_level_text }}</div>
-                            </div>
-                        </div>
+                        <x-info-card
+                            icon="activity"
+                            label="Niveau physique"
+                            :value="$trip->physical_level_text"
+                        />
                         @endif
                         
                         <!-- Type d'offre -->
-                        <div class="bg-bg-alt rounded-lg p-4 flex items-center gap-3">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                            </svg>
-                            <div>
-                                <div class="text-sm text-text-secondary">Type d'offre</div>
-                                <div class="font-medium">{{ $trip->offer_type_label ?? $trip->type_text }}</div>
-                            </div>
-                        </div>
+                        <x-info-card
+                            icon="tag"
+                            label="Type d'offre"
+                            :value="$trip->offer_type_label ?? $trip->type_text"
+                        />
                         
                         <!-- Informations spécifiques pour hébergements -->
                         @if($trip->isAccommodation() && $trip->bedrooms)
-                        <div class="bg-bg-alt rounded-lg p-4 flex items-center gap-3">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                            </svg>
-                            <div>
-                                <div class="text-sm text-text-secondary">Chambres</div>
-                                <div class="font-medium">{{ $trip->bedrooms }} {{ Str::plural('chambre', $trip->bedrooms) }}</div>
-                            </div>
-                        </div>
+                        <x-info-card
+                            icon="bed"
+                            label="Chambres"
+                            :value="$trip->bedrooms . ' ' . Str::plural('chambre', $trip->bedrooms)"
+                        />
                         @endif
                         
                         @if($trip->isAccommodation() && $trip->bathrooms)
-                        <div class="bg-bg-alt rounded-lg p-4 flex items-center gap-3">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
-                            </svg>
-                            <div>
-                                <div class="text-sm text-text-secondary">Salles de bain</div>
-                                <div class="font-medium">{{ $trip->bathrooms }}</div>
-                            </div>
-                        </div>
+                        <x-info-card
+                            icon="droplet"
+                            label="Salles de bain"
+                            :value="$trip->bathrooms"
+                        />
                         @endif
                     </div>
                     
@@ -220,14 +190,7 @@
                             <h3 class="text-lg font-semibold text-text-primary mb-4">Ce qui est inclus</h3>
                             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                                 @foreach($trip->included as $item)
-                                <div class="flex items-center">
-                                    <div class="flex-shrink-0 w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center mr-3">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                                        </svg>
-                                    </div>
-                                    <span class="text-sm text-text-secondary">{{ $item }}</span>
-                                </div>
+                                <x-checkmark-item :text="$item" />
                                 @endforeach
                             </div>
                         </div>
@@ -261,14 +224,7 @@
                         @if($trip->equipment_list && count($trip->equipment_list) > 0)
                         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                             @foreach($trip->equipment_list as $equipment)
-                            <div class="flex items-center">
-                                <div class="flex-shrink-0 w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center mr-3">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                                    </svg>
-                                </div>
-                                <span class="text-sm text-text-secondary">{{ $equipment }}</span>
-                            </div>
+                            <x-checkmark-item :text="$equipment" />
                             @endforeach
                         </div>
                         @else
@@ -348,19 +304,19 @@
                             <!-- Badges -->
                             <div class="flex flex-wrap gap-2 mb-3">
                                 @if($availability->is_guaranteed)
-                                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                <x-badge variant="success" style="soft" size="sm">
                                     @if($trip->isActivity())
                                         Séance garantie
                                     @else
                                         Départ garanti
                                     @endif
-                                </span>
+                                </x-badge>
                                 @endif
-                                
+
                                 @if($availability->available_spots > 0 && $availability->available_spots <= 5)
-                                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
+                                <x-badge variant="warning" style="soft" size="sm">
                                     Dernières places
-                                </span>
+                                </x-badge>
                                 @endif
                             </div>
 
@@ -483,23 +439,11 @@
                                 Avis des voyageurs
                             @endif
                         </h2>
-                        <div class="flex items-center gap-2">
-                            <div class="flex">
-                                @for($i = 1; $i <= 5; $i++)
-                                    @if($i <= $reviewStats['average'])
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
-                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                    </svg>
-                                    @else
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-300" viewBox="0 0 20 20" fill="currentColor">
-                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                    </svg>
-                                    @endif
-                                @endfor
-                            </div>
-                            <span class="text-text-primary font-bold">{{ number_format($reviewStats['average'], 1) }}</span>
-                            <span class="text-text-secondary">({{ $reviewStats['count'] }} avis)</span>
-                        </div>
+                        <x-rating-stars
+                            :rating="$reviewStats['average']"
+                            size="md"
+                            :count="$reviewStats['count']"
+                        />
                     </div>
                     
                     @if(!isset($reviews) || count($reviews) == 0)
@@ -673,22 +617,12 @@
                             <div class="ml-4">
                                 <h3 class="font-medium text-text-primary">{{ $trip->vendor->company_name }}</h3>
                                 @if($trip->vendor->rating)
-                                <div class="flex items-center">
-                                    <div class="flex">
-                                        @for($i = 1; $i <= 5; $i++)
-                                            @if($i <= $trip->vendor->rating)
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
-                                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                            </svg>
-                                            @else
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-300" viewBox="0 0 20 20" fill="currentColor">
-                                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                            </svg>
-                                            @endif
-                                        @endfor
-                                    </div>
-                                    <span class="text-xs text-text-secondary ml-1">({{ $trip->vendor->reviews_count ?? 0 }} avis)</span>
-                                </div>
+                                <x-rating-stars
+                                    :rating="$trip->vendor->rating"
+                                    size="sm"
+                                    :count="$trip->vendor->reviews_count ?? 0"
+                                    :showValue="false"
+                                />
                                 @endif
                             </div>
                         </div>
