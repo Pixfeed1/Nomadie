@@ -37,49 +37,7 @@
         @if($articles->count() > 0)
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
             @foreach($articles->take(2) as $article)
-            <div class="bg-white rounded-lg shadow-lg overflow-hidden card">
-                <a href="{{ route('blog.show', $article->slug) }}" class="block overflow-hidden aspect-video">
-                    <img src="{{ $article->image_url ?? asset('images/blog/placeholder.jpg') }}" 
-                         alt="{{ $article->title }}" 
-                         class="w-full h-full object-cover hover:scale-105 transition-transform duration-300" 
-                         onerror="this.src='/api/placeholder/800/450';this.onerror=null;">
-                </a>
-                <div class="p-6">
-                    <div class="flex items-center mb-3">
-                        <span class="px-3 py-1 bg-primary/10 text-primary text-xs font-medium rounded-full">
-                            {{ $article->category ?? 'Non catégorisé' }}
-                        </span>
-                        <span class="ml-2 text-xs text-text-secondary">
-                            {{ $article->created_at->locale('fr')->isoFormat('LL') }}
-                        </span>
-                        <span class="ml-auto text-xs text-text-secondary flex items-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                            {{ $article->reading_time ?? 5 }} min
-                        </span>
-                    </div>
-                    <h2 class="text-xl font-bold text-text-primary mb-2">
-                        <a href="{{ route('blog.show', $article->slug) }}" class="hover:text-primary transition-colors">
-                            {{ $article->title }}
-                        </a>
-                    </h2>
-                    <p class="text-text-secondary mb-4">
-                        {{ $article->excerpt ?? Str::limit(strip_tags($article->content), 150) }}
-                    </p>
-                    <div class="flex items-center justify-between">
-                        <span class="text-sm text-text-secondary">
-                            Par {{ $article->author->display_name ?? $article->author->name ?? 'Anonyme' }}
-                        </span>
-                        <a href="{{ route('blog.show', $article->slug) }}" class="text-primary hover:text-primary-dark text-sm font-medium flex items-center">
-                            Lire la suite
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                            </svg>
-                        </a>
-                    </div>
-                </div>
-            </div>
+                <x-article-card :article="$article" variant="featured" />
             @endforeach
         </div>
         @endif
@@ -88,40 +46,7 @@
         @if($articles->count() > 2)
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             @foreach($articles->skip(2) as $article)
-            <div class="bg-white rounded-lg shadow-lg overflow-hidden card">
-                <a href="{{ route('blog.show', $article->slug) }}" class="block overflow-hidden aspect-video">
-                    <img src="{{ $article->image_url ?? asset('images/blog/placeholder.jpg') }}" 
-                         alt="{{ $article->title }}" 
-                         class="w-full h-full object-cover hover:scale-105 transition-transform duration-300" 
-                         onerror="this.src='/api/placeholder/400/250';this.onerror=null;">
-                </a>
-                <div class="p-5">
-                    <div class="flex items-center mb-2">
-                        <span class="px-2 py-1 bg-primary/10 text-primary text-xs font-medium rounded-full">
-                            {{ $article->category ?? 'Non catégorisé' }}
-                        </span>
-                        <span class="ml-auto text-xs text-text-secondary">
-                            {{ $article->reading_time ?? 5 }} min
-                        </span>
-                    </div>
-                    <h2 class="text-lg font-bold text-text-primary mb-2">
-                        <a href="{{ route('blog.show', $article->slug) }}" class="hover:text-primary transition-colors">
-                            {{ $article->title }}
-                        </a>
-                    </h2>
-                    <p class="text-sm text-text-secondary mb-3">
-                        {{ Str::limit($article->excerpt ?? strip_tags($article->content), 120) }}
-                    </p>
-                    <div class="flex items-center justify-between">
-                        <span class="text-xs text-text-secondary">
-                            {{ $article->created_at->locale('fr')->isoFormat('LL') }}
-                        </span>
-                        <a href="{{ route('blog.show', $article->slug) }}" class="text-primary hover:text-primary-dark text-xs font-medium">
-                            Lire la suite
-                        </a>
-                    </div>
-                </div>
-            </div>
+                <x-article-card :article="$article" variant="compact" />
             @endforeach
         </div>
         @endif

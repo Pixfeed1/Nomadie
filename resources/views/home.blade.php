@@ -30,53 +30,7 @@
     </div>
 
     <!-- Search Section -->
-    <div class="bg-white shadow-md relative z-10 -mt-8 mb-12 rounded-lg max-w-6xl mx-auto">
-        <div class="p-6">
-            <form action="{{ route('search') }}" method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div>
-                    <label for="destination" class="block text-sm font-medium text-text-secondary mb-1">Destination</label>
-                    <select id="destination" name="destination" class="block w-full rounded-md border-border shadow-sm focus:border-primary focus:ring-primary sm:text-sm p-2.5">
-                        <option value="">Toutes les destinations</option>
-                        @foreach($continents as $continent)
-                            <option value="{{ $continent->slug }}">{{ $continent->name }}</option>
-                        @endforeach
-                    </select>
-                </div>
-                <div>
-                    <label for="date" class="block text-sm font-medium text-text-secondary mb-1">Date de départ</label>
-                    <input type="date" id="date" name="date" class="block w-full rounded-md border-border shadow-sm focus:border-primary focus:ring-primary sm:text-sm p-2.5">
-                </div>
-                <div>
-                    <label for="travelers" class="block text-sm font-medium text-text-secondary mb-1">Voyageurs</label>
-                    <select id="travelers" name="travelers" class="block w-full rounded-md border-border shadow-sm focus:border-primary focus:ring-primary sm:text-sm p-2.5">
-                        <option value="1">1 voyageur</option>
-                        <option value="2">2 voyageurs</option>
-                        <option value="3">3 voyageurs</option>
-                        <option value="4">4 voyageurs</option>
-                        <option value="5+">5+ voyageurs</option>
-                    </select>
-                </div>
-                <div class="flex items-end">
-                    <button type="submit" class="w-full bg-primary hover:bg-primary-dark text-white font-medium py-2.5 px-4 rounded-md transition-colors">
-                        <div class="flex items-center justify-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                            </svg>
-                            Rechercher
-                        </div>
-                    </button>
-                </div>
-            </form>
-            <div class="mt-3 text-right">
-                <a href="{{ route('search.advanced') }}" class="text-sm text-primary hover:text-primary-dark font-medium flex items-center justify-end">
-                    Recherche avancée
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                    </svg>
-                </a>
-            </div>
-        </div>
-    </div>
+    <x-search-bar :destinations="$continents" variant="full" :showAdvanced="true" />
 
     <!-- Section Types d'Expériences -->
     <div id="experiences" class="bg-white py-16">
@@ -88,77 +42,41 @@
 
             <!-- Cartes des types d'offres - Version harmonisée -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-                <a href="{{ route('trips.index', ['offer_type' => 'accommodation']) }}" class="group h-full">
-                    <div class="bg-white border border-gray-200 p-6 rounded-lg text-center hover:shadow-lg hover:border-primary/30 transition-all group-hover:scale-105 h-full flex flex-col justify-between">
-                        <div>
-                            <div class="h-16 w-16 mx-auto bg-primary/10 text-primary rounded-full flex items-center justify-center mb-4 group-hover:bg-primary group-hover:text-white transition-colors">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                                </svg>
-                            </div>
-                            <h3 class="text-lg font-bold text-text-primary mb-2">{{ $offerTypeStats['accommodations']['label'] ?? 'Hébergements' }}</h3>
-                            <p class="text-sm text-text-secondary mb-3">{{ $offerTypeStats['accommodations']['description'] ?? 'Gîtes, villas et appartements de charme' }}</p>
-                        </div>
-                        <div>
-                            <div class="text-2xl font-bold text-primary">{{ $offerTypeStats['accommodations']['count'] ?? 0 }}</div>
-                            <p class="text-xs text-text-secondary">offres disponibles</p>
-                        </div>
-                    </div>
-                </a>
+                <x-offer-type-card
+                    type="accommodation"
+                    :title="$offerTypeStats['accommodations']['label'] ?? 'Hébergements'"
+                    :description="$offerTypeStats['accommodations']['description'] ?? 'Gîtes, villas et appartements de charme'"
+                    :count="$offerTypeStats['accommodations']['count'] ?? 0"
+                    :url="route('trips.index', ['offer_type' => 'accommodation'])"
+                    iconColor="primary"
+                />
 
-                <a href="{{ route('trips.index', ['offer_type' => 'organized_trip']) }}" class="group h-full">
-                    <div class="bg-white border border-gray-200 p-6 rounded-lg text-center hover:shadow-lg hover:border-primary/30 transition-all group-hover:scale-105 h-full flex flex-col justify-between">
-                        <div>
-                            <div class="h-16 w-16 mx-auto bg-primary/10 text-primary rounded-full flex items-center justify-center mb-4 group-hover:bg-primary group-hover:text-white transition-colors">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
-                                </svg>
-                            </div>
-                            <h3 class="text-lg font-bold text-text-primary mb-2">{{ $offerTypeStats['organized_trips']['label'] ?? 'Séjours organisés' }}</h3>
-                            <p class="text-sm text-text-secondary mb-3">{{ $offerTypeStats['organized_trips']['description'] ?? 'Voyages tout compris avec guide' }}</p>
-                        </div>
-                        <div>
-                            <div class="text-2xl font-bold text-primary">{{ $offerTypeStats['organized_trips']['count'] ?? 0 }}</div>
-                            <p class="text-xs text-text-secondary">offres disponibles</p>
-                        </div>
-                    </div>
-                </a>
+                <x-offer-type-card
+                    type="organized_trip"
+                    :title="$offerTypeStats['organized_trips']['label'] ?? 'Séjours organisés'"
+                    :description="$offerTypeStats['organized_trips']['description'] ?? 'Voyages tout compris avec guide'"
+                    :count="$offerTypeStats['organized_trips']['count'] ?? 0"
+                    :url="route('trips.index', ['offer_type' => 'organized_trip'])"
+                    iconColor="primary"
+                />
 
-                <a href="{{ route('trips.index', ['offer_type' => 'activity']) }}" class="group h-full">
-                    <div class="bg-white border border-gray-200 p-6 rounded-lg text-center hover:shadow-lg hover:border-primary/30 transition-all group-hover:scale-105 h-full flex flex-col justify-between">
-                        <div>
-                            <div class="h-16 w-16 mx-auto bg-primary/10 text-primary rounded-full flex items-center justify-center mb-4 group-hover:bg-primary group-hover:text-white transition-colors">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                            </div>
-                            <h3 class="text-lg font-bold text-text-primary mb-2">{{ $offerTypeStats['activities']['label'] ?? 'Activités' }}</h3>
-                            <p class="text-sm text-text-secondary mb-3">{{ $offerTypeStats['activities']['description'] ?? 'Expériences et découvertes locales' }}</p>
-                        </div>
-                        <div>
-                            <div class="text-2xl font-bold text-primary">{{ $offerTypeStats['activities']['count'] ?? 0 }}</div>
-                            <p class="text-xs text-text-secondary">offres disponibles</p>
-                        </div>
-                    </div>
-                </a>
+                <x-offer-type-card
+                    type="activity"
+                    :title="$offerTypeStats['activities']['label'] ?? 'Activités'"
+                    :description="$offerTypeStats['activities']['description'] ?? 'Expériences et découvertes locales'"
+                    :count="$offerTypeStats['activities']['count'] ?? 0"
+                    :url="route('trips.index', ['offer_type' => 'activity'])"
+                    iconColor="primary"
+                />
 
-                <a href="{{ route('trips.index', ['offer_type' => 'custom']) }}" class="group h-full">
-                    <div class="bg-white border border-gray-200 p-6 rounded-lg text-center hover:shadow-lg hover:border-primary/30 transition-all group-hover:scale-105 h-full flex flex-col justify-between">
-                        <div>
-                            <div class="h-16 w-16 mx-auto bg-accent/10 text-accent rounded-full flex items-center justify-center mb-4 group-hover:bg-accent group-hover:text-white transition-colors">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
-                                </svg>
-                            </div>
-                            <h3 class="text-lg font-bold text-text-primary mb-2">{{ $offerTypeStats['custom']['label'] ?? 'Sur mesure' }}</h3>
-                            <p class="text-sm text-text-secondary mb-3">{{ $offerTypeStats['custom']['description'] ?? 'Créez votre voyage personnalisé' }}</p>
-                        </div>
-                        <div>
-                            <div class="text-2xl font-bold text-accent">{{ $offerTypeStats['custom']['count'] ?? 0 }}</div>
-                            <p class="text-xs text-text-secondary">offres disponibles</p>
-                        </div>
-                    </div>
-                </a>
+                <x-offer-type-card
+                    type="custom"
+                    :title="$offerTypeStats['custom']['label'] ?? 'Sur mesure'"
+                    :description="$offerTypeStats['custom']['description'] ?? 'Créez votre voyage personnalisé'"
+                    :count="$offerTypeStats['custom']['count'] ?? 0"
+                    :url="route('trips.index', ['offer_type' => 'custom'])"
+                    iconColor="accent"
+                />
             </div>
 
             <!-- Offres en promotion -->
@@ -170,36 +88,7 @@
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     @foreach($promotionalOffers->take(3) as $offer)
-                    <div class="bg-white rounded-lg shadow-md overflow-hidden relative card">
-                        <!-- Badge de promotion -->
-                        <div class="absolute top-2 left-2 z-10 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-bold">
-                            -{{ $offer->best_discount }}%
-                        </div>
-                        <div class="relative h-48 overflow-hidden">
-                            @if($offer->main_image)
-                                <img src="{{ asset($offer->main_image) }}" alt="{{ $offer->title }}" class="w-full h-full object-cover transition-transform duration-500 hover:scale-110">
-                            @else
-                                <img src="/api/placeholder/600/400?text={{ urlencode($offer->title) }}" alt="{{ $offer->title }}" class="w-full h-full object-cover">
-                            @endif
-                            <div class="absolute top-2 right-2 bg-white/90 px-2 py-1 rounded text-xs font-semibold text-primary">
-                                {{ $offer->offer_type_label }}
-                            </div>
-                        </div>
-                        <div class="p-4">
-                            <h4 class="text-lg font-bold text-text-primary mb-1">{{ $offer->title }}</h4>
-                            <p class="text-sm text-text-secondary mb-2">{{ $offer->destination->name ?? '' }}</p>
-                            <p class="text-xs text-gray-600 mb-3 line-clamp-2">{{ $offer->short_description }}</p>
-                            <div class="flex justify-between items-center">
-                                <div>
-                                    <span class="text-lg font-bold text-primary">{{ $offer->price_display }}</span>
-                                    <span class="text-xs text-gray-500 line-through ml-1">{{ number_format($offer->price * 1.2, 0, ',', ' ') }} €</span>
-                                </div>
-                                <a href="{{ route('trips.show', $offer->slug) }}" class="text-primary hover:text-primary-dark text-sm font-medium">
-                                    Voir →
-                                </a>
-                            </div>
-                        </div>
-                    </div>
+                        <x-trip-card :trip="$offer" :showDiscount="true" :featured="true" />
                     @endforeach
                 </div>
             </div>
@@ -227,34 +116,7 @@
                 <div x-show="activeTab === 'accommodations'" x-transition class="grid grid-cols-1 md:grid-cols-4 gap-6">
                     @if(isset($latestAccommodations))
                         @forelse($latestAccommodations as $accommodation)
-                        <div class="bg-white rounded-lg shadow-md overflow-hidden card">
-                            <div class="relative h-40 overflow-hidden">
-                                @if($accommodation->main_image)
-                                    <img src="{{ asset($accommodation->main_image) }}" alt="{{ $accommodation->title }}" class="w-full h-full object-cover">
-                                @else
-                                    <img src="/api/placeholder/400/300?text=Hébergement" alt="{{ $accommodation->title }}" class="w-full h-full object-cover">
-                                @endif
-                            </div>
-                            <div class="p-4">
-                                <h4 class="font-bold text-text-primary mb-1 truncate">{{ $accommodation->title }}</h4>
-                                <p class="text-sm text-text-secondary mb-2">{{ $accommodation->destination->name ?? '' }}</p>
-                                <div class="flex items-center justify-between">
-                                    <div>
-                                        <span class="text-lg font-bold text-primary">{{ number_format($accommodation->price, 0, ',', ' ') }} €</span>
-                                        <span class="text-xs text-gray-500">/nuit</span>
-                                    </div>
-                                    <div class="flex items-center text-xs text-gray-500">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                                        </svg>
-                                        {{ $accommodation->property_capacity ?? $accommodation->max_travelers }} pers.
-                                    </div>
-                                </div>
-                                <a href="{{ route('trips.show', $accommodation->slug) }}" class="mt-3 block text-center bg-primary/10 text-primary hover:bg-primary hover:text-white py-2 rounded transition-colors text-sm font-medium">
-                                    Voir les détails
-                                </a>
-                            </div>
-                        </div>
+                            <x-trip-card :trip="$accommodation" />
                         @empty
                         <div class="col-span-4 text-center py-8 text-gray-500">
                             Aucun hébergement disponible pour le moment
@@ -271,31 +133,7 @@
                 <div x-show="activeTab === 'organized_trips'" x-transition class="grid grid-cols-1 md:grid-cols-4 gap-6">
                     @if(isset($latestOrganizedTrips))
                         @forelse($latestOrganizedTrips as $trip)
-                        <div class="bg-white rounded-lg shadow-md overflow-hidden card">
-                            <div class="relative h-40 overflow-hidden">
-                                @if($trip->main_image)
-                                    <img src="{{ asset($trip->main_image) }}" alt="{{ $trip->title }}" class="w-full h-full object-cover">
-                                @else
-                                    <img src="/api/placeholder/400/300?text=Séjour" alt="{{ $trip->title }}" class="w-full h-full object-cover">
-                                @endif
-                            </div>
-                            <div class="p-4">
-                                <h4 class="font-bold text-text-primary mb-1 truncate">{{ $trip->title }}</h4>
-                                <p class="text-sm text-text-secondary mb-2">{{ $trip->destination->name ?? '' }}</p>
-                                <div class="flex items-center justify-between mb-2">
-                                    <div>
-                                        <span class="text-lg font-bold text-primary">{{ number_format($trip->price, 0, ',', ' ') }} €</span>
-                                        <span class="text-xs text-gray-500">/pers</span>
-                                    </div>
-                                    <div class="text-xs text-gray-500">
-                                        {{ $trip->duration }} jours
-                                    </div>
-                                </div>
-                                <a href="{{ route('trips.show', $trip->slug) }}" class="block text-center bg-primary/10 text-primary hover:bg-primary hover:text-white py-2 rounded transition-colors text-sm font-medium">
-                                    Voir les détails
-                                </a>
-                            </div>
-                        </div>
+                            <x-trip-card :trip="$trip" />
                         @empty
                         <div class="col-span-4 text-center py-8 text-gray-500">
                             Aucun séjour organisé disponible pour le moment
@@ -312,31 +150,7 @@
                 <div x-show="activeTab === 'activities'" x-transition class="grid grid-cols-1 md:grid-cols-4 gap-6">
                     @if(isset($latestActivities))
                         @forelse($latestActivities as $activity)
-                        <div class="bg-white rounded-lg shadow-md overflow-hidden card">
-                            <div class="relative h-40 overflow-hidden">
-                                @if($activity->main_image)
-                                    <img src="{{ asset($activity->main_image) }}" alt="{{ $activity->title }}" class="w-full h-full object-cover">
-                                @else
-                                    <img src="/api/placeholder/400/300?text=Activité" alt="{{ $activity->title }}" class="w-full h-full object-cover">
-                                @endif
-                            </div>
-                            <div class="p-4">
-                                <h4 class="font-bold text-text-primary mb-1 truncate">{{ $activity->title }}</h4>
-                                <p class="text-sm text-text-secondary mb-2">{{ $activity->destination->name ?? '' }}</p>
-                                <div class="flex items-center justify-between mb-2">
-                                    <div>
-                                        <span class="text-lg font-bold text-primary">{{ number_format($activity->price, 0, ',', ' ') }} €</span>
-                                        <span class="text-xs text-gray-500">/pers</span>
-                                    </div>
-                                    <div class="text-xs text-gray-500">
-                                        {{ $activity->duration_hours ?? 2 }}h
-                                    </div>
-                                </div>
-                                <a href="{{ route('trips.show', $activity->slug) }}" class="block text-center bg-primary/10 text-primary hover:bg-primary hover:text-white py-2 rounded transition-colors text-sm font-medium">
-                                    Voir les détails
-                                </a>
-                            </div>
-                        </div>
+                            <x-trip-card :trip="$activity" />
                         @empty
                         <div class="col-span-4 text-center py-8 text-gray-500">
                             Aucune activité disponible pour le moment
@@ -353,27 +167,7 @@
                 <div x-show="activeTab === 'custom'" x-transition class="grid grid-cols-1 md:grid-cols-4 gap-6">
                     @if(isset($latestCustomOffers))
                         @forelse($latestCustomOffers as $custom)
-                        <div class="bg-white rounded-lg shadow-md overflow-hidden card">
-                            <div class="relative h-40 overflow-hidden">
-                                @if($custom->main_image)
-                                    <img src="{{ asset($custom->main_image) }}" alt="{{ $custom->title }}" class="w-full h-full object-cover">
-                                @else
-                                    <img src="/api/placeholder/400/300?text=Sur+mesure" alt="{{ $custom->title }}" class="w-full h-full object-cover">
-                                @endif
-                            </div>
-                            <div class="p-4">
-                                <h4 class="font-bold text-text-primary mb-1 truncate">{{ $custom->title }}</h4>
-                                <p class="text-sm text-text-secondary mb-2">{{ $custom->destination->name ?? '' }}</p>
-                                <div class="flex items-center justify-between mb-2">
-                                    <div>
-                                        <span class="text-lg font-bold text-accent">Sur devis</span>
-                                    </div>
-                                </div>
-                                <a href="{{ route('trips.show', $custom->slug) }}" class="block text-center bg-accent/10 text-accent hover:bg-accent hover:text-white py-2 rounded transition-colors text-sm font-medium">
-                                    Demander un devis
-                                </a>
-                            </div>
-                        </div>
+                            <x-trip-card :trip="$custom" />
                         @empty
                         <div class="col-span-4 text-center py-8 text-gray-500">
                             Aucune offre sur mesure disponible pour le moment
