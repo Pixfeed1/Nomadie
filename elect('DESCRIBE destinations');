@@ -1,0 +1,30 @@
+[90m= [39m[34;4mIlluminate\Support\Collection[39;24m {#5295
+    [34mall[39m: [
+      {#5294
+        +"[1mid[22m": [35m1[39m,
+        +"[1mname[22m": "[32mAlbanie[39m",
+        +"[1mcontinent_id[22m": [35m6[39m,
+      },
+      {#5291
+        +"[1mid[22m": [35m2[39m,
+        +"[1mname[22m": "[32mAllemagne[39m",
+        +"[1mcontinent_id[22m": [35m6[39m,
+      },
+      {#5290
+        +"[1mid[22m": [35m3[39m,
+        +"[1mname[22m": "[32mAndorre[39m",
+        +"[1mcontinent_id[22m": [35m6[39m,
+      },
+      {#5289
+        +"[1mid[22m": [35m4[39m,
+        +"[1mname[22m": "[32mAutriche[39m",
+        +"[1mcontinent_id[22m": [35m6[39m,
+      },
+      {#5288
+        +"[1mid[22m": [35m5[39m,
+        +"[1mname[22m": "[32mBelgique[39m",
+        +"[1mcontinent_id[22m": [35m6[39m,
+      },
+    ],
+  }
+

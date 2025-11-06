@@ -1,0 +1,40 @@
+[30-Oct-2025 10:00:44 Europe/Paris] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/jurojinn/test2.jewelme.fr/config/broadcasting.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/jurojinn/test2.jewelme.fr/config/broadcasting.php on line 18
+[30-Oct-2025 10:00:44 Europe/Paris] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/jurojinn/test2.jewelme.fr/config/services.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/jurojinn/test2.jewelme.fr/config/services.php on line 18
+[30-Oct-2025 10:00:45 Europe/Paris] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/jurojinn/test2.jewelme.fr/config/session.php:21
+Stack trace:
+#0 {main}
+  thrown in /home/jurojinn/test2.jewelme.fr/config/session.php on line 21
+[30-Oct-2025 10:00:48 Europe/Paris] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/jurojinn/test2.jewelme.fr/config/mail.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/jurojinn/test2.jewelme.fr/config/mail.php on line 16
+[30-Oct-2025 10:00:51 Europe/Paris] PHP Fatal error:  Uncaught Error: Call to undefined function resource_path() in /home/jurojinn/test2.jewelme.fr/config/view.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/jurojinn/test2.jewelme.fr/config/view.php on line 17
+[30-Oct-2025 10:00:52 Europe/Paris] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/jurojinn/test2.jewelme.fr/config/filesystems.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/jurojinn/test2.jewelme.fr/config/filesystems.php on line 16
+[30-Oct-2025 10:00:56 Europe/Paris] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/jurojinn/test2.jewelme.fr/config/queue.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/jurojinn/test2.jewelme.fr/config/queue.php on line 16
+[30-Oct-2025 10:01:00 Europe/Paris] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/jurojinn/test2.jewelme.fr/config/database.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/jurojinn/test2.jewelme.fr/config/database.php on line 18
+[30-Oct-2025 10:01:01 Europe/Paris] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/jurojinn/test2.jewelme.fr/config/app.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/jurojinn/test2.jewelme.fr/config/app.php on line 18
+[30-Oct-2025 10:01:01 Europe/Paris] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/jurojinn/test2.jewelme.fr/config/cache.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/jurojinn/test2.jewelme.fr/config/cache.php on line 18

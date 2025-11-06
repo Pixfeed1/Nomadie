@@ -1,0 +1,48 @@
+// Body
+$body-bg: #f8fafc;
+
+// Typography
+$font-family-sans-serif: 'Nunito', sans-serif;
+$font-size-base: 0.9rem;
+$line-height-base: 1.6;
+
+// Couleurs personnalisées
+$primary: #38B2AC;
+$secondary: #718096;
+$success: #68D391;
+$danger: #FC8181;
+$warning: #F6AD55; // Votre couleur accent
+$info: #4299E1; // Bleu clair, vous pouvez ajuster
+$light: #F7FAFC; // Votre bg-main
+$dark: #2D3748; // Votre text-primary
+
+// Couleurs supplémentaires (disponibles via des variables Sass)
+$primary-dark: #2C7A7B;
+$accent-dark: #DD6B20;
+$bg-alt: #EDF2F7;
+$border-color: #E2E8F0;
+
+// Personnalisation des composants Bootstrap
+$border-radius: 0.375rem;
+$btn-border-radius: 0.375rem;
+
+// Couleurs des boutons
+$btn-box-shadow: none;
+$btn-focus-box-shadow: none;
+$btn-active-box-shadow: none;
+
+// Couleurs de hover pour les boutons
+$btn-hover-bg-shade-amount: 15%;
+$btn-hover-bg-tint-amount: 15%;
+$btn-hover-border-shade-amount: 20%;
+$btn-hover-border-tint-amount: 10%;
+
+// Générer les variables RGB pour les couleurs
+$primary-rgb: red($primary), green($primary), blue($primary);
+$secondary-rgb: red($secondary), green($secondary), blue($secondary);
+$success-rgb: red($success), green($success), blue($success);
+$danger-rgb: red($danger), green($danger), blue($danger);
+$warning-rgb: red($warning), green($warning), blue($warning);
+$info-rgb: red($info), green($info), blue($info);
+$light-rgb: red($light), green($light), blue($light);
+$dark-rgb: red($dark), green($dark), blue($dark);
