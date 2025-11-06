@@ -8,92 +8,26 @@
 <div x-data="dashboardData" class="space-y-6">
     <!-- Stats Cards -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <!-- Vendeurs inscrits -->
-        <div class="bg-white rounded-lg shadow-sm overflow-hidden card">
-            <div class="p-6 flex items-center justify-between">
-                <div>
-                    <p class="text-text-secondary text-sm">Vendeurs inscrits</p>
-                    <p class="text-3xl font-bold text-text-primary mt-1">254</p>
-                    <p class="text-xs text-success font-medium flex items-center mt-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-                        </svg>
-                        +12% ce mois
-                    </p>
-                </div>
-                <div class="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                    </svg>
-                </div>
-            </div>
-            <div class="px-6 py-4 bg-gradient-to-r from-primary/5 to-primary/10 border-t border-primary/10">
-                <a href="{{ route('admin.vendors.index') }}" class="text-sm text-primary hover:text-primary-dark font-medium flex items-center">
-                    Voir tous les vendeurs
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                    </svg>
-                </a>
-            </div>
-        </div>
-        
-        <!-- Ventes générées -->
-        <div class="bg-white rounded-lg shadow-sm overflow-hidden card">
-            <div class="p-6 flex items-center justify-between">
-                <div>
-                    <p class="text-text-secondary text-sm">Ventes générées</p>
-                    <p class="text-3xl font-bold text-text-primary mt-1">7 520 €</p>
-                    <p class="text-xs text-success font-medium flex items-center mt-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-                        </svg>
-                        +8.5% ce mois
-                    </p>
-                </div>
-                <div class="h-16 w-16 rounded-full bg-accent/10 flex items-center justify-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                </div>
-            </div>
-            <div class="px-6 py-4 bg-gradient-to-r from-accent/5 to-accent/10 border-t border-accent/10">
-                <a href="{{ route('admin.orders.index') }}" class="text-sm text-accent-dark hover:text-accent font-medium flex items-center">
-                    Voir les détails
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                    </svg>
-                </a>
-            </div>
-        </div>
-        
-        <!-- Commissions collectées -->
-        <div class="bg-white rounded-lg shadow-sm overflow-hidden card">
-            <div class="p-6 flex items-center justify-between">
-                <div>
-                    <p class="text-text-secondary text-sm">Commissions collectées</p>
-                    <p class="text-3xl font-bold text-text-primary mt-1">752 €</p>
-                    <p class="text-xs text-success font-medium flex items-center mt-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-                        </svg>
-                        +10% ce mois
-                    </p>
-                </div>
-                <div class="h-16 w-16 rounded-full bg-success/10 flex items-center justify-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
-                    </svg>
-                </div>
-            </div>
-            <div class="px-6 py-4 bg-gradient-to-r from-success/5 to-success/10 border-t border-success/10">
-                <a href="{{ route('admin.subscriptions.index') }}" class="text-sm text-success hover:text-success/80 font-medium flex items-center">
-                    Voir les abonnements
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                    </svg>
-                </a>
-            </div>
-        </div>
+        <x-stat-card
+            title="Vendeurs inscrits"
+            value="254"
+            icon="users"
+            color="primary"
+        />
+
+        <x-stat-card
+            title="Ventes générées"
+            value="7 520 €"
+            icon="currency"
+            color="accent"
+        />
+
+        <x-stat-card
+            title="Commissions collectées"
+            value="752 €"
+            icon="wallet"
+            color="success"
+        />
     </div>
     
     <!-- Graphiques et tableaux -->

@@ -41,65 +41,26 @@
     
     <!-- Statistiques rapides -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div class="bg-white rounded-lg shadow-sm overflow-hidden card">
-            <div class="p-6 border-b border-border flex items-center justify-between">
-                <div>
-                    <p class="text-text-secondary text-sm">Vendeurs actifs</p>
-                    <p class="text-3xl font-bold text-text-primary mt-1">3</p>
-                </div>
-                <div class="h-12 w-12 rounded-full bg-success/10 flex items-center justify-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                </div>
-            </div>
-            <div class="px-6 py-3 bg-white flex items-center">
-                <span class="text-xs text-success font-medium flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-                    </svg>
-                    +12.5% ce mois
-                </span>
-            </div>
-        </div>
-        
-        <div class="bg-white rounded-lg shadow-sm overflow-hidden card">
-            <div class="p-6 border-b border-border flex items-center justify-between">
-                <div>
-                    <p class="text-text-secondary text-sm">En attente</p>
-                    <p class="text-3xl font-bold text-text-primary mt-1">1</p>
-                </div>
-                <div class="h-12 w-12 rounded-full bg-accent/10 flex items-center justify-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                </div>
-            </div>
-            <div class="px-6 py-3 bg-white flex items-center">
-                <span class="text-xs text-accent font-medium flex items-center">
-                    En attente d'approbation
-                </span>
-            </div>
-        </div>
-        
-        <div class="bg-white rounded-lg shadow-sm overflow-hidden card">
-            <div class="p-6 border-b border-border flex items-center justify-between">
-                <div>
-                    <p class="text-text-secondary text-sm">Suspendus</p>
-                    <p class="text-3xl font-bold text-text-primary mt-1">1</p>
-                </div>
-                <div class="h-12 w-12 rounded-full bg-error/10 flex items-center justify-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-error" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                    </svg>
-                </div>
-            </div>
-            <div class="px-6 py-3 bg-white flex items-center">
-                <span class="text-xs text-error font-medium flex items-center">
-                    Accès restreint
-                </span>
-            </div>
-        </div>
+        <x-stat-card
+            title="Vendeurs actifs"
+            value="3"
+            icon="check-circle"
+            color="success"
+        />
+
+        <x-stat-card
+            title="En attente"
+            value="1"
+            icon="clock"
+            color="accent"
+        />
+
+        <x-stat-card
+            title="Suspendus"
+            value="1"
+            icon="alert"
+            color="error"
+        />
     </div>
     
     <!-- Tableau des vendeurs -->
