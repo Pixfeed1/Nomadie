@@ -17,74 +17,42 @@
 
     {{-- Messages d'alerte --}}
     @if(session('success'))
-        <div class="alert bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg">
-            {{ session('success') }}
-        </div>
+        <x-alert type="success" :message="session('success')" />
     @endif
 
     @if(session('error'))
-        <div class="alert bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg">
-            {{ session('error') }}
-        </div>
+        <x-alert type="error" :message="session('error')" />
     @endif
 
     {{-- Statistiques --}}
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div class="bg-white rounded-lg shadow-sm p-4">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-xs font-medium text-text-secondary uppercase">Total</p>
-                    <p class="text-2xl font-bold text-text-primary mt-1">{{ $stats['total_bookings'] }}</p>
-                </div>
-                <div class="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
-                    <svg class="h-5 w-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                    </svg>
-                </div>
-            </div>
-        </div>
+        <x-stat-card
+            title="Total"
+            :value="$stats['total_bookings']"
+            icon="calendar"
+            color="primary"
+        />
 
-        <div class="bg-white rounded-lg shadow-sm p-4">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-xs font-medium text-text-secondary uppercase">À venir</p>
-                    <p class="text-2xl font-bold text-text-primary mt-1">{{ $stats['upcoming_bookings'] }}</p>
-                </div>
-                <div class="h-10 w-10 rounded-full bg-accent/10 flex items-center justify-center">
-                    <svg class="h-5 w-5 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
-                </div>
-            </div>
-        </div>
+        <x-stat-card
+            title="À venir"
+            :value="$stats['upcoming_bookings']"
+            icon="clock"
+            color="accent"
+        />
 
-        <div class="bg-white rounded-lg shadow-sm p-4">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-xs font-medium text-text-secondary uppercase">Terminées</p>
-                    <p class="text-2xl font-bold text-text-primary mt-1">{{ $stats['past_bookings'] }}</p>
-                </div>
-                <div class="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center">
-                    <svg class="h-5 w-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
-                </div>
-            </div>
-        </div>
+        <x-stat-card
+            title="Terminées"
+            :value="$stats['past_bookings']"
+            icon="check-circle"
+            color="success"
+        />
 
-        <div class="bg-white rounded-lg shadow-sm p-4">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-xs font-medium text-text-secondary uppercase">Total dépensé</p>
-                    <p class="text-2xl font-bold text-text-primary mt-1">{{ number_format($stats['total_spent'], 0, ',', ' ') }} €</p>
-                </div>
-                <div class="h-10 w-10 rounded-full bg-yellow-100 flex items-center justify-center">
-                    <svg class="h-5 w-5 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
-                </div>
-            </div>
-        </div>
+        <x-stat-card
+            title="Total dépensé"
+            :value="number_format($stats['total_spent'], 0, ',', ' ') . ' €'"
+            icon="currency"
+            color="warning"
+        />
     </div>
 
     @if($bookings->isEmpty())

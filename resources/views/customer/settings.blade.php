@@ -18,15 +18,11 @@
 
     {{-- Messages d'alerte --}}
     @if(session('success'))
-        <div class="alert bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg">
-            {{ session('success') }}
-        </div>
+        <x-alert type="success" :message="session('success')" />
     @endif
 
     @if(session('error'))
-        <div class="alert bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg">
-            {{ session('error') }}
-        </div>
+        <x-alert type="error" :message="session('error')" />
     @endif
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">

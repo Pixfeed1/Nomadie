@@ -18,9 +18,7 @@
 
     {{-- Messages d'alerte --}}
     @if(session('success'))
-        <div class="alert bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg">
-            {{ session('success') }}
-        </div>
+        <x-alert type="success" :message="session('success')" />
     @endif
 
     @if($reviews->isEmpty())
