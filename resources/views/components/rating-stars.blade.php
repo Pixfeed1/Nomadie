@@ -4,6 +4,8 @@
     'showValue' => true,
     'count' => null,         // Nombre d'avis (optionnel)
     'interactive' => false,  // Si true, permet la sélection
+    'name' => 'rating',      // Name pour le input (si interactive)
+    'required' => false,     // Required pour le input (si interactive)
 ])
 
 @php
@@ -29,44 +31,59 @@ $emptyStars = 5 - $fullStars - ($hasHalfStar ? 1 : 0);
 
 <div class="flex items-center gap-1 sm:gap-2" {{ $attributes }}>
     {{-- Stars --}}
-    <div class="flex items-center gap-0.5">
-        {{-- Full stars --}}
-        @for($i = 0; $i < $fullStars; $i++)
-        <svg class="{{ $starSize }} text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-        </svg>
-        @endfor
+    @if($interactive)
+        {{-- Interactive stars (for forms) --}}
+        <div class="flex items-center gap-0.5">
+            @for($i = 1; $i <= 5; $i++)
+            <label class="cursor-pointer">
+                <input type="radio" name="{{ $name }}" value="{{ $i }}" class="hidden peer" {{ $required ? 'required' : '' }} {{ old($name) == $i ? 'checked' : '' }}>
+                <svg xmlns="http://www.w3.org/2000/svg" class="{{ $starSize }} text-gray-300 peer-checked:text-yellow-400 hover:text-yellow-300 transition-colors" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                </svg>
+            </label>
+            @endfor
+        </div>
+    @else
+        {{-- Display-only stars --}}
+        <div class="flex items-center gap-0.5">
+            {{-- Full stars --}}
+            @for($i = 0; $i < $fullStars; $i++)
+            <svg class="{{ $starSize }} text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+            </svg>
+            @endfor
 
-        {{-- Half star --}}
-        @if($hasHalfStar)
-        <svg class="{{ $starSize }} text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-            <defs>
-                <linearGradient id="half-{{ $size }}">
-                    <stop offset="50%" stop-color="currentColor"/>
-                    <stop offset="50%" stop-color="#D1D5DB" stop-opacity="1"/>
-                </linearGradient>
-            </defs>
-            <path fill="url(#half-{{ $size }})" d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-        </svg>
-        @endif
+            {{-- Half star --}}
+            @if($hasHalfStar)
+            <svg class="{{ $starSize }} text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                <defs>
+                    <linearGradient id="half-{{ $size }}">
+                        <stop offset="50%" stop-color="currentColor"/>
+                        <stop offset="50%" stop-color="#D1D5DB" stop-opacity="1"/>
+                    </linearGradient>
+                </defs>
+                <path fill="url(#half-{{ $size }})" d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+            </svg>
+            @endif
 
-        {{-- Empty stars --}}
-        @for($i = 0; $i < $emptyStars; $i++)
-        <svg class="{{ $starSize }} text-gray-300" fill="currentColor" viewBox="0 0 20 20">
-            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-        </svg>
-        @endfor
-    </div>
+            {{-- Empty stars --}}
+            @for($i = 0; $i < $emptyStars; $i++)
+            <svg class="{{ $starSize }} text-gray-300" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+            </svg>
+            @endfor
+        </div>
+    @endif
 
     {{-- Rating value --}}
-    @if($showValue)
+    @if($showValue && !$interactive)
     <span class="{{ $textSize }} font-medium text-gray-700">
         {{ number_format($rating, 1) }}
     </span>
     @endif
 
     {{-- Review count --}}
-    @if($count !== null)
+    @if($count !== null && !$interactive)
     <span class="{{ $textSize }} text-gray-500">
         ({{ $count }})
     </span>
