@@ -30,37 +30,16 @@
                     </p>
                     
                     <ul class="space-y-3">
-                        <li class="flex items-start">
-                            <svg class="h-5 w-5 text-success mt-0.5 mr-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                            </svg>
-                            <span class="text-sm text-text-secondary">Hébergements, séjours et activités disponibles</span>
-                        </li>
-                        <li class="flex items-start">
-                            <svg class="h-5 w-5 text-success mt-0.5 mr-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                            </svg>
-                            <span class="text-sm text-text-secondary">Réservation en ligne sécurisée</span>
-                        </li>
-                        <li class="flex items-start">
-                            <svg class="h-5 w-5 text-success mt-0.5 mr-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                            </svg>
-                            <span class="text-sm text-text-secondary">Historique de vos réservations</span>
-                        </li>
-                        <li class="flex items-start">
-                            <svg class="h-5 w-5 text-success mt-0.5 mr-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                            </svg>
-                            <span class="text-sm text-text-secondary">Avis et recommandations personnalisés</span>
-                        </li>
+                        <x-checkmark-item color="success">Hébergements, séjours et activités disponibles</x-checkmark-item>
+                        <x-checkmark-item color="success">Réservation en ligne sécurisée</x-checkmark-item>
+                        <x-checkmark-item color="success">Historique de vos réservations</x-checkmark-item>
+                        <x-checkmark-item color="success">Avis et recommandations personnalisés</x-checkmark-item>
                     </ul>
-                    
+
                     <div class="pt-4">
-                        <a href="{{ route('register') }}" 
-                           class="block w-full py-3 px-4 border-2 border-primary rounded-md shadow-sm text-center text-primary hover:bg-primary hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all">
+                        <x-button href="{{ route('register') }}" variant="outline" size="lg" :fullWidth="true">
                             Créer mon compte membre
-                        </a>
+                        </x-button>
                     </div>
                 </div>
             </div>
@@ -92,37 +71,16 @@
                     </p>
                     
                     <ul class="space-y-3">
-                        <li class="flex items-start">
-                            <svg class="h-5 w-5 text-primary mt-0.5 mr-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                            </svg>
-                            <span class="text-sm text-text-secondary">Créez et gérez vos offres (hébergements, séjours, activités)</span>
-                        </li>
-                        <li class="flex items-start">
-                            <svg class="h-5 w-5 text-primary mt-0.5 mr-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                            </svg>
-                            <span class="text-sm text-text-secondary">Tableau de bord professionnel complet</span>
-                        </li>
-                        <li class="flex items-start">
-                            <svg class="h-5 w-5 text-primary mt-0.5 mr-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                            </svg>
-                            <span class="text-sm text-text-secondary">Gestion des réservations et paiements</span>
-                        </li>
-                        <li class="flex items-start">
-                            <svg class="h-5 w-5 text-primary mt-0.5 mr-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                            </svg>
-                            <span class="text-sm text-text-secondary">Visibilité auprès de milliers de clients</span>
-                        </li>
+                        <x-checkmark-item color="primary">Créez et gérez vos offres (hébergements, séjours, activités)</x-checkmark-item>
+                        <x-checkmark-item color="primary">Tableau de bord professionnel complet</x-checkmark-item>
+                        <x-checkmark-item color="primary">Gestion des réservations et paiements</x-checkmark-item>
+                        <x-checkmark-item color="primary">Visibilité auprès de milliers de clients</x-checkmark-item>
                     </ul>
-                    
+
                     <div class="pt-4">
-                        <a href="{{ route('vendor.register') }}" 
-                           class="block w-full py-3 px-4 border-2 border-primary rounded-md shadow-sm text-center text-primary hover:bg-primary hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all">
+                        <x-button href="{{ route('vendor.register') }}" variant="outline" size="lg" :fullWidth="true">
                             Devenir organisateur
-                        </a>
+                        </x-button>
                     </div>
                 </div>
             </div>

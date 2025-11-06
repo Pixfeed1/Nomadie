@@ -15,28 +15,32 @@
                 @csrf
                 
                 @if ($errors->any())
-                <div class="bg-error/10 text-error p-4 rounded-lg mb-4">
+                <x-alert type="error">
                     <ul class="list-disc list-inside text-sm">
                         @foreach ($errors->all() as $error)
                             <li>{{ $error }}</li>
                         @endforeach
                     </ul>
-                </div>
+                </x-alert>
                 @endif
                 
-                <div>
-                    <label for="email" class="block text-sm font-medium text-text-primary mb-1">Adresse email</label>
-                    <input type="email" id="email" name="email" value="{{ old('email') }}" class="w-full px-4 py-3 border border-border rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary" placeholder="votre@email.com" required autofocus>
-                </div>
+                <x-input
+                    type="email"
+                    name="email"
+                    label="Adresse email"
+                    placeholder="votre@email.com"
+                    :required="true"
+                    autofocus
+                />
                 
                 <div>
-                    <div class="flex items-center justify-between">
-                        <label for="password" class="block text-sm font-medium text-text-primary mb-1">Mot de passe</label>
+                    <div class="flex items-center justify-between mb-1">
+                        <label for="password" class="block text-sm font-medium text-text-primary">Mot de passe</label>
                         <a href="{{ route('password.request') }}" class="text-sm text-primary hover:text-primary-dark">
                             Mot de passe oublié ?
                         </a>
                     </div>
-                    <input type="password" id="password" name="password" class="w-full px-4 py-3 border border-border rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary" placeholder="••••••••" required>
+                    <input type="password" id="password" name="password" class="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary" placeholder="••••••••" required>
                 </div>
                 
                 <div class="flex items-center">
@@ -46,17 +50,11 @@
                     </label>
                 </div>
                 
-                <div>
-                    <button type="submit" class="w-full px-4 py-3 bg-primary hover:bg-primary-dark text-white font-medium rounded-lg transition-colors">
-                        Se connecter
-                    </button>
-                </div>
+                <x-button type="submit" variant="primary" size="lg" :fullWidth="true">
+                    Se connecter
+                </x-button>
                 
-                <div class="relative flex py-3 items-center">
-                    <div class="flex-grow border-t border-border"></div>
-                    <span class="flex-shrink mx-4 text-text-secondary text-sm">ou</span>
-                    <div class="flex-grow border-t border-border"></div>
-                </div>
+                <x-divider text="ou" />
                 
                 <div>
                     <a href="{{ route('login.google') }}" class="flex items-center justify-center w-full px-4 py-3 border border-border rounded-lg hover:bg-bg-alt transition-colors text-text-primary">

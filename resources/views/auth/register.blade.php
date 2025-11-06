@@ -53,48 +53,47 @@
                 <div class="form-step" id="step1">
                     <h3 class="text-lg font-semibold text-text-primary border-b border-gray-200 pb-2 mb-4">Informations personnelles</h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <label for="name" class="block text-sm font-medium text-text-secondary mb-1">Nom complet</label>
-                            <input id="name" type="text" class="block w-full rounded-md border-border shadow-sm focus:border-primary focus:ring-primary sm:text-sm p-2.5 @error('name') border-red-500 @enderror" 
-                                   name="name" value="{{ old('name') }}" required autocomplete="name" autofocus>
-                            @error('name')
-                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                            @enderror
-                        </div>
-                        
-                        <div>
-                            <label for="email" class="block text-sm font-medium text-text-secondary mb-1">Adresse email</label>
-                            <input id="email" type="email" class="block w-full rounded-md border-border shadow-sm focus:border-primary focus:ring-primary sm:text-sm p-2.5 @error('email') border-red-500 @enderror" 
-                                   name="email" value="{{ old('email') }}" required autocomplete="email">
-                            @error('email')
-                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                            @enderror
-                        </div>
-                        
-                        <div>
-                            <label for="password" class="block text-sm font-medium text-text-secondary mb-1">Mot de passe</label>
-                            <input id="password" type="password" class="block w-full rounded-md border-border shadow-sm focus:border-primary focus:ring-primary sm:text-sm p-2.5 @error('password') border-red-500 @enderror" 
-                                   name="password" required autocomplete="new-password">
-                            <p class="mt-1 text-xs text-text-secondary">8 caractères minimum, avec chiffres et lettres</p>
-                            @error('password')
-                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                            @enderror
-                        </div>
-                        
-                        <div>
-                            <label for="password-confirm" class="block text-sm font-medium text-text-secondary mb-1">Confirmer le mot de passe</label>
-                            <input id="password-confirm" type="password" class="block w-full rounded-md border-border shadow-sm focus:border-primary focus:ring-primary sm:text-sm p-2.5" 
-                                   name="password_confirmation" required autocomplete="new-password">
-                        </div>
-                        
-                        <div>
-                            <label for="phone" class="block text-sm font-medium text-text-secondary mb-1">Téléphone</label>
-                            <input id="phone" type="text" class="block w-full rounded-md border-border shadow-sm focus:border-primary focus:ring-primary sm:text-sm p-2.5 @error('phone') border-red-500 @enderror" 
-                                   name="phone" value="{{ old('phone') }}" required>
-                            @error('phone')
-                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                            @enderror
-                        </div>
+                        <x-input
+                            type="text"
+                            name="name"
+                            label="Nom complet"
+                            :required="true"
+                            autocomplete="name"
+                            autofocus
+                        />
+
+                        <x-input
+                            type="email"
+                            name="email"
+                            label="Adresse email"
+                            :required="true"
+                            autocomplete="email"
+                        />
+
+                        <x-input
+                            type="password"
+                            name="password"
+                            label="Mot de passe"
+                            hint="8 caractères minimum, avec chiffres et lettres"
+                            :required="true"
+                            autocomplete="new-password"
+                        />
+
+                        <x-input
+                            type="password"
+                            id="password-confirm"
+                            name="password_confirmation"
+                            label="Confirmer le mot de passe"
+                            :required="true"
+                            autocomplete="new-password"
+                        />
+
+                        <x-input
+                            type="text"
+                            name="phone"
+                            label="Téléphone"
+                            :required="true"
+                        />
                     </div>
                     
                     <div class="mt-8 flex justify-end">
@@ -111,70 +110,56 @@
                 <div class="form-step hidden" id="step2">
                     <h3 class="text-lg font-semibold text-text-primary border-b border-gray-200 pb-2 mb-4">Informations sur l'entreprise</h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <label for="company_name" class="block text-sm font-medium text-text-secondary mb-1">Nom de l'entreprise</label>
-                            <input id="company_name" type="text" class="block w-full rounded-md border-border shadow-sm focus:border-primary focus:ring-primary sm:text-sm p-2.5 @error('company_name') border-red-500 @enderror" 
-                                   name="company_name" value="{{ old('company_name') }}" required>
-                            @error('company_name')
-                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                            @enderror
-                        </div>
-                        
-                        <div>
-                            <label for="company_website" class="block text-sm font-medium text-text-secondary mb-1">Site web</label>
-                            <input id="company_website" type="url" class="block w-full rounded-md border-border shadow-sm focus:border-primary focus:ring-primary sm:text-sm p-2.5 @error('company_website') border-red-500 @enderror" 
-                                   name="company_website" value="{{ old('company_website') }}">
-                            @error('company_website')
-                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                            @enderror
-                        </div>
-                        
-                        <div>
-                            <label for="company_siret" class="block text-sm font-medium text-text-secondary mb-1">Numéro SIRET</label>
-                            <input id="company_siret" type="text" class="block w-full rounded-md border-border shadow-sm focus:border-primary focus:ring-primary sm:text-sm p-2.5 @error('company_siret') border-red-500 @enderror" 
-                                   name="company_siret" value="{{ old('company_siret') }}" required>
-                            @error('company_siret')
-                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                            @enderror
-                        </div>
-                        
-                        <div>
-                            <label for="company_vat" class="block text-sm font-medium text-text-secondary mb-1">Numéro de TVA <span class="text-text-secondary text-xs">(optionnel)</span></label>
-                            <input id="company_vat" type="text" class="block w-full rounded-md border-border shadow-sm focus:border-primary focus:ring-primary sm:text-sm p-2.5 @error('company_vat') border-red-500 @enderror" 
-                                   name="company_vat" value="{{ old('company_vat') }}">
-                            <p class="mt-1 text-xs text-text-secondary">Pour les entreprises assujetties à la TVA (format FR12345678901)</p>
-                            @error('company_vat')
-                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                            @enderror
-                        </div>
-                        
-                        <div>
-                            <label for="company_address" class="block text-sm font-medium text-text-secondary mb-1">Adresse de l'entreprise</label>
-                            <input id="company_address" type="text" class="block w-full rounded-md border-border shadow-sm focus:border-primary focus:ring-primary sm:text-sm p-2.5 @error('company_address') border-red-500 @enderror" 
-                                   name="company_address" value="{{ old('company_address') }}" required>
-                            @error('company_address')
-                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                            @enderror
-                        </div>
-                        
+                        <x-input
+                            type="text"
+                            name="company_name"
+                            label="Nom de l'entreprise"
+                            :required="true"
+                        />
+
+                        <x-input
+                            type="url"
+                            name="company_website"
+                            label="Site web"
+                        />
+
+                        <x-input
+                            type="text"
+                            name="company_siret"
+                            label="Numéro SIRET"
+                            :required="true"
+                        />
+
+                        <x-input
+                            type="text"
+                            name="company_vat"
+                            label="Numéro de TVA (optionnel)"
+                            hint="Pour les entreprises assujetties à la TVA (format FR12345678901)"
+                        />
+
+                        <x-input
+                            type="text"
+                            name="company_address"
+                            label="Adresse de l'entreprise"
+                            :required="true"
+                        />
+
                         <div>
                             <label for="company_logo" class="block text-sm font-medium text-text-secondary mb-1">Logo de l'entreprise</label>
-                            <input id="company_logo" type="file" class="block w-full rounded-md border-border shadow-sm focus:border-primary focus:ring-primary sm:text-sm p-2.5 @error('company_logo') border-red-500 @enderror" 
+                            <input id="company_logo" type="file" class="block w-full rounded-md border-border shadow-sm focus:border-primary focus:ring-primary sm:text-sm p-2.5 @error('company_logo') border-red-500 @enderror"
                                    name="company_logo" accept="image/*">
                             <p class="mt-1 text-xs text-text-secondary">Format recommandé: PNG ou JPG, max 2Mo</p>
                             @error('company_logo')
                                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                             @enderror
                         </div>
-                        
-                        <div class="md:col-span-2">
-                            <label for="company_description" class="block text-sm font-medium text-text-secondary mb-1">Description de l'entreprise</label>
-                            <textarea id="company_description" class="block w-full rounded-md border-border shadow-sm focus:border-primary focus:ring-primary sm:text-sm p-2.5 @error('company_description') border-red-500 @enderror" 
-                                      name="company_description" rows="4">{{ old('company_description') }}</textarea>
-                            @error('company_description')
-                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                            @enderror
-                        </div>
+
+                        <x-textarea
+                            name="company_description"
+                            label="Description de l'entreprise"
+                            :rows="4"
+                            class="md:col-span-2"
+                        />
                     </div>
                     
                     <div class="mt-8 flex justify-between">
@@ -197,39 +182,41 @@
                 <div class="form-step hidden" id="step3">
                     <h3 class="text-lg font-semibold text-text-primary border-b border-gray-200 pb-2 mb-4">Spécialités et régions</h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <label for="specialties" class="block text-sm font-medium text-text-secondary mb-1">Types de voyages proposés</label>
-                            <select id="specialties" class="block w-full rounded-md border-border shadow-sm focus:border-primary focus:ring-primary sm:text-sm p-2.5 @error('specialties') border-red-500 @enderror" 
-                                    name="specialties[]" multiple required>
-                                <option value="aventure" {{ in_array('aventure', old('specialties', [])) ? 'selected' : '' }}>Aventure</option>
-                                <option value="culturel" {{ in_array('culturel', old('specialties', [])) ? 'selected' : '' }}>Culturel</option>
-                                <option value="gastronomique" {{ in_array('gastronomique', old('specialties', [])) ? 'selected' : '' }}>Gastronomique</option>
-                                <option value="detente" {{ in_array('detente', old('specialties', [])) ? 'selected' : '' }}>Détente</option>
-                                <option value="sportif" {{ in_array('sportif', old('specialties', [])) ? 'selected' : '' }}>Sportif</option>
-                            </select>
-                            <p class="mt-1 text-xs text-text-secondary">Maintenez Ctrl pour sélectionner plusieurs options</p>
-                            @error('specialties')
-                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                            @enderror
-                        </div>
-                        
-                        <div>
-                            <label for="regions" class="block text-sm font-medium text-text-secondary mb-1">Régions proposées</label>
-                            <select id="regions" class="block w-full rounded-md border-border shadow-sm focus:border-primary focus:ring-primary sm:text-sm p-2.5 @error('regions') border-red-500 @enderror" 
-                                    name="regions[]" multiple required>
-                                <option value="europe" {{ in_array('europe', old('regions', [])) ? 'selected' : '' }}>Europe</option>
-                                <option value="asie" {{ in_array('asie', old('regions', [])) ? 'selected' : '' }}>Asie</option>
-                                <option value="afriqueN" {{ in_array('afriqueN', old('regions', [])) ? 'selected' : '' }}>Afrique du Nord</option>
-                                <option value="afriqueS" {{ in_array('afriqueS', old('regions', [])) ? 'selected' : '' }}>Afrique Subsaharienne</option>
-                                <option value="amerique_nord" {{ in_array('amerique_nord', old('regions', [])) ? 'selected' : '' }}>Amérique du Nord</option>
-                                <option value="amerique_sud" {{ in_array('amerique_sud', old('regions', [])) ? 'selected' : '' }}>Amérique du Sud</option>
-                                <option value="oceanie" {{ in_array('oceanie', old('regions', [])) ? 'selected' : '' }}>Océanie</option>
-                            </select>
-                            <p class="mt-1 text-xs text-text-secondary">Maintenez Ctrl pour sélectionner plusieurs options</p>
-                            @error('regions')
-                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                            @enderror
-                        </div>
+                        <x-select
+                            name="specialties[]"
+                            label="Types de voyages proposés"
+                            :options="[
+                                'aventure' => 'Aventure',
+                                'culturel' => 'Culturel',
+                                'gastronomique' => 'Gastronomique',
+                                'detente' => 'Détente',
+                                'sportif' => 'Sportif'
+                            ]"
+                            :selected="old('specialties', [])"
+                            :required="true"
+                            hint="Maintenez Ctrl pour sélectionner plusieurs options"
+                            multiple
+                            placeholder=""
+                        />
+
+                        <x-select
+                            name="regions[]"
+                            label="Régions proposées"
+                            :options="[
+                                'europe' => 'Europe',
+                                'asie' => 'Asie',
+                                'afriqueN' => 'Afrique du Nord',
+                                'afriqueS' => 'Afrique Subsaharienne',
+                                'amerique_nord' => 'Amérique du Nord',
+                                'amerique_sud' => 'Amérique du Sud',
+                                'oceanie' => 'Océanie'
+                            ]"
+                            :selected="old('regions', [])"
+                            :required="true"
+                            hint="Maintenez Ctrl pour sélectionner plusieurs options"
+                            multiple
+                            placeholder=""
+                        />
                     </div>
                 
                     <div class="mt-8 border-t border-gray-200 pt-6">

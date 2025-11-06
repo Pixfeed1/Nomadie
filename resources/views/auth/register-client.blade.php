@@ -18,82 +18,54 @@
 
                 <!-- Nom et Prénom -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label for="lastname" class="block text-sm font-medium text-text-primary mb-1">
-                            Nom <span class="text-error">*</span>
-                        </label>
-                        <input type="text" id="lastname" name="lastname" 
-                               class="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary @error('lastname') border-error @enderror" 
-                               value="{{ old('lastname') }}" required>
-                        @error('lastname')
-                            <p class="text-xs text-error mt-1">{{ $message }}</p>
-                        @enderror
-                    </div>
+                    <x-input
+                        type="text"
+                        name="lastname"
+                        label="Nom"
+                        :required="true"
+                    />
 
-                    <div>
-                        <label for="firstname" class="block text-sm font-medium text-text-primary mb-1">
-                            Prénom <span class="text-error">*</span>
-                        </label>
-                        <input type="text" id="firstname" name="firstname" 
-                               class="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary @error('firstname') border-error @enderror" 
-                               value="{{ old('firstname') }}" required>
-                        @error('firstname')
-                            <p class="text-xs text-error mt-1">{{ $message }}</p>
-                        @enderror
-                    </div>
+                    <x-input
+                        type="text"
+                        name="firstname"
+                        label="Prénom"
+                        :required="true"
+                    />
                 </div>
 
                 <!-- Pseudo -->
-                <div>
-                    <label for="pseudo" class="block text-sm font-medium text-text-primary mb-1">
-                        Pseudo <span class="text-text-secondary text-xs">(optionnel)</span>
-                    </label>
-                    <input type="text" id="pseudo" name="pseudo" 
-                           class="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary @error('pseudo') border-error @enderror" 
-                           value="{{ old('pseudo') }}"
-                           placeholder="Comment souhaitez-vous être affiché ?">
-                    <p class="text-xs text-text-secondary mt-1">Si vide, nous utiliserons votre prénom</p>
-                    @error('pseudo')
-                        <p class="text-xs text-error mt-1">{{ $message }}</p>
-                    @enderror
-                </div>
+                <x-input
+                    type="text"
+                    name="pseudo"
+                    label="Pseudo (optionnel)"
+                    placeholder="Comment souhaitez-vous être affiché ?"
+                    hint="Si vide, nous utiliserons votre prénom"
+                />
 
                 <!-- Email -->
-                <div>
-                    <label for="email" class="block text-sm font-medium text-text-primary mb-1">
-                        Adresse email <span class="text-error">*</span>
-                    </label>
-                    <input type="email" id="email" name="email" 
-                           class="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary @error('email') border-error @enderror" 
-                           value="{{ old('email') }}" required>
-                    @error('email')
-                        <p class="text-xs text-error mt-1">{{ $message }}</p>
-                    @enderror
-                </div>
+                <x-input
+                    type="email"
+                    name="email"
+                    label="Adresse email"
+                    :required="true"
+                />
 
                 <!-- Mot de passe -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label for="password" class="block text-sm font-medium text-text-primary mb-1">
-                            Mot de passe <span class="text-error">*</span>
-                        </label>
-                        <input type="password" id="password" name="password" 
-                               class="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary @error('password') border-error @enderror" 
-                               required>
-                        <p class="text-xs text-text-secondary mt-1">8 caractères minimum</p>
-                        @error('password')
-                            <p class="text-xs text-error mt-1">{{ $message }}</p>
-                        @enderror
-                    </div>
+                    <x-input
+                        type="password"
+                        name="password"
+                        label="Mot de passe"
+                        hint="8 caractères minimum"
+                        :required="true"
+                    />
 
-                    <div>
-                        <label for="password_confirmation" class="block text-sm font-medium text-text-primary mb-1">
-                            Confirmer le mot de passe <span class="text-error">*</span>
-                        </label>
-                        <input type="password" id="password_confirmation" name="password_confirmation" 
-                               class="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary" 
-                               required>
-                    </div>
+                    <x-input
+                        type="password"
+                        name="password_confirmation"
+                        label="Confirmer le mot de passe"
+                        :required="true"
+                    />
                 </div>
 
                 <!-- Photo de profil -->
@@ -146,9 +118,9 @@
                 </div>
 
                 <!-- Bouton submit -->
-                <button type="submit" class="w-full py-3 px-4 border border-transparent rounded-md shadow-sm text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors">
+                <x-button type="submit" variant="primary" size="lg" :fullWidth="true">
                     Créer mon compte
-                </button>
+                </x-button>
 
                 <!-- Lien connexion -->
                 <p class="text-center text-sm text-text-secondary">
