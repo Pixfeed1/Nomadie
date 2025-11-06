@@ -12,37 +12,19 @@
 }">
     <!-- Statistiques en haut -->
     <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-        <!-- Badges débloqués -->
-        <div class="bg-white rounded-lg shadow-sm p-4">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-xs text-text-secondary uppercase">Badges débloqués</p>
-                    <p class="text-2xl font-bold text-text-primary mt-1">
-                        {{ $stats['unlocked_count'] }}/{{ $stats['total_badges'] }}
-                    </p>
-                </div>
-                <div class="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
-                    <svg class="h-5 w-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-                    </svg>
-                </div>
-            </div>
-        </div>
+        <x-stat-card
+            title="Badges débloqués"
+            :value="$stats['unlocked_count'] . '/' . $stats['total_badges']"
+            icon="star"
+            color="primary"
+        />
 
-        <!-- Progression globale -->
-        <div class="bg-white rounded-lg shadow-sm p-4">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-xs text-text-secondary uppercase">Progression globale</p>
-                    <p class="text-2xl font-bold text-text-primary mt-1">{{ $stats['completion_percentage'] }}%</p>
-                </div>
-                <div class="h-10 w-10 rounded-full bg-accent/10 flex items-center justify-center">
-                    <svg class="h-5 w-5 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                    </svg>
-                </div>
-            </div>
-        </div>
+        <x-stat-card
+            title="Progression globale"
+            :value="$stats['completion_percentage'] . '%'"
+            icon="chart"
+            color="accent"
+        />
 
         <!-- Prochain badge -->
         <div class="bg-white rounded-lg shadow-sm p-4">
