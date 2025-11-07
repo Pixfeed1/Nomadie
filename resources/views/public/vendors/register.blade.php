@@ -274,36 +274,43 @@
                             <h2 class="text-xl font-semibold text-text-primary mb-4">Informations générales</h2>
                             
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div>
-                                    <label for="company_name" class="block text-sm font-medium text-text-primary mb-1 form-required">Nom de l'entreprise</label>
-                                    <input type="text" id="company_name" name="company_name" class="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary" placeholder="Nom de votre société ou entreprise" required value="{{ old('company_name') }}">
-                                    @error('company_name')<p class="text-xs text-error mt-1" data-field="company_name">{{ $message }}</p>@enderror
-                                </div>
-                                
-                                <div>
-                                    <label for="legal_status" class="block text-sm font-medium text-text-primary mb-1 form-required">Statut juridique</label>
-                                    <select id="legal_status" name="legal_status" class="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary" required>
-                                        <option value="">Sélectionnez</option>
-                                        <option value="sarl" {{ old('legal_status') == 'sarl' ? 'selected' : '' }}>SARL</option>
-                                        <option value="sas" {{ old('legal_status') == 'sas' ? 'selected' : '' }}>SAS</option>
-                                        <option value="ei" {{ old('legal_status') == 'ei' ? 'selected' : '' }}>Entreprise Individuelle</option>
-                                        <option value="other" {{ old('legal_status') == 'other' ? 'selected' : '' }}>Autre</option>
-                                    </select>
-                                    @error('legal_status')<p class="text-xs text-error mt-1" data-field="legal_status">{{ $message }}</p>@enderror
-                                </div>
-                                
-                                <div>
-                                    <label for="siret" class="block text-sm font-medium text-text-primary mb-1 form-required">Numéro SIRET</label>
-                                    <input type="text" id="siret" name="siret" class="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary" placeholder="123 456 789 00012" required value="{{ old('siret') }}">
-                                    <p class="text-xs text-text-secondary mt-1">14 chiffres, formatage automatique</p>
-                                    @error('siret')<p class="text-xs text-error mt-1" data-field="siret">{{ $message }}</p>@enderror
-                                </div>
+                                <x-input
+                                    type="text"
+                                    name="company_name"
+                                    label="Nom de l'entreprise"
+                                    placeholder="Nom de votre société ou entreprise"
+                                    :required="true"
+                                />
 
-                                <div>
-                                    <label for="vat" class="block text-sm font-medium text-text-primary mb-1">Numéro de TVA</label>
-                                    <input type="text" id="vat" name="vat" class="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary" placeholder="FR 12 123456789" value="{{ old('vat') }}">
-                                    @error('vat')<p class="text-xs text-error mt-1" data-field="vat">{{ $message }}</p>@enderror
-                                </div>
+                                <x-select
+                                    name="legal_status"
+                                    label="Statut juridique"
+                                    :options="[
+                                        '' => 'Sélectionnez',
+                                        'sarl' => 'SARL',
+                                        'sas' => 'SAS',
+                                        'ei' => 'Entreprise Individuelle',
+                                        'other' => 'Autre'
+                                    ]"
+                                    :selected="old('legal_status')"
+                                    :required="true"
+                                />
+
+                                <x-input
+                                    type="text"
+                                    name="siret"
+                                    label="Numéro SIRET"
+                                    placeholder="123 456 789 00012"
+                                    hint="14 chiffres, formatage automatique"
+                                    :required="true"
+                                />
+
+                                <x-input
+                                    type="text"
+                                    name="vat"
+                                    label="Numéro de TVA"
+                                    placeholder="FR 12 123456789"
+                                />
                             </div>
                         </div>
 
@@ -312,55 +319,69 @@
                             <h2 class="text-xl font-semibold text-text-primary mb-4">Coordonnées de l'entreprise</h2>
 
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div>
-                                    <label for="email" class="block text-sm font-medium text-text-primary mb-1 form-required">Email principal de contact</label>
-                                    <input type="email" id="email" name="email" class="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary" placeholder="contact@votreentreprise.com" required value="{{ old('email') }}">
-                                    <p class="text-xs text-text-secondary mt-1">Email utilisé pour les notifications de l'entreprise</p>
-                                    @error('email')<p class="text-xs text-error mt-1" data-field="email">{{ $message }}</p>@enderror
-                                </div>
-                                
-                                <div>
-                                    <label for="phone" class="block text-sm font-medium text-text-primary mb-1 form-required">Téléphone</label>
-                                    <input type="tel" id="phone" name="phone" class="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary" placeholder="+33 6 12 34 56 78" required value="{{ old('phone') }}">
-                                    @error('phone')<p class="text-xs text-error mt-1" data-field="phone">{{ $message }}</p>@enderror
-                                </div>
-                                
-                                <div>
-                                    <label for="website" class="block text-sm font-medium text-text-primary mb-1">Site internet</label>
-                                    <input type="url" id="website" name="website" class="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary" placeholder="www.votresite.com" value="{{ old('website') }}">
-                                    <p class="text-xs text-text-secondary mt-1">Le https:// sera ajouté automatiquement</p>
-                                    @error('website')<p class="text-xs text-error mt-1" data-field="website">{{ $message }}</p>@enderror
-                                </div>
-                                
-                                <div>
-                                    <label for="address" class="block text-sm font-medium text-text-primary mb-1 form-required">Adresse</label>
-                                    <input type="text" id="address" name="address" class="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary" placeholder="15 rue des voyages" required value="{{ old('address') }}">
-                                    @error('address')<p class="text-xs text-error mt-1" data-field="address">{{ $message }}</p>@enderror
-                                </div>
-                                
-                                <div>
-                                    <label for="postal_code" class="block text-sm font-medium text-text-primary mb-1 form-required">Code postal</label>
-                                    <input type="text" id="postal_code" name="postal_code" class="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary" placeholder="75001" required value="{{ old('postal_code') }}">
-                                    @error('postal_code')<p class="text-xs text-error mt-1" data-field="postal_code">{{ $message }}</p>@enderror
-                                </div>
-                                
-                                <div>
-                                    <label for="city" class="block text-sm font-medium text-text-primary mb-1 form-required">Ville</label>
-                                    <input type="text" id="city" name="city" class="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary" placeholder="Paris" required value="{{ old('city') }}">
-                                    @error('city')<p class="text-xs text-error mt-1" data-field="city">{{ $message }}</p>@enderror
-                                </div>
-                                
-                                <div class="md:col-span-2">
-                                    <label for="country" class="block text-sm font-medium text-text-primary mb-1 form-required">Pays</label>
-                                    <select id="country" name="country" class="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary" required>
-                                        <option value="FR" {{ old('country') == 'FR' ? 'selected' : '' }}>France</option>
-                                        <option value="BE" {{ old('country') == 'BE' ? 'selected' : '' }}>Belgique</option>
-                                        <option value="CH" {{ old('country') == 'CH' ? 'selected' : '' }}>Suisse</option>
-                                        <option value="CA" {{ old('country') == 'CA' ? 'selected' : '' }}>Canada</option>
-                                        <option value="other" {{ old('country') == 'other' ? 'selected' : '' }}>Autre</option>
-                                    </select>
-                                    @error('country')<p class="text-xs text-error mt-1" data-field="country">{{ $message }}</p>@enderror
-                                </div>
+                                <x-input
+                                    type="email"
+                                    name="email"
+                                    label="Email principal de contact"
+                                    placeholder="contact@votreentreprise.com"
+                                    hint="Email utilisé pour les notifications de l'entreprise"
+                                    :required="true"
+                                />
+
+                                <x-input
+                                    type="tel"
+                                    name="phone"
+                                    label="Téléphone"
+                                    placeholder="+33 6 12 34 56 78"
+                                    :required="true"
+                                />
+
+                                <x-input
+                                    type="url"
+                                    name="website"
+                                    label="Site internet"
+                                    placeholder="www.votresite.com"
+                                    hint="Le https:// sera ajouté automatiquement"
+                                />
+
+                                <x-input
+                                    type="text"
+                                    name="address"
+                                    label="Adresse"
+                                    placeholder="15 rue des voyages"
+                                    :required="true"
+                                />
+
+                                <x-input
+                                    type="text"
+                                    name="postal_code"
+                                    label="Code postal"
+                                    placeholder="75001"
+                                    :required="true"
+                                />
+
+                                <x-input
+                                    type="text"
+                                    name="city"
+                                    label="Ville"
+                                    placeholder="Paris"
+                                    :required="true"
+                                />
+
+                                <x-select
+                                    name="country"
+                                    label="Pays"
+                                    :options="[
+                                        'FR' => 'France',
+                                        'BE' => 'Belgique',
+                                        'CH' => 'Suisse',
+                                        'CA' => 'Canada',
+                                        'other' => 'Autre'
+                                    ]"
+                                    :selected="old('country', 'FR')"
+                                    :required="true"
+                                    class="md:col-span-2"
+                                />
                             </div>
                         </div>
 
@@ -370,30 +391,36 @@
                             <p class="text-sm text-text-secondary mb-4">Personne physique responsable de l'entreprise</p>
 
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div>
-                                    <label for="rep_firstname" class="block text-sm font-medium text-text-primary mb-1 form-required">Prénom</label>
-                                    <input type="text" id="rep_firstname" name="rep_firstname" class="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary" required value="{{ old('rep_firstname') }}">
-                                    @error('rep_firstname')<p class="text-xs text-error mt-1" data-field="rep_firstname">{{ $message }}</p>@enderror
-                                </div>
-                                
-                                <div>
-                                    <label for="rep_lastname" class="block text-sm font-medium text-text-primary mb-1 form-required">Nom</label>
-                                    <input type="text" id="rep_lastname" name="rep_lastname" class="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary" required value="{{ old('rep_lastname') }}">
-                                    @error('rep_lastname')<p class="text-xs text-error mt-1" data-field="rep_lastname">{{ $message }}</p>@enderror
-                                </div>
-                                
-                                <div>
-                                    <label for="rep_position" class="block text-sm font-medium text-text-primary mb-1 form-required">Fonction</label>
-                                    <input type="text" id="rep_position" name="rep_position" class="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary" placeholder="Directeur, Gérant, etc." required value="{{ old('rep_position') }}">
-                                    @error('rep_position')<p class="text-xs text-error mt-1" data-field="rep_position">{{ $message }}</p>@enderror
-                                </div>
-                                
-                                <div>
-                                    <label for="rep_email" class="block text-sm font-medium text-text-primary mb-1 form-required">Email personnel du représentant</label>
-                                    <input type="email" id="rep_email" name="rep_email" class="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary" placeholder="john.doe@email.com" required value="{{ old('rep_email') }}">
-                                    <p class="text-xs text-text-secondary mt-1">Peut être différent de l'email de l'entreprise</p>
-                                    @error('rep_email')<p class="text-xs text-error mt-1" data-field="rep_email">{{ $message }}</p>@enderror
-                                </div>
+                                <x-input
+                                    type="text"
+                                    name="rep_firstname"
+                                    label="Prénom"
+                                    :required="true"
+                                />
+
+                                <x-input
+                                    type="text"
+                                    name="rep_lastname"
+                                    label="Nom"
+                                    :required="true"
+                                />
+
+                                <x-input
+                                    type="text"
+                                    name="rep_position"
+                                    label="Fonction"
+                                    placeholder="Directeur, Gérant, etc."
+                                    :required="true"
+                                />
+
+                                <x-input
+                                    type="email"
+                                    name="rep_email"
+                                    label="Email personnel du représentant"
+                                    placeholder="john.doe@email.com"
+                                    hint="Peut être différent de l'email de l'entreprise"
+                                    :required="true"
+                                />
                             </div>
                         </div>
 
@@ -402,25 +429,29 @@
                             <h2 class="text-xl font-semibold text-text-primary mb-4">Présentation de votre entreprise</h2>
 
                             <div class="space-y-4">
-                                <div>
-                                    <label for="description" class="block text-sm font-medium text-text-primary mb-1 form-required">Description courte</label>
-                                    <textarea id="description" name="description" rows="4" class="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary" placeholder="Présentez brièvement votre entreprise, votre spécialité dans l'organisation de voyages et votre approche..." required>{{ old('description') }}</textarea>
-                                    <p class="mt-1 text-xs text-text-secondary">Maximum 500 caractères</p>
-                                    @error('description')<p class="text-xs text-error mt-1" data-field="description">{{ $message }}</p>@enderror
-                                </div>
-                                
-                                <div>
-                                    <label for="experience" class="block text-sm font-medium text-text-primary mb-1 form-required">Années d'expérience</label>
-                                    <select id="experience" name="experience" class="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary" required>
-                                        <option value="">Sélectionnez</option>
-                                        <option value="1" {{ old('experience') == '1' ? 'selected' : '' }}>Moins d'1 an</option>
-                                        <option value="1-3" {{ old('experience') == '1-3' ? 'selected' : '' }}>1 à 3 ans</option>
-                                        <option value="3-5" {{ old('experience') == '3-5' ? 'selected' : '' }}>3 à 5 ans</option>
-                                        <option value="5-10" {{ old('experience') == '5-10' ? 'selected' : '' }}>5 à 10 ans</option>
-                                        <option value="10+" {{ old('experience') == '10+' ? 'selected' : '' }}>Plus de 10 ans</option>
-                                    </select>
-                                    @error('experience')<p class="text-xs text-error mt-1" data-field="experience">{{ $message }}</p>@enderror
-                                </div>
+                                <x-textarea
+                                    name="description"
+                                    label="Description courte"
+                                    :rows="4"
+                                    placeholder="Présentez brièvement votre entreprise, votre spécialité dans l'organisation de voyages et votre approche..."
+                                    hint="Maximum 500 caractères"
+                                    :required="true"
+                                />
+
+                                <x-select
+                                    name="experience"
+                                    label="Années d'expérience"
+                                    :options="[
+                                        '' => 'Sélectionnez',
+                                        '1' => 'Moins d\'1 an',
+                                        '1-3' => '1 à 3 ans',
+                                        '3-5' => '3 à 5 ans',
+                                        '5-10' => '5 à 10 ans',
+                                        '10+' => 'Plus de 10 ans'
+                                    ]"
+                                    :selected="old('experience')"
+                                    :required="true"
+                                />
                                 
                                 <div>
                                     <label class="block text-sm font-medium text-text-primary mb-1">Logo de l'entreprise</label>
@@ -447,8 +478,8 @@
 
                         <!-- Navigation -->
                         <div class="text-right">
-                            <button 
-                                type="button" 
+                            <button
+                                type="button"
                                 @click="nextStep()"
                                 :disabled="isSubmitting"
                                 :class="isSubmitting ? 'btn-loading' : ''"
@@ -487,24 +518,9 @@
                                 <p class="text-2xl font-bold">0 €<span class="text-sm font-normal text-text-secondary">/mois</span></p>
                                 <p class="text-sm text-text-secondary">Commission par vente: <span class="font-bold text-error">20%</span></p>
                                 <ul class="space-y-2 text-sm">
-                                    <li class="flex items-center">
-                                        <svg class="h-5 w-5 text-success mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                                        </svg>
-                                        Accès à la plateforme
-                                    </li>
-                                    <li class="flex items-center">
-                                        <svg class="h-5 w-5 text-success mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                                        </svg>
-                                        <span class="font-semibold text-error">5 offres actives maximum</span>
-                                    </li>
-                                    <li class="flex items-center">
-                                        <svg class="h-5 w-5 text-success mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                                        </svg>
-                                        Support par email
-                                    </li>
+                                    <x-checkmark-item color="success">Accès à la plateforme</x-checkmark-item>
+                                    <x-checkmark-item color="success"><span class="font-semibold text-error">5 offres actives maximum</span></x-checkmark-item>
+                                    <x-checkmark-item color="success">Support par email</x-checkmark-item>
                                 </ul>
                             </div>
 
@@ -527,29 +543,14 @@
                                 <p class="text-2xl font-bold">49 €<span class="text-sm font-normal text-text-secondary">/mois</span></p>
                                 <p class="text-sm text-text-secondary">Commission par vente: <span class="font-bold text-accent">10%</span></p>
                                 <ul class="space-y-2 text-sm">
-                                    <li class="flex items-center">
-                                        <svg class="h-5 w-5 text-success mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                                        </svg>
-                                        Accès à la plateforme
-                                    </li>
-                                    <li class="flex items-center">
-                                        <svg class="h-5 w-5 text-success mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                                        </svg>
-                                        <span class="font-semibold text-accent">50 offres actives maximum</span>
-                                    </li>
-                                    <li class="flex items-center">
-                                        <svg class="h-5 w-5 text-success mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                                        </svg>
-                                        Support prioritaire
-                                    </li>
+                                    <x-checkmark-item color="success">Accès à la plateforme</x-checkmark-item>
+                                    <x-checkmark-item color="success"><span class="font-semibold text-accent">50 offres actives maximum</span></x-checkmark-item>
+                                    <x-checkmark-item color="success">Support prioritaire</x-checkmark-item>
                                 </ul>
                             </div>
 
                             <!-- Abonnement Pro -->
-                            <div 
+                            <div
                                 @click="subscription = 'pro'"
                                 :class="{ 'selected': subscription === 'pro' }"
                                 class="subscription-plan border border-border rounded-lg p-6 space-y-4"
@@ -558,7 +559,7 @@
                                 <div class="flex justify-between items-center">
                                     <h3 class="text-lg font-bold text-text-primary">Pro</h3>
                                     <div class="h-6 w-6 rounded-full border-2 border-border flex items-center justify-center">
-                                        <div 
+                                        <div
                                             :class="{ 'hidden': subscription !== 'pro' }"
                                             class="h-3 w-3 rounded-full bg-primary"
                                         ></div>
@@ -567,30 +568,10 @@
                                 <p class="text-2xl font-bold">99 €<span class="text-sm font-normal text-text-secondary">/mois</span></p>
                                 <p class="text-sm text-text-secondary">Commission par vente: <span class="font-bold text-success">5%</span></p>
                                 <ul class="space-y-2 text-sm">
-                                    <li class="flex items-center">
-                                        <svg class="h-5 w-5 text-success mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                                        </svg>
-                                        Accès à la plateforme
-                                    </li>
-                                    <li class="flex items-center">
-                                        <svg class="h-5 w-5 text-success mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                                        </svg>
-                                        <span class="font-semibold text-success">Offres illimitées</span>
-                                    </li>
-                                    <li class="flex items-center">
-                                        <svg class="h-5 w-5 text-success mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                                        </svg>
-                                        Support 24/7
-                                    </li>
-                                    <li class="flex items-center">
-                                        <svg class="h-5 w-5 text-success mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                                        </svg>
-                                        Mise en avant prioritaire
-                                    </li>
+                                    <x-checkmark-item color="success">Accès à la plateforme</x-checkmark-item>
+                                    <x-checkmark-item color="success"><span class="font-semibold text-success">Offres illimitées</span></x-checkmark-item>
+                                    <x-checkmark-item color="success">Support 24/7</x-checkmark-item>
+                                    <x-checkmark-item color="success">Mise en avant prioritaire</x-checkmark-item>
                                 </ul>
                             </div>
                         </div>
@@ -633,22 +614,15 @@
                         </p>
 
                         <!-- Note informative sur les offres -->
-                        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-                            <div class="flex items-start">
-                                <svg class="h-5 w-5 text-blue-600 mt-0.5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                                <div class="text-sm text-blue-800">
-                                    <strong>Information :</strong> Les destinations que vous sélectionnez ici définissent 
-                                    où vous pouvez créer vos offres. Le nombre d'offres actives dépend de votre abonnement :
-                                    <ul class="mt-2 space-y-1">
-                                        <li>• <strong>Gratuit :</strong> 5 offres actives maximum</li>
-                                        <li>• <strong>Essentiel :</strong> 50 offres actives maximum</li>
-                                        <li>• <strong>Pro :</strong> Offres illimitées</li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
+                        <x-alert type="info" class="mb-6">
+                            <strong>Information :</strong> Les destinations que vous sélectionnez ici définissent
+                            où vous pouvez créer vos offres. Le nombre d'offres actives dépend de votre abonnement :
+                            <ul class="mt-2 space-y-1">
+                                <li>• <strong>Gratuit :</strong> 5 offres actives maximum</li>
+                                <li>• <strong>Essentiel :</strong> 50 offres actives maximum</li>
+                                <li>• <strong>Pro :</strong> Offres illimitées</li>
+                            </ul>
+                        </x-alert>
                         
                         <!-- Barre de recherche -->
                         <div>
