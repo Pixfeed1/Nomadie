@@ -134,6 +134,24 @@ class Article extends Model
     }
 
     /**
+     * Relations avec les partages sociaux
+     */
+    public function shares()
+    {
+        return $this->hasMany(ArticleShare::class)->orderBy('shared_at', 'desc');
+    }
+
+    /**
+     * Partages vérifiés seulement
+     */
+    public function verifiedShares()
+    {
+        return $this->hasMany(ArticleShare::class)
+                    ->where('status', 'verified')
+                    ->orderBy('shared_at', 'desc');
+    }
+
+    /**
      * Scopes
      */
     public function scopePublished($query)

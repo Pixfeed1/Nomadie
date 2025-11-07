@@ -248,7 +248,18 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::post('/vendors/{id}/suspend', [AdminVendorController::class, 'suspend'])->name('vendors.suspend');
     Route::post('/vendors/{id}/activate', [AdminVendorController::class, 'activate'])->name('vendors.activate');
     Route::delete('/vendors/{id}', [AdminVendorController::class, 'destroy'])->name('vendors.destroy');
-    
+
+    // Writers (Rédacteurs) - Validation des candidatures
+    Route::prefix('writers')->name('writers.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\AdminWriterController::class, 'index'])->name('index');
+        Route::get('/{id}', [\App\Http\Controllers\Admin\AdminWriterController::class, 'show'])->name('show');
+        Route::post('/{id}/validate', [\App\Http\Controllers\Admin\AdminWriterController::class, 'validate'])->name('validate');
+        Route::post('/{id}/reject', [\App\Http\Controllers\Admin\AdminWriterController::class, 'reject'])->name('reject');
+        Route::post('/{id}/suspend', [\App\Http\Controllers\Admin\AdminWriterController::class, 'suspend'])->name('suspend');
+        Route::post('/{id}/restore', [\App\Http\Controllers\Admin\AdminWriterController::class, 'restore'])->name('restore');
+        Route::post('/{id}/update-notes', [\App\Http\Controllers\Admin\AdminWriterController::class, 'updateNotes'])->name('update-notes');
+    });
+
     // Destinations
     Route::resource('destinations', AdminDestinationController::class);
     
@@ -433,9 +444,21 @@ Route::middleware(['auth', 'vendor_dashboard'])->prefix('vendor')->name('vendor.
 // ==========================================
 // ESPACE RÉDACTEURS
 // ==========================================
+// ==========================================
+// ROUTES INSCRIPTION RÉDACTEUR (auth seulement)
+// ==========================================
 Route::middleware(['auth'])->prefix('writer')->name('writer.')->group(function () {
+    Route::get('/register', [\App\Http\Controllers\Writer\RegistrationController::class, 'showForm'])->name('register');
+    Route::post('/register', [\App\Http\Controllers\Writer\RegistrationController::class, 'register'])->name('register.submit');
+    Route::get('/pending', [\App\Http\Controllers\Writer\RegistrationController::class, 'pending'])->name('pending');
+});
+
+// ==========================================
+// ROUTES ESPACE RÉDACTEUR (writer middleware)
+// ==========================================
+Route::middleware(['auth', 'writer'])->prefix('writer')->name('writer.')->group(function () {
     Route::get('/dashboard', [\App\Http\Controllers\Writer\DashboardController::class, 'index'])->name('dashboard');
-    
+
     Route::prefix('articles')->name('articles.')->group(function () {
         Route::get('/', [\App\Http\Controllers\Writer\ArticleController::class, 'index'])->name('index');
         Route::get('/create', [\App\Http\Controllers\Writer\ArticleController::class, 'create'])->name('create');
@@ -445,6 +468,10 @@ Route::middleware(['auth'])->prefix('writer')->name('writer.')->group(function (
         Route::delete('/{article}', [\App\Http\Controllers\Writer\ArticleController::class, 'destroy'])->name('destroy');
         Route::post('/analyze', [\App\Http\Controllers\Writer\ArticleController::class, 'analyze'])->name('analyze');
         Route::post('/upload-image', [\App\Http\Controllers\Writer\ArticleController::class, 'uploadImage'])->name('upload-image');
+
+        // Phase 2: Social share tracking for DoFollow criteria
+        Route::post('/{article}/record-share', [\App\Http\Controllers\Writer\ArticleController::class, 'recordShare'])->name('record-share');
+        Route::get('/{article}/share-status', [\App\Http\Controllers\Writer\ArticleController::class, 'getShareStatus'])->name('share-status');
     });
     
     Route::prefix('badges')->name('badges.')->group(function () {
