@@ -59,7 +59,8 @@ class ArticleController extends Controller
             'slug' => 'nullable|string|max:255',
             'category' => 'nullable|string',
             'tags' => 'nullable|string',
-            'status' => 'nullable|in:draft,pending,published' // Ajout des statuts
+            'status' => 'nullable|in:draft,pending,published', // Ajout des statuts
+            'is_test_article' => 'nullable|boolean' // PHASE 5: Article test pour community writers
         ]);
 
         $article = new Article();
@@ -69,7 +70,17 @@ class ArticleController extends Controller
         $article->content = $validated['content'];
         $article->excerpt = $validated['excerpt'] ?? Str::limit(strip_tags($validated['content']), 160);
         $article->status = $request->input('status', 'draft');
-        
+
+        // PHASE 5: Marquer comme article test si demandé
+        $article->is_test_article = $request->boolean('is_test_article', false);
+
+        // Si community writer pending → Forcer is_test_article = true pour premier article
+        if (Auth::user()->isCommunityWriter() &&
+            Auth::user()->isPendingWriter() &&
+            Auth::user()->articles()->count() === 0) {
+            $article->is_test_article = true;
+        }
+
         // Si publié, définir la date de publication
         if ($validated['status'] === 'published' && !$article->published_at) {
             $article->published_at = now();

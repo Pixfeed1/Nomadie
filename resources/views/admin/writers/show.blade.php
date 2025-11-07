@@ -116,6 +116,34 @@
                                     Lire l'article →
                                 </a>
                             </div>
+
+                            {{-- PHASE 5: Validation rapide de l'article test --}}
+                            @if($writer->isPendingWriter() && $testArticle->latestSeoAnalysis)
+                                @php
+                                    $score = $testArticle->latestSeoAnalysis->global_score;
+                                    $canValidate = $score >= 78;
+                                @endphp
+
+                                <div class="mt-4 p-4 rounded-lg {{ $canValidate ? 'bg-green-50 border border-green-200' : 'bg-orange-50 border border-orange-200' }}">
+                                    @if($canValidate)
+                                        <div class="flex items-start justify-between">
+                                            <div class="flex-1">
+                                                <p class="text-sm font-semibold text-green-800 mb-1">✅ Article test validé ({{ $score }}/100)</p>
+                                                <p class="text-xs text-green-700">L'article atteint le score minimum de 78/100. Vous pouvez valider le rédacteur.</p>
+                                            </div>
+                                            <form method="POST" action="{{ route('admin.writers.validate', $writer->id) }}" class="ml-3" onsubmit="return confirm('Valider ce rédacteur ? Il obtiendra un accès complet à l\'espace writer.');">
+                                                @csrf
+                                                <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-green-700 transition whitespace-nowrap">
+                                                    Valider le rédacteur
+                                                </button>
+                                            </form>
+                                        </div>
+                                    @else
+                                        <p class="text-sm font-semibold text-orange-800 mb-1">⚠️ Score insuffisant ({{ $score }}/100)</p>
+                                        <p class="text-xs text-orange-700">L'article test doit atteindre au moins 78/100 pour être validé. Contactez le rédacteur pour améliorer son contenu.</p>
+                                    @endif
+                                </div>
+                            @endif
                         </div>
                     @else
                         <p class="text-gray-500 italic">Aucun article test soumis pour le moment.</p>
