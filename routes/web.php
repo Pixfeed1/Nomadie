@@ -249,7 +249,18 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::post('/vendors/{id}/suspend', [AdminVendorController::class, 'suspend'])->name('vendors.suspend');
     Route::post('/vendors/{id}/activate', [AdminVendorController::class, 'activate'])->name('vendors.activate');
     Route::delete('/vendors/{id}', [AdminVendorController::class, 'destroy'])->name('vendors.destroy');
-    
+
+    // Writers (Rédacteurs) - Validation des candidatures
+    Route::prefix('writers')->name('writers.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\AdminWriterController::class, 'index'])->name('index');
+        Route::get('/{id}', [\App\Http\Controllers\Admin\AdminWriterController::class, 'show'])->name('show');
+        Route::post('/{id}/validate', [\App\Http\Controllers\Admin\AdminWriterController::class, 'validate'])->name('validate');
+        Route::post('/{id}/reject', [\App\Http\Controllers\Admin\AdminWriterController::class, 'reject'])->name('reject');
+        Route::post('/{id}/suspend', [\App\Http\Controllers\Admin\AdminWriterController::class, 'suspend'])->name('suspend');
+        Route::post('/{id}/restore', [\App\Http\Controllers\Admin\AdminWriterController::class, 'restore'])->name('restore');
+        Route::post('/{id}/update-notes', [\App\Http\Controllers\Admin\AdminWriterController::class, 'updateNotes'])->name('update-notes');
+    });
+
     // Destinations
     Route::resource('destinations', AdminDestinationController::class);
     
