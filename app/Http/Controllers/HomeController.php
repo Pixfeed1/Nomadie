@@ -127,37 +127,34 @@ class HomeController extends Controller
                   ->where('discount_percentage', '>', 0)
                   ->where('status', '!=', 'cancelled');
             })
+            ->withMax(['availabilities as best_discount' => function($query) {
+                $query->where('start_date', '>=', now())
+                      ->where('discount_percentage', '>', 0);
+            }], 'discount_percentage')
             ->orderBy('created_at', 'desc')
             ->take(6)
-            ->get()
-            ->map(function($trip) {
-                // Récupérer la meilleure promo disponible
-                $bestDiscount = $trip->availabilities()
-                    ->where('start_date', '>=', now())
-                    ->where('discount_percentage', '>', 0)
-                    ->max('discount_percentage');
-                $trip->best_discount = $bestDiscount;
-                return $trip;
-            });
+            ->get();
 
         // Récupérer les meilleurs organisateurs actifs
         $featuredVendors = Vendor::where('status', 'active')
             ->withCount(['trips' => function($query) {
                 $query->where('status', 'active');
             }])
+            ->withAvg(['trips as trips_avg_rating' => function($query) {
+                $query->where('rating', '>', 0);
+            }], 'rating')
             ->orderByDesc('trips_count')
             ->take(4)
             ->get()
             ->map(function($vendor) {
-                // Calculer la note moyenne
-                $avgRating = $vendor->trips()
-                    ->where('rating', '>', 0)
-                    ->avg('rating');
-                $vendor->average_rating = $avgRating ? round($avgRating, 1) : 4.7;
-                
+                // Utiliser la note moyenne calculée par withAvg (pas de N+1 query)
+                $vendor->average_rating = $vendor->trips_avg_rating
+                    ? round($vendor->trips_avg_rating, 1)
+                    : 4.7;
+
                 // Ajouter une spécialité par défaut si pas définie
                 $vendor->specialty = $this->getVendorSpecialty($vendor);
-                
+
                 return $vendor;
             });
 

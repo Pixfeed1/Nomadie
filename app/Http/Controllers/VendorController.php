@@ -14,12 +14,12 @@ class VendorController extends Controller
      */
     public function show($vendor)
     {
-        // Charger le vendor avec ses relations
+        // Charger le vendor avec ses relations et statistiques (évite N+1 queries)
         $vendor = Vendor::with(['user', 'countries', 'serviceCategories'])
             ->where(function($query) use ($vendor) {
                 // Chercher par ID ou slug
                 $query->where('id', $vendor);
-                
+
                 // Si on ajoute un slug plus tard
                 if (is_string($vendor) && !is_numeric($vendor)) {
                     $query->orWhere('slug', $vendor);
@@ -28,6 +28,14 @@ class VendorController extends Controller
                 }
             })
             ->where('status', 'active') // Seulement les vendors actifs
+            ->withCount(['trips as active_trips_count' => function($query) {
+                $query->where('status', 'active');
+            }])
+            ->withAvg(['trips as trips_avg_rating' => function($query) {
+                $query->where('rating', '>', 0);
+            }], 'rating')
+            ->withSum(['trips as trips_reviews_count'], 'reviews_count')
+            ->withCount('countries as destinations_count')
             ->firstOrFail();
         
         // Récupérer toutes les offres actives avec pagination
@@ -49,26 +57,25 @@ class VendorController extends Controller
                 return $trip->offer_type ?? 'organized_trip';
             });
         
-        // Compter les offres par type
+        // Compter les offres par type (utilise la collection déjà chargée)
         $offerCounts = [
-            'all' => $vendor->trips()->where('status', 'active')->count(),
+            'all' => $vendor->active_trips_count, // Utilise withCount (pas de N+1)
             'accommodation' => $tripsByType->get('accommodation', collect())->count(),
             'organized_trip' => $tripsByType->get('organized_trip', collect())->count(),
             'activity' => $tripsByType->get('activity', collect())->count(),
             'custom' => $tripsByType->get('custom', collect())->count(),
         ];
-        
-        // Statistiques du vendor
+
+        // Statistiques du vendor (utilise les valeurs pré-chargées par withCount/withAvg/withSum)
         $stats = [
-            'total_trips' => $vendor->trips()->where('status', 'active')->count(),
-            'total_bookings' => $vendor->trips()
-                ->join('bookings', 'trips.id', '=', 'bookings.trip_id')
-                ->where('bookings.status', 'confirmed')
-                ->count(),
-            'average_rating' => $vendor->trips()->where('rating', '>', 0)->avg('rating') ?? 0,
-            'total_reviews' => $vendor->trips()->sum('reviews_count'),
+            'total_trips' => $vendor->active_trips_count, // Pré-chargé avec withCount
+            'total_bookings' => \App\Models\Booking::whereHas('trip', function($q) use ($vendor) {
+                $q->where('vendor_id', $vendor->id);
+            })->where('status', 'confirmed')->count(),
+            'average_rating' => $vendor->trips_avg_rating ? round($vendor->trips_avg_rating, 1) : 0, // Pré-chargé avec withAvg
+            'total_reviews' => $vendor->trips_reviews_count ?? 0, // Pré-chargé avec withSum
             'member_since' => $vendor->created_at ? $vendor->created_at->year : date('Y'),
-            'destinations_count' => $vendor->countries()->count(),
+            'destinations_count' => $vendor->destinations_count, // Pré-chargé avec withCount
             'response_time' => '< 24h', // À implémenter avec un vrai calcul
             'languages' => ['Français', 'Anglais'], // À récupérer depuis la BDD si disponible
         ];
