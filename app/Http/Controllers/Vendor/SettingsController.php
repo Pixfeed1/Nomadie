@@ -146,7 +146,7 @@ class SettingsController extends Controller
             'country' => 'required|string|size:2',
             'description' => 'nullable|string|max:1000',
             'experience' => 'nullable|string|in:1,1-3,3-5,5-10,10+',
-            'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'logo' => 'nullable|image|mimes:' . implode(',', config('uploads.allowed_extensions.images')) . '|max:' . config('uploads.max_sizes.avatar'),
             'rep_firstname' => 'required|string|max:100',
             'rep_lastname' => 'required|string|max:100',
             'rep_position' => 'required|string|max:100',

@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
+use Illuminate\Support\Str;
 use App\Models\User;
 use App\Models\Trip;
 use App\Models\Booking;
@@ -129,13 +130,38 @@ class CustomerDashboardController extends Controller
     {
         $booking = Booking::where('user_id', Auth::id())
             ->findOrFail($id);
-        
+
         if ($booking->canBeCancelled()) {
             $booking->cancel($request->input('reason', 'Annulé par le client'));
             return back()->with('success', 'Réservation annulée avec succès');
         }
-        
+
         return back()->with('error', 'Cette réservation ne peut pas être annulée');
+    }
+
+    /**
+     * Demander un remboursement
+     */
+    public function requestRefund(Request $request, $id)
+    {
+        $request->validate([
+            'reason' => 'required|string|max:' . config('business.validation.max_reason_length')
+        ]);
+
+        $booking = Booking::where('user_id', Auth::id())
+            ->findOrFail($id);
+
+        if (!$booking->canRequestRefund()) {
+            return back()->with('error', 'Cette réservation ne peut pas être remboursée.');
+        }
+
+        $refund = $booking->requestRefund($request->reason);
+
+        if (!$refund) {
+            return back()->with('error', 'Impossible de créer la demande de remboursement.');
+        }
+
+        return back()->with('success', 'Demande de remboursement créée. Vous serez remboursé de ' . number_format($refund->amount, 2) . '€ (' . $refund->refund_percentage . '%)');
     }
 
     /**
@@ -362,22 +388,46 @@ class CustomerDashboardController extends Controller
     public function replyMessage(Request $request, $tripSlug)
     {
         $request->validate([
-            'content' => 'required|string|max:5000'
+            'content' => 'required|string|max:5000',
+            'attachment' => 'nullable|file|max:' . config('uploads.max_sizes.attachment') . '|mimes:' . implode(',', config('uploads.allowed_extensions.attachments'))
         ]);
-        
+
         // Récupérer le trip par son slug
         $trip = Trip::where('slug', $tripSlug)->firstOrFail();
-        
+
         // Déterminer le destinataire (le vendor du trip)
         $recipientId = $trip->vendor->user_id;
-        
+
         // Générer le conversation_id
         $conversationId = Message::generateConversationId(
             Auth::id(),
             $recipientId,
             $trip->id
         );
-        
+
+        // Gérer l'upload de la pièce jointe
+        $attachmentPath = null;
+        $attachmentName = null;
+
+        if ($request->hasFile('attachment')) {
+            $file = $request->file('attachment');
+
+            // Générer un nom de fichier sécurisé
+            $extension = $file->getClientOriginalExtension();
+            $fileName = Str::random(40) . '_' . time() . '.' . $extension;
+
+            // Vérifier le type MIME de manière sécurisée
+            $allowedMimes = config('uploads.allowed_mimes.attachments');
+
+            if (!in_array($file->getMimeType(), $allowedMimes)) {
+                return back()->withErrors(['attachment' => 'Type de fichier non autorisé']);
+            }
+
+            // Stocker dans le disque privé
+            $attachmentPath = $file->storeAs('messages/attachments', $fileName, 'private');
+            $attachmentName = $file->getClientOriginalName();
+        }
+
         Message::create([
             'sender_id' => Auth::id(),
             'sender_type' => 'customer',
@@ -387,11 +437,34 @@ class CustomerDashboardController extends Controller
             'trip_id' => $trip->id,
             'subject' => 'Re: ' . $trip->title,
             'content' => $request->content,
+            'attachment' => $attachmentPath,
+            'attachment_name' => $attachmentName,
             'is_read' => false
         ]);
-        
+
         return redirect()->route('customer.messages.show', $tripSlug)
             ->with('success', 'Message envoyé');
+    }
+
+    /**
+     * Télécharger une pièce jointe de message
+     */
+    public function downloadAttachment($messageId)
+    {
+        $message = Message::where(function($query) {
+                $query->where('recipient_id', Auth::id())
+                      ->orWhere('sender_id', Auth::id());
+            })
+            ->findOrFail($messageId);
+
+        if (!$message->attachment || !Storage::disk('private')->exists($message->attachment)) {
+            abort(404, 'Fichier non trouvé');
+        }
+
+        return Storage::disk('private')->download(
+            $message->attachment,
+            $message->attachment_name
+        );
     }
 
     /**
@@ -403,7 +476,7 @@ class CustomerDashboardController extends Controller
             ->with(['trip', 'trip.vendor'])
             ->orderBy('created_at', 'desc')
             ->paginate(10);
-        
+
         return view('customer.reviews', compact('reviews'));
     }
 
@@ -507,7 +580,7 @@ class CustomerDashboardController extends Controller
     public function updateAvatar(Request $request)
     {
         $request->validate([
-            'avatar' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048'
+            'avatar' => 'required|image|mimes:' . implode(',', config('uploads.allowed_extensions.images')) . '|max:' . config('uploads.max_sizes.avatar')
         ]);
         
         $user = Auth::user();
@@ -764,6 +837,7 @@ class CustomerDashboardController extends Controller
             ->whereIn('destination_id', $favoriteDestinations)
             ->whereNotIn('id', Favorite::where('user_id', $user->id)->pluck('trip_id'))
             ->with(['vendor', 'destination'])
+            ->withCount('reviews')
             ->inRandomOrder()
             ->take(4)
             ->get();
@@ -773,10 +847,12 @@ class CustomerDashboardController extends Controller
             $additionalTrips = Trip::where('status', 'active')
                 ->whereNotIn('id', $recommendations->pluck('id'))
                 ->whereNotIn('id', Favorite::where('user_id', $user->id)->pluck('trip_id'))
+                ->with(['vendor', 'destination'])
+                ->withCount('reviews')
                 ->orderBy('views_count', 'desc')
                 ->take(4 - $recommendations->count())
                 ->get();
-            
+
             $recommendations = $recommendations->concat($additionalTrips);
         }
 
@@ -792,7 +868,7 @@ class CustomerDashboardController extends Controller
                 'pricing_mode' => $trip->pricing_mode,
                 'image' => $trip->main_image ?? null,
                 'rating' => $trip->average_rating ?? 0,
-                'reviews_count' => $trip->reviews()->count()
+                'reviews_count' => $trip->reviews_count ?? 0
             ];
         });
     }
