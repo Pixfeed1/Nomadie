@@ -344,10 +344,19 @@ class Trip extends Model
      */
     public function isCustomOffer()
     {
-        return $this->offer_type === self::OFFER_TYPE_CUSTOM || 
+        return $this->offer_type === self::OFFER_TYPE_CUSTOM ||
                $this->pricing_mode === self::PRICING_MODE_CUSTOM;
     }
-    
+
+    /**
+     * Vérifier si c'est une location de propriété (alias de isAccommodation)
+     * Utilisé par TripAvailability pour gérer les réservations exclusives
+     */
+    public function isPropertyRental()
+    {
+        return $this->isAccommodation();
+    }
+
     /**
      * Vérifier si c'est un tarif de groupe
      */

@@ -39,9 +39,7 @@ class Country extends Model
 
     public function trips()
     {
-        // Si vous avez un modèle Trip existant
-        // return $this->hasMany(Trip::class);
-        return [];
+        return $this->hasMany(Trip::class);
     }
     
     public function getTripsCountAttribute()
