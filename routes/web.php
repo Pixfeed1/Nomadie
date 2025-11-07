@@ -97,7 +97,6 @@ Route::middleware(['guest'])->group(function () {
         Route::get('/complete', [VendorRegistrationController::class, 'completeRegistration'])->name('register.complete');
         Route::get('/confirm/{token}', [VendorRegistrationController::class, 'confirmEmail'])->name('confirm');
         Route::get('/cleanup', [VendorRegistrationController::class, 'cleanupExpiredData'])->name('cleanup');
-        Route::post('/', [VendorRegistrationController::class, 'store'])->name('register.submit');
     });
 });
 

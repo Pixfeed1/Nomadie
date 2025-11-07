@@ -924,15 +924,4 @@ class VendorRegistrationController extends Controller
             ]);
         }
     }
-
-    /**
-     * ANCIENNE MÉTHODE - Gardée pour compatibilité mais non utilisée
-     * La nouvelle approche utilise nextStep() et finalSubmit()
-     */
-    public function store(Request $request)
-    {
-        return response()->json([
-            'error' => 'Cette méthode est obsolète. Utilisez le formulaire AJAX.'
-        ], 400);
-    }
 }
