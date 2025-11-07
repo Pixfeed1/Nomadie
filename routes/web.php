@@ -260,6 +260,27 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
         Route::post('/{id}/update-notes', [\App\Http\Controllers\Admin\AdminWriterController::class, 'updateNotes'])->name('update-notes');
     });
 
+    // PHASE 7: Briefs - Mode Commande Interne
+    Route::prefix('briefs')->name('briefs.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\AdminBriefController::class, 'index'])->name('index');
+        Route::get('/create', [\App\Http\Controllers\Admin\AdminBriefController::class, 'create'])->name('create');
+        Route::post('/', [\App\Http\Controllers\Admin\AdminBriefController::class, 'store'])->name('store');
+        Route::get('/{brief}', [\App\Http\Controllers\Admin\AdminBriefController::class, 'show'])->name('show');
+        Route::get('/{brief}/edit', [\App\Http\Controllers\Admin\AdminBriefController::class, 'edit'])->name('edit');
+        Route::put('/{brief}', [\App\Http\Controllers\Admin\AdminBriefController::class, 'update'])->name('update');
+        Route::delete('/{brief}', [\App\Http\Controllers\Admin\AdminBriefController::class, 'destroy'])->name('destroy');
+
+        // Actions spécifiques
+        Route::post('/{brief}/assign', [\App\Http\Controllers\Admin\AdminBriefController::class, 'assign'])->name('assign');
+        Route::post('/{brief}/approve', [\App\Http\Controllers\Admin\AdminBriefController::class, 'approve'])->name('approve');
+        Route::post('/{brief}/request-revision', [\App\Http\Controllers\Admin\AdminBriefController::class, 'requestRevision'])->name('request-revision');
+        Route::post('/{brief}/cancel', [\App\Http\Controllers\Admin\AdminBriefController::class, 'cancel'])->name('cancel');
+
+        // Templates
+        Route::get('/templates/index', [\App\Http\Controllers\Admin\AdminBriefController::class, 'templates'])->name('templates');
+        Route::post('/templates/{template}/use', [\App\Http\Controllers\Admin\AdminBriefController::class, 'createFromTemplate'])->name('create-from-template');
+    });
+
     // Destinations
     Route::resource('destinations', AdminDestinationController::class);
     
