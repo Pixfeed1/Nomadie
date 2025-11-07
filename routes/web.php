@@ -469,6 +469,10 @@ Route::middleware(['auth', 'writer'])->prefix('writer')->name('writer.')->group(
         Route::delete('/{article}', [\App\Http\Controllers\Writer\ArticleController::class, 'destroy'])->name('destroy');
         Route::post('/analyze', [\App\Http\Controllers\Writer\ArticleController::class, 'analyze'])->name('analyze');
         Route::post('/upload-image', [\App\Http\Controllers\Writer\ArticleController::class, 'uploadImage'])->name('upload-image');
+
+        // Phase 2: Social share tracking for DoFollow criteria
+        Route::post('/{article}/record-share', [\App\Http\Controllers\Writer\ArticleController::class, 'recordShare'])->name('record-share');
+        Route::get('/{article}/share-status', [\App\Http\Controllers\Writer\ArticleController::class, 'getShareStatus'])->name('share-status');
     });
     
     Route::prefix('badges')->name('badges.')->group(function () {

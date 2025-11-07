@@ -357,7 +357,7 @@ class ArticleController extends Controller
     protected function getUpdateSuccessMessage($newScore, $oldScore)
     {
         $difference = $newScore - $oldScore;
-        
+
         if ($difference > 10) {
             return "Amélioration spectaculaire ! Score SEO : {$newScore}/100 (+" . $difference . " points)";
         } elseif ($difference > 0) {
@@ -367,5 +367,69 @@ class ArticleController extends Controller
         } else {
             return "Article mis à jour. Score SEO : {$newScore}/100 (" . $difference . " points)";
         }
+    }
+
+    /**
+     * Record social share (AJAX)
+     * Phase 2: Tracking des partages sociaux obligatoires pour DoFollow
+     */
+    public function recordShare(Request $request, $id)
+    {
+        $article = Article::where('user_id', Auth::id())->findOrFail($id);
+
+        $validated = $request->validate([
+            'platform' => 'required|in:facebook,twitter,linkedin,whatsapp,other',
+            'share_url' => 'nullable|url|max:500',
+        ]);
+
+        // Créer l'enregistrement du partage
+        $share = $article->shares()->create([
+            'user_id' => Auth::id(),
+            'platform' => $validated['platform'],
+            'share_url' => $validated['share_url'] ?? null,
+            'shared_at' => now(),
+            'status' => 'pending', // En attente de vérification admin (optionnel)
+        ]);
+
+        // Auto-vérifier si l'URL est fournie (pas de validation manuelle requise pour le moment)
+        if ($validated['share_url']) {
+            $share->update(['status' => 'verified']);
+        }
+
+        // Re-vérifier le statut DoFollow après partage
+        CheckDoFollowStatus::dispatch(Auth::user());
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Partage enregistré avec succès !',
+            'share' => $share
+        ]);
+    }
+
+    /**
+     * Get share status for an article (AJAX)
+     */
+    public function getShareStatus($id)
+    {
+        $article = Article::where('user_id', Auth::id())->findOrFail($id);
+
+        $shares = $article->shares()
+            ->where('user_id', Auth::id())
+            ->orderBy('shared_at', 'desc')
+            ->get();
+
+        $sharesByPlatform = $shares->groupBy('platform')->map(function ($platformShares) {
+            return [
+                'count' => $platformShares->count(),
+                'latest' => $platformShares->first(),
+                'has_verified' => $platformShares->where('status', 'verified')->count() > 0,
+            ];
+        });
+
+        return response()->json([
+            'shares' => $sharesByPlatform,
+            'total_verified' => $shares->where('status', 'verified')->count(),
+            'requirement_met' => $shares->where('status', 'verified')->count() >= 1,
+        ]);
     }
 }

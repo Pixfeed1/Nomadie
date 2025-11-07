@@ -241,6 +241,14 @@ class User extends Authenticatable
     }
 
     /**
+     * Relation avec les partages sociaux
+     */
+    public function articleShares()
+    {
+        return $this->hasMany(ArticleShare::class);
+    }
+
+    /**
      * V�rifier si l'utilisateur a un badge
      */
     public function hasBadge($badgeCode)
