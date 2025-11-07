@@ -481,47 +481,160 @@ class SeoAnalyzer
     }
     
     /**
-     * Analyser la hiérarchie des titres
+     * PHASE 6: Analyser la hiérarchie des titres (H1-H6 complet)
+     * Vérifie la structure complète et l'ordre logique sans saut de niveau
      */
     protected function analyzeHeadings($htmlContent)
     {
         $criterion = SeoCriterion::where('code', 'headings_hierarchy')->first();
         if (!$criterion) return;
-        
+
         $dom = new DOMDocument();
         @$dom->loadHTML(mb_convert_encoding($htmlContent, 'HTML-ENTITIES', 'UTF-8'));
-        
-        $h1Count = $dom->getElementsByTagName('h1')->length;
-        $h2Count = $dom->getElementsByTagName('h2')->length;
-        $h3Count = $dom->getElementsByTagName('h3')->length;
-        
+
+        // Compter tous les niveaux H1-H6
+        $headingCounts = [
+            'h1' => $dom->getElementsByTagName('h1')->length,
+            'h2' => $dom->getElementsByTagName('h2')->length,
+            'h3' => $dom->getElementsByTagName('h3')->length,
+            'h4' => $dom->getElementsByTagName('h4')->length,
+            'h5' => $dom->getElementsByTagName('h5')->length,
+            'h6' => $dom->getElementsByTagName('h6')->length,
+        ];
+
+        // Extraire l'ordre d'apparition des titres pour vérifier la hiérarchie
+        $headingsOrder = $this->extractHeadingsOrder($dom);
+
         $rules = $criterion->validation_rules;
         $score = $criterion->max_score;
         $passed = true;
         $issues = [];
-        
-        if ($h1Count !== $rules['h1_count']) {
+        $suggestions = [];
+
+        // 1. Vérifier le H1 (doit être exactement 1)
+        if ($headingCounts['h1'] !== ($rules['h1_count'] ?? 1)) {
             $score *= 0.7;
             $passed = false;
-            $issues[] = $h1Count === 0 ? "Pas de H1" : "Plusieurs H1 ({$h1Count})";
+            if ($headingCounts['h1'] === 0) {
+                $issues[] = "Pas de H1";
+                $suggestions[] = "Ajoutez un titre H1 unique pour votre article";
+            } else {
+                $issues[] = "Plusieurs H1 ({$headingCounts['h1']})";
+                $suggestions[] = "Utilisez un seul H1 - les autres doivent être H2+";
+            }
         }
-        
-        if ($h2Count < $rules['min_h2']) {
-            $score *= 0.8;
+
+        // 2. Vérifier le minimum de H2
+        if ($headingCounts['h2'] < ($rules['min_h2'] ?? 3)) {
+            $score *= 0.85;
             $passed = false;
-            $issues[] = "Seulement {$h2Count} H2 (minimum: {$rules['min_h2']})";
+            $issues[] = "Seulement {$headingCounts['h2']} H2 (minimum: {$rules['min_h2']})";
+            $suggestions[] = "Ajoutez plus de sous-titres H2 pour structurer votre contenu";
         }
-        
+
+        // 3. PHASE 6: Vérifier la hiérarchie (pas de saut de niveau)
+        if ($rules['check_hierarchy'] ?? true) {
+            $hierarchyIssues = $this->checkHeadingsHierarchy($headingsOrder);
+            if (!empty($hierarchyIssues)) {
+                $score *= 0.9;
+                $passed = false;
+                $issues = array_merge($issues, $hierarchyIssues);
+                $suggestions[] = "Respectez l'ordre logique : H1 > H2 > H3 > H4 > H5 > H6 sans sauter de niveau";
+            }
+        }
+
+        // 4. Avertissement si trop de niveaux imbriqués
+        $maxLevel = $this->getMaxHeadingLevel($headingCounts);
+        if ($maxLevel > ($rules['warn_deep_nesting'] ?? 5)) {
+            $issues[] = "Profondeur excessive: jusqu'à H{$maxLevel}";
+            $suggestions[] = "Évitez d'utiliser plus de 5 niveaux de titres (H1-H5)";
+        }
+
+        // Calculer le score final
+        $score = max(0, $score);
+
         $feedback = [
-            'message' => $passed ? 'Structure des titres correcte' : 'Problèmes: ' . implode(', ', $issues),
-            'suggestions' => $passed ? [] : ['Utilisez un seul H1', 'Ajoutez plus de sous-titres H2']
+            'message' => $passed
+                ? sprintf('Structure H1-H6 correcte (%d niveaux utilisés)', $maxLevel)
+                : 'Problèmes: ' . implode(', ', $issues),
+            'suggestions' => $suggestions
         ];
-        
+
         $this->saveDetail($criterion, $score, $passed, $feedback, [
-            'h1_count' => $h1Count,
-            'h2_count' => $h2Count,
-            'h3_count' => $h3Count
+            'h1_count' => $headingCounts['h1'],
+            'h2_count' => $headingCounts['h2'],
+            'h3_count' => $headingCounts['h3'],
+            'h4_count' => $headingCounts['h4'],
+            'h5_count' => $headingCounts['h5'],
+            'h6_count' => $headingCounts['h6'],
+            'max_level' => $maxLevel,
+            'hierarchy_valid' => empty($hierarchyIssues ?? []),
+            'headings_order' => array_slice($headingsOrder, 0, 10) // Max 10 premiers pour debug
         ]);
+    }
+
+    /**
+     * Extraire l'ordre d'apparition des titres dans le document
+     */
+    protected function extractHeadingsOrder($dom)
+    {
+        $headings = [];
+        $xpath = new DOMXPath($dom);
+
+        // Récupérer tous les titres H1-H6 dans l'ordre d'apparition
+        $nodes = $xpath->query('//h1 | //h2 | //h3 | //h4 | //h5 | //h6');
+
+        foreach ($nodes as $node) {
+            $level = (int) substr($node->nodeName, 1); // h1 -> 1, h2 -> 2, etc.
+            $headings[] = [
+                'level' => $level,
+                'text' => substr(trim($node->textContent), 0, 50) // Premier 50 chars
+            ];
+        }
+
+        return $headings;
+    }
+
+    /**
+     * Vérifier qu'il n'y a pas de saut dans la hiérarchie
+     */
+    protected function checkHeadingsHierarchy($headingsOrder)
+    {
+        $issues = [];
+        $previousLevel = 0;
+
+        foreach ($headingsOrder as $index => $heading) {
+            $currentLevel = $heading['level'];
+
+            // Vérifier qu'on ne saute pas de niveau en descendant
+            if ($currentLevel > $previousLevel + 1 && $previousLevel > 0) {
+                $issues[] = sprintf(
+                    "Saut de H%d à H%d (position %d)",
+                    $previousLevel,
+                    $currentLevel,
+                    $index + 1
+                );
+            }
+
+            $previousLevel = $currentLevel;
+        }
+
+        return array_unique($issues);
+    }
+
+    /**
+     * Obtenir le niveau maximum utilisé
+     */
+    protected function getMaxHeadingLevel($headingCounts)
+    {
+        $maxLevel = 0;
+        foreach ($headingCounts as $tag => $count) {
+            if ($count > 0) {
+                $level = (int) substr($tag, 1); // h1 -> 1, h2 -> 2, etc.
+                $maxLevel = max($maxLevel, $level);
+            }
+        }
+        return $maxLevel;
     }
     
     /**
