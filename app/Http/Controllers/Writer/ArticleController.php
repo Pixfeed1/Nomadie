@@ -95,6 +95,27 @@ class ArticleController extends Controller
         $analyzer = new \App\Services\Seo\SeoAnalyzer();
         $analysis = $analyzer->analyzeArticle($article, Auth::user());
 
+        // PHASE 3: Validation stricte pour partenaires (max 20% auto-promo)
+        if (Auth::user()->isPartner() && $analysis->auto_promo_percentage > 20) {
+            // Forcer le statut en brouillon (ne pas publier)
+            $article->status = 'draft';
+            $article->save();
+
+            Log::warning('Article partenaire rejeté : auto-promo excessive', [
+                'user_id' => Auth::id(),
+                'article_id' => $article->id,
+                'auto_promo_percentage' => $analysis->auto_promo_percentage
+            ]);
+
+            return redirect()->route('writer.articles.edit', $article->id)
+                ->with('error', sprintf(
+                    'PUBLICATION REFUSÉE : Votre article contient %.1f%% d\'auto-promotion (limite partenaires : 20%%). ' .
+                    'Réduisez les liens vers votre domaine ou ajoutez plus de liens externes neutres.',
+                    $analysis->auto_promo_percentage
+                ))
+                ->with('auto_promo_warning', true);
+        }
+
         // Vérifier si le score est exceptionnel et envoyer une notification
         if ($analysis->global_score >= 90) {
             try {
@@ -189,6 +210,29 @@ class ArticleController extends Controller
 
         // Re-run SEO analysis
         $analysis = $this->seoAnalyzer->analyzeArticle($article, Auth::user());
+
+        // PHASE 3: Validation stricte pour partenaires (max 20% auto-promo)
+        if (Auth::user()->isPartner() && $analysis->auto_promo_percentage > 20) {
+            // Forcer le statut en brouillon si tentative de publication
+            if ($article->status === 'published') {
+                $article->status = 'draft';
+                $article->save();
+            }
+
+            Log::warning('Article partenaire rejeté (update) : auto-promo excessive', [
+                'user_id' => Auth::id(),
+                'article_id' => $article->id,
+                'auto_promo_percentage' => $analysis->auto_promo_percentage
+            ]);
+
+            return redirect()->route('writer.articles.edit', $article->id)
+                ->with('error', sprintf(
+                    'PUBLICATION REFUSÉE : Votre article contient %.1f%% d\'auto-promotion (limite partenaires : 20%%). ' .
+                    'Réduisez les liens vers votre domaine ou ajoutez plus de liens externes neutres.',
+                    $analysis->auto_promo_percentage
+                ))
+                ->with('auto_promo_warning', true);
+        }
 
         // Vérifier si le score est exceptionnel et envoyer une notification
         // Ne notifier que si le nouveau score est >= 90 ET si c'est une amélioration significative

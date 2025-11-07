@@ -1291,40 +1291,177 @@ class SeoAnalyzer
     }
     
     /**
-     * Analyser l'auto-promotion (partenaires)
+     * Analyser l'auto-promotion (partenaires) - PHASE 3 STRICT
+     *
+     * Détecte les liens auto-promotionnels (vers le domaine du partenaire)
+     * et calcule le pourcentage réel : (liens auto-promo / total liens externes) * 100
+     *
+     * Pour les partenaires : MAX 20% de liens auto-promo tolérés
      */
     protected function analyzeAutoPromo()
     {
         $criterion = SeoCriterion::where('code', 'auto_promo_limit')->first();
         if (!$criterion) return;
-        
-        $content = strtolower($this->article->content);
-        $wordCount = str_word_count($content);
-        
-        // Mots/phrases typiques d'auto-promotion
+
+        // Extraire tous les liens externes
+        $dom = new DOMDocument();
+        @$dom->loadHTML(mb_convert_encoding($this->article->content, 'HTML-ENTITIES', 'UTF-8'));
+
+        $links = $dom->getElementsByTagName('a');
+        $externalLinks = [];
+        $autoPromoLinks = [];
+        $partnerDomains = [];
+
+        // Récupérer les domaines du partenaire depuis partner_offer_url
+        if ($this->user->writer_type === User::WRITER_TYPE_PARTNER && $this->user->partner_offer_url) {
+            $offerDomain = $this->extractDomain($this->user->partner_offer_url);
+            if ($offerDomain) {
+                $partnerDomains[] = $offerDomain;
+            }
+        }
+
+        // Analyser tous les liens
+        foreach ($links as $link) {
+            $href = $link->getAttribute('href');
+
+            // Ignorer liens internes et ancres
+            if (empty($href) || strpos($href, '#') === 0 || strpos($href, '/') === 0) {
+                continue;
+            }
+
+            // Ignorer liens vers le site Nomadie
+            if (strpos($href, config('app.url')) !== false) {
+                continue;
+            }
+
+            // C'est un lien externe
+            if (strpos($href, 'http') === 0) {
+                $linkDomain = $this->extractDomain($href);
+                $externalLinks[] = [
+                    'url' => $href,
+                    'domain' => $linkDomain,
+                    'text' => $link->textContent
+                ];
+
+                // Vérifier si c'est un lien auto-promo
+                foreach ($partnerDomains as $partnerDomain) {
+                    if ($linkDomain === $partnerDomain || strpos($linkDomain, $partnerDomain) !== false) {
+                        $autoPromoLinks[] = [
+                            'url' => $href,
+                            'domain' => $linkDomain,
+                            'text' => $link->textContent
+                        ];
+                        break;
+                    }
+                }
+            }
+        }
+
+        // Calculer le pourcentage réel d'auto-promo
+        $totalExternal = count($externalLinks);
+        $totalAutoPromo = count($autoPromoLinks);
+
+        // Pourcentage = (liens auto-promo / total liens externes) * 100
+        $autoPromoPercentage = 0;
+        if ($totalExternal > 0) {
+            $autoPromoPercentage = ($totalAutoPromo / $totalExternal) * 100;
+        } elseif ($totalAutoPromo > 0) {
+            // Si aucun lien externe SAUF auto-promo = 100%
+            $autoPromoPercentage = 100;
+        }
+
+        // Détecter aussi les mots-clés auto-promo dans le texte
+        $content = strtolower(strip_tags($this->article->content));
         $promoKeywords = [
             'notre offre', 'nos services', 'nous proposons', 'contactez-nous',
-            'réservez avec nous', 'notre équipe', 'notre agence', 'nos tarifs'
+            'réservez avec nous', 'notre équipe', 'notre agence', 'nos tarifs',
+            'notre site', 'notre plateforme', 'chez nous'
         ];
-        
-        $promoCount = 0;
+
+        $promoKeywordCount = 0;
         foreach ($promoKeywords as $keyword) {
-            $promoCount += substr_count($content, $keyword);
+            $promoKeywordCount += substr_count($content, $keyword);
         }
-        
-        $promoPercentage = ($promoCount * 10) / $wordCount * 100; // Estimation approximative
-        
-        $this->analysis->has_auto_promo = $promoPercentage > 0;
-        $this->analysis->auto_promo_percentage = min(100, $promoPercentage);
-        
+
+        // Bonus pénalité si beaucoup de mots-clés promo (max +10%)
+        if ($promoKeywordCount > 5) {
+            $autoPromoPercentage += min(10, ($promoKeywordCount - 5) * 2);
+        }
+
+        $autoPromoPercentage = min(100, round($autoPromoPercentage, 1));
+
+        // Sauvegarder dans l'analyse
+        $this->analysis->has_auto_promo = $totalAutoPromo > 0 || $promoKeywordCount > 0;
+        $this->analysis->auto_promo_percentage = $autoPromoPercentage;
+
+        // Vérifier si le critère est respecté
         $rules = $criterion->validation_rules;
-        $passed = $promoPercentage <= $rules['max_percentage'];
-        $score = $passed ? $criterion->max_score : max(0, $criterion->max_score * (1 - $promoPercentage / 100));
-        
+        $maxAllowed = $rules['max_percentage'] ?? 20;
+        $passed = $autoPromoPercentage <= $maxAllowed;
+
+        // Calculer le score
+        if ($passed) {
+            $score = $criterion->max_score;
+        } else {
+            // Pénalité proportionnelle au dépassement
+            $excess = $autoPromoPercentage - $maxAllowed;
+            $score = max(0, $criterion->max_score * (1 - ($excess / 100)));
+        }
+
+        $message = sprintf(
+            "Auto-promotion: %.1f%% (%d lien(s) promo / %d externes)",
+            $autoPromoPercentage,
+            $totalAutoPromo,
+            $totalExternal
+        );
+
+        if ($promoKeywordCount > 0) {
+            $message .= " + {$promoKeywordCount} mot(s)-clé promo";
+        }
+
+        $suggestions = [];
+        if (!$passed) {
+            $suggestions[] = sprintf(
+                'LIMITE DÉPASSÉE : %.1f%% auto-promo (max autorisé: %d%% pour partenaires)',
+                $autoPromoPercentage,
+                $maxAllowed
+            );
+            $suggestions[] = 'Supprimez des liens vers votre domaine ou ajoutez plus de liens externes neutres';
+
+            if ($totalExternal === $totalAutoPromo && $totalAutoPromo > 0) {
+                $suggestions[] = 'CRITIQUE : Tous vos liens externes sont auto-promotionnels !';
+            }
+        }
+
         $this->saveDetail($criterion, $score, $passed, [
-            'message' => "Auto-promotion: " . round($promoPercentage) . "%",
-            'suggestions' => $passed ? [] : ['Réduisez le contenu auto-promotionnel (max 20%)']
-        ], ['percentage' => $promoPercentage]);
+            'message' => $message,
+            'suggestions' => $suggestions
+        ], [
+            'percentage' => $autoPromoPercentage,
+            'auto_promo_links_count' => $totalAutoPromo,
+            'external_links_count' => $totalExternal,
+            'promo_keywords_count' => $promoKeywordCount,
+            'auto_promo_links' => array_slice($autoPromoLinks, 0, 5), // Max 5 exemples
+            'partner_domains' => $partnerDomains
+        ]);
+    }
+
+    /**
+     * Extraire le domaine d'une URL
+     */
+    protected function extractDomain($url)
+    {
+        $parsed = parse_url($url);
+        if (!isset($parsed['host'])) {
+            return null;
+        }
+
+        $host = $parsed['host'];
+
+        // Retirer www.
+        $host = preg_replace('/^www\./', '', $host);
+
+        return strtolower($host);
     }
     
     /**
