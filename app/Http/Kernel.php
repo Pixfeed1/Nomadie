@@ -105,8 +105,11 @@ class Kernel extends HttpKernel
         'session.debug' => \App\Http\Middleware\SessionDebugMiddleware::class,
         'vendor.registration' => \App\Http\Middleware\VendorRegistrationMiddleware::class,
         'vendor' => \App\Http\Middleware\VendorMiddleware::class,
-        
+
         // NOUVEAU : Middleware pour les clients
         'customer' => \App\Http\Middleware\CustomerMiddleware::class,
+
+        // Middleware pour les administrateurs
+        'admin' => \App\Http\Middleware\AdminMiddleware::class,
     ];
 }
