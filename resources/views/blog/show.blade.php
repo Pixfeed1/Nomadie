@@ -212,22 +212,24 @@
             </div>
         </div>
         
-        <!-- Commentaires (optionnel) -->
+        <!-- Commentaires -->
         <div class="mt-12 bg-white rounded-lg shadow-lg p-8">
-            <h2 class="text-2xl font-bold text-text-primary mb-6">Commentaires (3)</h2>
-            
+            <h2 class="text-2xl font-bold text-text-primary mb-6">Commentaires ({{ $comments->total() }})</h2>
+
+            @auth
             <!-- Formulaire de commentaire -->
             <div class="mb-8">
                 <div class="flex items-start space-x-4">
                     <div class="flex-shrink-0">
                         <div class="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">
-                            V
+                            {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
                         </div>
                     </div>
                     <div class="min-w-0 flex-1">
-                        <form>
+                        <form action="{{ route('comments.store', $article->slug) }}" method="POST">
+                            @csrf
                             <div class="mb-4">
-                                <textarea rows="3" placeholder="Ajouter un commentaire..." class="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"></textarea>
+                                <textarea name="content" rows="3" placeholder="Ajouter un commentaire..." class="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary" required></textarea>
                             </div>
                             <div class="flex justify-end">
                                 <button type="submit" class="px-4 py-2 bg-primary hover:bg-primary-dark text-white font-medium rounded-lg transition-colors">
@@ -238,108 +240,49 @@
                     </div>
                 </div>
             </div>
+            @else
+            <div class="mb-8 p-4 bg-bg-alt rounded-lg text-center">
+                <p class="text-text-secondary">
+                    <a href="{{ route('login') }}" class="text-primary hover:underline">Connectez-vous</a> pour laisser un commentaire
+                </p>
+            </div>
+            @endauth
             
             <!-- Liste des commentaires -->
             <div class="space-y-6">
-                <!-- Commentaire 1 -->
-                <div class="flex space-x-4">
-                    <div class="flex-shrink-0">
-                        <div class="h-10 w-10 rounded-full bg-accent/10 flex items-center justify-center text-accent font-bold">
-                            ML
-                        </div>
-                    </div>
-                    <div class="flex-1">
-                        <div class="bg-bg-alt p-4 rounded-lg">
-                            <div class="flex items-center justify-between mb-2">
-                                <span class="font-medium text-text-primary">Marie Leblanc</span>
-                                <span class="text-xs text-text-secondary">Il y a 2 jours</span>
-                            </div>
-                            <p class="text-text-secondary">Super article ! J'ai visité cette région l'année dernière et je confirme que les conseils sont excellents. J'ajouterais juste qu'il est préférable de réserver ses billets à l'avance pour les musées.</p>
-                            <div class="mt-2 flex items-center space-x-4">
-                                <button class="text-xs text-text-secondary hover:text-primary flex items-center">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" />
-                                    </svg>
-                                    J'aime (5)
-                                </button>
-                                <button class="text-xs text-text-secondary hover:text-primary flex items-center">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
-                                    </svg>
-                                    Répondre
-                                </button>
+                @forelse($comments as $comment)
+                    <div class="flex space-x-4">
+                        <div class="flex-shrink-0">
+                            <div class="h-10 w-10 rounded-full bg-accent/10 flex items-center justify-center text-accent font-bold">
+                                {{ strtoupper(substr($comment->author_name ?? $comment->user->name ?? 'A', 0, 2)) }}
                             </div>
                         </div>
-                    </div>
-                </div>
-                
-                <!-- Commentaire 2 -->
-                <div class="flex space-x-4">
-                    <div class="flex-shrink-0">
-                        <div class="h-10 w-10 rounded-full bg-success/10 flex items-center justify-center text-success font-bold">
-                            JD
-                        </div>
-                    </div>
-                    <div class="flex-1">
-                        <div class="bg-bg-alt p-4 rounded-lg">
-                            <div class="flex items-center justify-between mb-2">
-                                <span class="font-medium text-text-primary">Jean Dupont</span>
-                                <span class="text-xs text-text-secondary">Il y a 4 jours</span>
-                            </div>
-                            <p class="text-text-secondary">Merci pour ces informations très utiles. Pourriez-vous faire un article similaire pour l'Italie du Sud ?</p>
-                            <div class="mt-2 flex items-center space-x-4">
-                                <button class="text-xs text-text-secondary hover:text-primary flex items-center">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.60L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" />
-                                    </svg>
-                                    J'aime (3)
-                                </button>
-                                <button class="text-xs text-text-secondary hover:text-primary flex items-center">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
-                                    </svg>
-                                    Répondre
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <!-- Réponse au commentaire -->
-                        <div class="mt-3 ml-6">
-                            <div class="flex space-x-4">
-                                <div class="flex-shrink-0">
-                                    <div class="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs">
-                                        A
-                                    </div>
+                        <div class="flex-1">
+                            <div class="bg-bg-alt p-4 rounded-lg">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="font-medium text-text-primary">{{ $comment->author_name ?? $comment->user->name ?? 'Anonyme' }}</span>
+                                    <span class="text-xs text-text-secondary">{{ $comment->created_at->diffForHumans() }}</span>
                                 </div>
-                                <div class="flex-1">
-                                    <div class="bg-bg-alt p-4 rounded-lg">
-                                        <div class="flex items-center justify-between mb-2">
-                                            <span class="font-medium text-text-primary">Auteur</span>
-                                            <span class="text-xs text-text-secondary">Il y a 3 jours</span>
-                                        </div>
-                                        <p class="text-text-secondary">Merci pour votre suggestion Jean ! C'est prévu pour le mois prochain, restez à l'écoute !</p>
-                                        <div class="mt-2 flex items-center space-x-4">
-                                            <button class="text-xs text-text-secondary hover:text-primary flex items-center">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" />
-                                                </svg>
-                                                J'aime (2)
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
+                                <p class="text-text-secondary">{{ $comment->content }}</p>
                             </div>
                         </div>
                     </div>
-                </div>
+                @empty
+                    <div class="text-center py-8">
+                        <svg class="w-16 h-16 mx-auto text-text-secondary/30 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                        </svg>
+                        <p class="text-text-secondary">Aucun commentaire pour le moment. Soyez le premier à commenter !</p>
+                    </div>
+                @endforelse
             </div>
             
             <!-- Pagination commentaires -->
+            @if($comments->hasPages())
             <div class="mt-8 flex justify-center">
-                <button class="px-4 py-2 border border-primary text-primary font-medium rounded-lg hover:bg-primary/5 transition-colors">
-                    Voir plus de commentaires
-                </button>
+                {{ $comments->links() }}
             </div>
+            @endif
         </div>
         
         <!-- Newsletter -->

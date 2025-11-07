@@ -75,13 +75,14 @@ class BlogController extends Controller
                 return $related;
             });
         
-        // Récupérer les commentaires si tu as une table comments
-        // $comments = Comment::where('article_id', $article->id)
-        //     ->where('approved', true)
-        //     ->orderBy('created_at', 'desc')
-        //     ->paginate(10);
-        
-        return view('blog.show', compact('article', 'relatedArticles'));
+        // Récupérer les commentaires approuvés
+        $comments = Comment::where('article_id', $article->id)
+            ->where('status', 'approved')
+            ->with('user')
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
+
+        return view('blog.show', compact('article', 'relatedArticles', 'comments'));
     }
     
     /**
