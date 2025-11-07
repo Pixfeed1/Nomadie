@@ -41,7 +41,7 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
-        'email_verification_token', // Ajouté pour ne pas exposer le token
+        'email_verification_token', // Ajoutï¿½ pour ne pas exposer le token
     ];
 
     /**
@@ -52,6 +52,7 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
         'newsletter' => 'boolean',
+        'is_dofollow' => 'boolean',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
@@ -96,12 +97,12 @@ class User extends Authenticatable
      */
     public function hasRole($role)
     {
-        // Vérification basée sur le champ 'role' de la table users
+        // Vï¿½rification basï¿½e sur le champ 'role' de la table users
         if ($this->role === $role) {
             return true;
         }
         
-        // Vérification spéciale pour les vendors
+        // Vï¿½rification spï¿½ciale pour les vendors
         if ($role === 'vendor') {
             return $this->isVendor();
         }
@@ -171,7 +172,7 @@ class User extends Authenticatable
         if ($this->avatar) {
             return asset('storage/' . $this->avatar);
         }
-        // Avatar par défaut si aucun n'est défini
+        // Avatar par dï¿½faut si aucun n'est dï¿½fini
         return 'https://ui-avatars.com/api/?name=' . urlencode($this->display_name) . '&background=38B2AC&color=fff';
     }
 
@@ -217,7 +218,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Vérifier si l'utilisateur a un badge
+     * Vï¿½rifier si l'utilisateur a un badge
      */
     public function hasBadge($badgeCode)
     {
@@ -225,7 +226,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Débloquer un badge
+     * Dï¿½bloquer un badge
      */
     public function unlockBadge($badge)
     {

@@ -61,11 +61,32 @@ class UserBadge extends Model
      */
     public function notifyUser()
     {
-        // Envoyer une notification (à implémenter)
-        // $this->user->notify(new BadgeUnlocked($this->badge));
-        
-        $this->notified_at = now();
-        $this->save();
+        try {
+            // Envoyer la notification
+            $this->user->notify(new BadgeUnlocked($this->badge));
+
+            $this->notified_at = now();
+            $this->save();
+
+            \Log::info("Badge notification sent successfully", [
+                'user_id' => $this->user_id,
+                'badge_id' => $this->badge_id,
+                'badge_code' => $this->badge->code,
+                'badge_name' => $this->badge->name
+            ]);
+        } catch (\Exception $e) {
+            \Log::error("Failed to send badge notification", [
+                'user_id' => $this->user_id,
+                'badge_id' => $this->badge_id,
+                'badge_code' => $this->badge->code ?? 'unknown',
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            // Même en cas d'erreur, on marque comme notifié pour éviter les boucles
+            $this->notified_at = now();
+            $this->save();
+        }
     }
 
     public function updateProgress($data, $percentage = null)
