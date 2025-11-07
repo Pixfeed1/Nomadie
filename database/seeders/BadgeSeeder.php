@@ -154,6 +154,69 @@ class BadgeSeeder extends Seeder
                     'platform_consultation' => 'Consultation sur l\'évolution de la plateforme',
                     'rare_badge' => 'Badge de prestige rare et recherché'
                 ]
+            ],
+            // PHASE 4: Writer Type Specific Badges
+            [
+                'code' => 'voyageur_verifie',
+                'name' => 'Voyageur Vérifié',
+                'description' => 'Expérience de voyage vérifiée via réservation confirmée',
+                'icon' => '✈️',
+                'color' => 'teal',
+                'order' => 9,
+                'conditions' => [
+                    'type' => 'writer_type',
+                    'writer_type' => 'client_contributor',
+                    'verified_booking' => true
+                ],
+                'rewards' => [
+                    'verified_status' => 'Statut de voyageur authentique',
+                    'credibility_boost' => 'Crédibilité renforcée auprès des lecteurs',
+                    'booking_validation' => 'Réservation vérifiée par Nomadie',
+                    'authentic_badge' => 'Badge "Expérience vécue" sur vos articles'
+                ]
+            ],
+            [
+                'code' => 'partenaire_certifie',
+                'name' => 'Partenaire Certifié',
+                'description' => 'Partenaire commercial validé et de confiance',
+                'icon' => '🤝',
+                'color' => 'orange',
+                'order' => 10,
+                'conditions' => [
+                    'type' => 'writer_type',
+                    'writer_type' => 'partner',
+                    'offer_verified' => true,
+                    'max_auto_promo' => 20
+                ],
+                'rewards' => [
+                    'partner_status' => 'Statut de partenaire officiel',
+                    'commercial_mention' => 'Mention "Partenaire Certifié" visible',
+                    'offer_showcase' => 'Mise en avant de votre offre',
+                    'quality_seal' => 'Sceau de qualité Nomadie',
+                    'limited_promo' => 'Droit à 20% de contenu promotionnel'
+                ]
+            ],
+            [
+                'code' => 'team_nomadie',
+                'name' => 'Team Nomadie',
+                'description' => 'Membre officiel de l\'équipe Nomadie',
+                'icon' => '⭐',
+                'color' => 'indigo',
+                'order' => 11,
+                'conditions' => [
+                    'type' => 'writer_type',
+                    'writer_type' => 'team',
+                    'internal_team' => true
+                ],
+                'rewards' => [
+                    'team_status' => 'Statut d\'équipe officielle',
+                    'admin_powers' => 'Accès aux fonctionnalités admin',
+                    'commande_mode' => 'Accès au mode commande interne',
+                    'beta_features' => 'Accès anticipé aux nouvelles features',
+                    'moderation_tools' => 'Outils de modération',
+                    'global_stats' => 'Accès aux statistiques globales',
+                    'official_badge' => 'Badge officiel "Team Nomadie"'
+                ]
             ]
         ];
 

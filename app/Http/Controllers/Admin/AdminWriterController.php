@@ -107,6 +107,14 @@ class AdminWriterController extends Controller
             }
         }
 
+        if ($writer->isTeamMember()) {
+            // Badge "Team Nomadie"
+            $badge = Badge::where('code', 'team_nomadie')->first();
+            if ($badge) {
+                $writer->unlockBadge($badge);
+            }
+        }
+
         // TODO: Envoyer notification email au rédacteur
 
         Log::info('Writer validated by admin', [
