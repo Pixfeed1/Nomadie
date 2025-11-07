@@ -34,27 +34,47 @@ class ReviewController extends Controller
     public function store(Request $request, $tripId)
     {
         $trip = Trip::findOrFail($tripId);
-        
+
         // Valider les données du formulaire
         $validated = $request->validate([
             'rating' => 'required|integer|min:1|max:5',
             'content' => 'required|string|min:10|max:1000',
             'travel_date' => 'required|date|before_or_equal:today',
         ]);
-        
-        // Créer le nouvel avis
-        $review = new Review();
-        $review->user_id = auth()->id();
-        $review->trip_id = $tripId;
-        $review->rating = $validated['rating'];
-        $review->content = $validated['content'];
-        $review->travel_date = $validated['travel_date'];
-        $review->user_name = auth()->user()->name;
-        $review->save();
-        
+
+        // Utiliser firstOrCreate pour éviter la race condition
+        // Vérifier d'abord si un avis existe déjà
+        $existingReview = Review::where('user_id', auth()->id())
+            ->where('trip_id', $tripId)
+            ->first();
+
+        if ($existingReview) {
+            return redirect()->route('trips.show', $tripId)
+                ->with('warning', 'Vous avez déjà laissé un avis pour ce voyage.');
+        }
+
+        // Créer le nouvel avis de manière atomique
+        try {
+            $review = Review::create([
+                'user_id' => auth()->id(),
+                'trip_id' => $tripId,
+                'rating' => $validated['rating'],
+                'content' => $validated['content'],
+                'travel_date' => $validated['travel_date'],
+                'user_name' => auth()->user()->name,
+            ]);
+        } catch (\Illuminate\Database\QueryException $e) {
+            // Si erreur de contrainte unique (duplicate entry)
+            if ($e->getCode() === '23000') {
+                return redirect()->route('trips.show', $tripId)
+                    ->with('warning', 'Vous avez déjà laissé un avis pour ce voyage.');
+            }
+            throw $e;
+        }
+
         // Mettre à jour la note moyenne du voyage
         $this->updateTripRating($tripId);
-        
+
         return redirect()->route('trips.show', $tripId)
             ->with('success', 'Votre avis a été ajouté avec succès. Merci de partager votre expérience !');
     }
