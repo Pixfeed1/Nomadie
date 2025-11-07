@@ -200,6 +200,9 @@ class SeoAnalyzer
         
         // Headings Hierarchy
         $this->analyzeHeadings($this->article->content);
+
+        // PHASE 6: LSI Keywords (richesse sémantique)
+        $this->analyzeLsiKeywords($content);
     }
     
     /**
@@ -479,7 +482,138 @@ class SeoAnalyzer
             'long_paragraphs' => $longParagraphs
         ]);
     }
-    
+
+    /**
+     * PHASE 6: Analyser la richesse sémantique (LSI Keywords)
+     * Évalue la diversité du vocabulaire et la profondeur sémantique
+     */
+    protected function analyzeLsiKeywords($content)
+    {
+        $criterion = SeoCriterion::where('code', 'lsi_keywords')->first();
+        if (!$criterion) return;
+
+        $rules = $criterion->validation_rules;
+
+        // Nettoyer et préparer le contenu
+        $cleanContent = strtolower($content);
+        $words = str_word_count($cleanContent, 1);
+        $totalWords = count($words);
+
+        if ($totalWords === 0) {
+            $this->saveDetail($criterion, 0, false, [
+                'message' => 'Pas de contenu à analyser',
+                'suggestions' => ['Ajoutez du contenu pour activer l\'analyse LSI']
+            ], []);
+            return;
+        }
+
+        // Stop words français à ignorer
+        $stopWords = [
+            'le', 'la', 'les', 'un', 'une', 'des', 'de', 'du', 'à', 'au', 'aux',
+            'et', 'ou', 'mais', 'donc', 'or', 'ni', 'car', 'je', 'tu', 'il', 'elle',
+            'nous', 'vous', 'ils', 'elles', 'ce', 'cette', 'ces', 'mon', 'ton', 'son',
+            'ma', 'ta', 'sa', 'mes', 'tes', 'ses', 'qui', 'que', 'quoi', 'dont', 'où',
+            'est', 'sont', 'a', 'ai', 'as', 'ont', 'être', 'avoir', 'faire', 'pour',
+            'dans', 'sur', 'avec', 'sans', 'sous', 'vers', 'chez', 'par', 'en', 'y'
+        ];
+
+        // Filtrer les stop words
+        $meaningfulWords = array_filter($words, fn($w) => !in_array($w, $stopWords) && strlen($w) > 2);
+        $meaningfulWordsCount = count($meaningfulWords);
+
+        // 1. Calculer la diversité lexicale (ratio mots uniques)
+        $uniqueWords = array_unique($meaningfulWords);
+        $uniqueWordsCount = count($uniqueWords);
+        $lexicalDiversity = $meaningfulWordsCount > 0 ? $uniqueWordsCount / $meaningfulWordsCount : 0;
+
+        // 2. Analyser la distribution des mots (répétitions)
+        $wordFrequency = array_count_values($meaningfulWords);
+        arsort($wordFrequency);
+        $topWords = array_slice($wordFrequency, 0, 10, true);
+
+        // Calculer le % du mot le plus répété
+        $maxRepetition = $meaningfulWordsCount > 0 ? (reset($topWords) / $meaningfulWordsCount) * 100 : 0;
+
+        // 3. Analyser la longueur moyenne des mots (vocabulaire complexe)
+        $totalLength = array_sum(array_map('strlen', $meaningfulWords));
+        $avgWordLength = $meaningfulWordsCount > 0 ? $totalLength / $meaningfulWordsCount : 0;
+
+        // 4. Ratio de mots longs (7+ caractères = vocabulaire riche)
+        $longWords = array_filter($meaningfulWords, fn($w) => strlen($w) >= 7);
+        $longWordsRatio = $meaningfulWordsCount > 0 ? count($longWords) / $meaningfulWordsCount : 0;
+
+        // Calculer le score
+        $score = $criterion->max_score;
+        $passed = true;
+        $issues = [];
+        $suggestions = [];
+
+        // Check 1: Diversité lexicale
+        $minDiversity = $rules['min_lexical_diversity'] ?? 0.45;
+        $optimalDiversity = $rules['optimal_lexical_diversity'] ?? 0.60;
+
+        if ($lexicalDiversity < $minDiversity) {
+            $score *= 0.7;
+            $passed = false;
+            $issues[] = sprintf("Diversité lexicale faible (%.0f%%)", $lexicalDiversity * 100);
+            $suggestions[] = "Utilisez plus de synonymes et variez votre vocabulaire";
+        } elseif ($lexicalDiversity < $optimalDiversity) {
+            $score *= 0.9;
+        }
+
+        // Check 2: Répétitions excessives
+        $maxRepetitionAllowed = $rules['max_word_repetition'] ?? 3.0;
+        if ($maxRepetition > $maxRepetitionAllowed) {
+            $score *= 0.85;
+            $passed = false;
+            $topWord = array_key_first($topWords);
+            $issues[] = sprintf("Mot '%s' trop répété (%.1f%%)", $topWord, $maxRepetition);
+            $suggestions[] = "Réduisez la répétition excessive de certains mots, utilisez des synonymes";
+        }
+
+        // Check 3: Longueur moyenne des mots
+        $minAvgLength = $rules['min_avg_word_length'] ?? 5.0;
+        if ($avgWordLength < $minAvgLength) {
+            $score *= 0.9;
+            $issues[] = sprintf("Vocabulaire simple (moy. %.1f lettres/mot)", $avgWordLength);
+            $suggestions[] = "Enrichissez votre vocabulaire avec des termes plus précis et techniques";
+        }
+
+        // Check 4: Ratio de mots longs
+        $minLongWordsRatio = $rules['min_long_words_ratio'] ?? 0.25;
+        if ($longWordsRatio < $minLongWordsRatio) {
+            $score *= 0.9;
+            $issues[] = sprintf("Peu de mots complexes (%.0f%%)", $longWordsRatio * 100);
+            $suggestions[] = "Utilisez un vocabulaire plus riche et spécialisé (mots de 7+ lettres)";
+        }
+
+        $score = max(0, $score);
+
+        $feedback = [
+            'message' => $passed
+                ? sprintf(
+                    "Richesse sémantique excellente (diversité: %.0f%%, moy: %.1f lettres)",
+                    $lexicalDiversity * 100,
+                    $avgWordLength
+                )
+                : 'Problèmes: ' . implode(', ', $issues),
+            'suggestions' => $suggestions
+        ];
+
+        $this->saveDetail($criterion, $score, $passed, $feedback, [
+            'total_words' => $totalWords,
+            'meaningful_words' => $meaningfulWordsCount,
+            'unique_words' => $uniqueWordsCount,
+            'lexical_diversity' => round($lexicalDiversity * 100, 1),
+            'max_word_repetition' => round($maxRepetition, 2),
+            'most_repeated_word' => array_key_first($topWords) ?? null,
+            'avg_word_length' => round($avgWordLength, 2),
+            'long_words_count' => count($longWords),
+            'long_words_ratio' => round($longWordsRatio * 100, 1),
+            'top_10_words' => $topWords
+        ]);
+    }
+
     /**
      * PHASE 6: Analyser la hiérarchie des titres (H1-H6 complet)
      * Vérifie la structure complète et l'ordre logique sans saut de niveau
