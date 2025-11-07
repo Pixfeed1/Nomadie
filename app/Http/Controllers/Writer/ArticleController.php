@@ -53,7 +53,7 @@ class ArticleController extends Controller
             'title' => 'required|string|max:255',
             'content' => 'required|string|min:500',
             'excerpt' => 'nullable|string|max:500',
-            'featured_image' => 'nullable|image|max:5120', // Augmenté à 5MB
+            'featured_image' => 'nullable|image|max:' . config('uploads.max_sizes.image'),
             'meta_description' => 'nullable|string|max:160',
             'keywords' => 'nullable|array',
             'slug' => 'nullable|string|max:255',
@@ -144,7 +144,7 @@ class ArticleController extends Controller
             'title' => 'required|string|max:255',
             'content' => 'required|string|min:500',
             'excerpt' => 'nullable|string|max:500',
-            'featured_image' => 'nullable|image|max:2048',
+            'featured_image' => 'nullable|image|max:' . config('uploads.max_sizes.image'),
             'meta_description' => 'nullable|string|max:160',
             'keywords' => 'nullable|array',
             'slug' => 'nullable|string|max:255',
@@ -225,7 +225,7 @@ class ArticleController extends Controller
     public function uploadImage(Request $request)
     {
         $request->validate([
-            'image' => 'required|image|max:5120' // Max 5MB
+            'image' => 'required|image|max:' . config('uploads.max_sizes.image')
         ]);
         
         $path = $request->file('image')->store('articles/content', 'public');

@@ -59,7 +59,7 @@ class ClientRegisterController extends Controller
                 'pseudo' => 'nullable|string|max:255|unique:users,pseudo',
                 'email' => 'required|string|email|max:255|unique:users,email',
                 'password' => 'required|string|min:8|confirmed',
-                'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+                'avatar' => 'nullable|image|mimes:' . implode(',', config('uploads.allowed_extensions.images')) . '|max:' . config('uploads.max_sizes.avatar'),
                 'terms' => 'required|accepted',
                 'newsletter' => 'nullable|in:on,off,1,0,true,false' // Accepte les valeurs checkbox HTML
             ], [

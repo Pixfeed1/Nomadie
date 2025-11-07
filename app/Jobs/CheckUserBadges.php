@@ -58,28 +58,22 @@ class CheckUserBadges implements ShouldQueue
         // Vérifier l'éligibilité
         if ($badge->checkEligibility($this->user)) {
             // Débloquer le badge
+            // La notification est envoyée automatiquement par UserBadge::boot() → notifyUser()
             $unlocked = $this->user->unlockBadge($badge);
-            
-            // Envoyer la notification si le badge a été débloqué avec succès
+
             if ($unlocked) {
-                try {
-                    $this->user->notify(new BadgeUnlocked($badge));
-                    \Log::info("Notification envoyée : Badge {$badge->name} débloqué pour l'utilisateur {$this->user->id}");
-                } catch (\Exception $e) {
-                    \Log::error("Erreur lors de l'envoi de la notification de badge : " . $e->getMessage(), [
-                        'user_id' => $this->user->id,
-                        'badge_id' => $badge->id,
-                        'badge_code' => $badge->code
-                    ]);
+                // Log du déblocage
+                \Log::info("Badge unlocked successfully", [
+                    'user_id' => $this->user->id,
+                    'badge_id' => $badge->id,
+                    'badge_code' => $badge->code,
+                    'badge_name' => $badge->name
+                ]);
+
+                // Si c'est le premier badge, vérifier les badges en cascade
+                if ($badge->code === 'premier_pas') {
+                    $this->checkCascadeBadges();
                 }
-            }
-            
-            // Log général
-            \Log::info("Badge débloqué : {$badge->name} pour l'utilisateur {$this->user->id}");
-            
-            // Si c'est le premier badge, vérifier les badges en cascade
-            if ($badge->code === 'premier_pas') {
-                $this->checkCascadeBadges();
             }
         } else {
             // Mettre à jour la progression si le badge n'est pas encore débloqué

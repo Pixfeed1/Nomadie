@@ -180,7 +180,7 @@ class VendorMessagesController extends Controller
     {
         $request->validate([
             'content' => 'required|string|min:2|max:5000',
-            'attachment' => 'nullable|file|max:5120|mimes:pdf,jpg,jpeg,png,doc,docx'
+            'attachment' => 'nullable|file|max:' . config('uploads.max_sizes.attachment') . '|mimes:' . implode(',', config('uploads.allowed_extensions.attachments'))
         ]);
 
         // Récupérer le trip par son slug

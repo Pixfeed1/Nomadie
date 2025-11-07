@@ -36,9 +36,21 @@ class UserBadge extends Model
         parent::boot();
 
         static::created(function ($userBadge) {
-            // Notifier l'utilisateur du nouveau badge
+            // Notifier l'utilisateur du nouveau badge de manière asynchrone
+            // On wrappe dans un try/catch au cas où le dispatch échoue
             if (!$userBadge->notified_at) {
-                $userBadge->notifyUser();
+                try {
+                    // Dispatcher la notification de manière asynchrone pour ne pas bloquer le process
+                    dispatch(function() use ($userBadge) {
+                        $userBadge->notifyUser();
+                    })->afterResponse();
+                } catch (\Exception $e) {
+                    \Log::error("Failed to dispatch badge notification", [
+                        'user_id' => $userBadge->user_id,
+                        'badge_id' => $userBadge->badge_id,
+                        'error' => $e->getMessage()
+                    ]);
+                }
             }
         });
     }
@@ -61,11 +73,50 @@ class UserBadge extends Model
      */
     public function notifyUser()
     {
-        // Envoyer une notification
-        $this->user->notify(new BadgeUnlocked($this->badge));
+        try {
+            // Vérifier que l'utilisateur et le badge existent
+            if (!$this->user || !$this->badge) {
+                throw new \Exception("User or Badge not loaded");
+            }
 
-        $this->notified_at = now();
-        $this->save();
+            // Envoyer la notification (si SMTP échoue, on log mais on ne crash pas)
+            $this->user->notify(new BadgeUnlocked($this->badge));
+
+            $this->notified_at = now();
+            $this->save();
+
+            \Log::info("Badge notification sent successfully", [
+                'user_id' => $this->user_id,
+                'badge_id' => $this->badge_id,
+                'badge_code' => $this->badge->code,
+                'badge_name' => $this->badge->name
+            ]);
+        } catch (\Symfony\Component\Mailer\Exception\TransportException $e) {
+            // Erreur SMTP spécifique - on log et on continue
+            \Log::warning("Badge notification email failed (SMTP error) - notification saved in database", [
+                'user_id' => $this->user_id,
+                'badge_id' => $this->badge_id,
+                'badge_code' => $this->badge->code ?? 'unknown',
+                'error' => $e->getMessage()
+            ]);
+
+            // Marquer comme notifié quand même (la notification est dans la DB)
+            $this->notified_at = now();
+            $this->save();
+        } catch (\Exception $e) {
+            // Erreur générique
+            \Log::error("Failed to send badge notification", [
+                'user_id' => $this->user_id,
+                'badge_id' => $this->badge_id,
+                'badge_code' => $this->badge->code ?? 'unknown',
+                'error' => $e->getMessage(),
+                'type' => get_class($e)
+            ]);
+
+            // Même en cas d'erreur, on marque comme notifié pour éviter les boucles
+            $this->notified_at = now();
+            $this->save();
+        }
     }
 
     public function updateProgress($data, $percentage = null)

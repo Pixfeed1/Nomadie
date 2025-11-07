@@ -139,11 +139,16 @@ class DashboardController extends Controller
             ->whereNotNull('rating')
             ->avg('rating') ?? 0;
 
-        // Nombre total de réservations (à adapter selon votre modèle Order/Booking)
-        $totalBookings = 0; // À implémenter quand vous aurez le modèle Order
+        // Nombre total de réservations
+        $totalBookings = $vendor->bookings()
+            ->whereIn('status', ['confirmed', 'completed'])
+            ->count();
 
-        // Revenus totaux (à adapter selon votre modèle)
-        $totalRevenue = 0; // À implémenter quand vous aurez les commandes
+        // Revenus totaux
+        $totalRevenue = $vendor->bookings()
+            ->whereIn('status', ['confirmed', 'completed'])
+            ->where('payment_status', 'paid')
+            ->sum('total_amount');
 
         // Informations sur l'abonnement
         $subscriptionInfo = $this->getSubscriptionInfo($vendor);
@@ -275,8 +280,17 @@ class DashboardController extends Controller
                 ->whereBetween('created_at', [$monthStart, $monthEnd])
                 ->count();
 
-            // Compter les réservations ce mois-ci (à adapter)
-            $bookingsCount = 0; // À implémenter avec votre modèle Order
+            // Compter les réservations ce mois-ci
+            $bookingsCount = $vendor->bookings()
+                ->whereBetween('created_at', [$monthStart, $monthEnd])
+                ->whereIn('status', ['confirmed', 'completed'])
+                ->count();
+
+            // Revenus du mois
+            $revenue = $vendor->bookings()
+                ->whereBetween('created_at', [$monthStart, $monthEnd])
+                ->where('payment_status', 'paid')
+                ->sum('total_amount');
 
             $last6Months->push([
                 'month' => $date->format('M Y'),
@@ -284,7 +298,7 @@ class DashboardController extends Controller
                 'trips_created' => $tripsCreated,
                 'availabilities_created' => $availabilitiesCreated,
                 'bookings' => $bookingsCount,
-                'revenue' => 0 // À implémenter
+                'revenue' => $revenue
             ]);
         }
 
@@ -488,19 +502,255 @@ class DashboardController extends Controller
                 ->whereBetween('start_date', [$monthStart, $monthEnd])
                 ->count();
 
+            // Réservations du mois
+            $bookings = $vendor->bookings()
+                ->whereBetween('created_at', [$monthStart, $monthEnd])
+                ->whereIn('status', ['confirmed', 'completed'])
+                ->count();
+
+            // Revenus du mois
+            $revenue = $vendor->bookings()
+                ->whereBetween('created_at', [$monthStart, $monthEnd])
+                ->where('payment_status', 'paid')
+                ->sum('total_amount');
+
             $last12Months->push([
                 'month' => $date->format('M Y'),
                 'month_short' => $date->format('M'),
                 'year' => $date->format('Y'),
                 'trips_created' => $tripsCreated,
                 'availabilities_starting' => $availabilitiesStarting,
-                'bookings' => 0, // À implémenter
-                'revenue' => 0   // À implémenter
+                'bookings' => $bookings,
+                'revenue' => $revenue
             ]);
         }
 
         return [
             'monthly_data' => $last12Months
         ];
+    }
+
+    /**
+     * Rapport des ventes
+     *
+     * @param Request $request
+     * @return \Illuminate\View\View
+     */
+    public function salesReport(Request $request)
+    {
+        $vendor = Auth::user()->vendor;
+
+        if (!$vendor) {
+            return redirect()->route('vendor.register');
+        }
+
+        // Période par défaut : 30 derniers jours
+        $startDate = $request->input('start_date', Carbon::now()->subDays(30)->format('Y-m-d'));
+        $endDate = $request->input('end_date', Carbon::now()->format('Y-m-d'));
+
+        // Réservations de la période
+        $bookings = $vendor->bookings()
+            ->with(['trip', 'user', 'availability'])
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->orderBy('created_at', 'desc')
+            ->paginate(20);
+
+        // Statistiques de la période
+        $stats = [
+            'total_bookings' => $vendor->bookings()
+                ->whereBetween('created_at', [$startDate, $endDate])
+                ->count(),
+            'confirmed_bookings' => $vendor->bookings()
+                ->whereBetween('created_at', [$startDate, $endDate])
+                ->whereIn('status', ['confirmed', 'completed'])
+                ->count(),
+            'cancelled_bookings' => $vendor->bookings()
+                ->whereBetween('created_at', [$startDate, $endDate])
+                ->where('status', 'cancelled')
+                ->count(),
+            'total_revenue' => $vendor->bookings()
+                ->whereBetween('created_at', [$startDate, $endDate])
+                ->where('payment_status', 'paid')
+                ->sum('total_amount'),
+            'pending_revenue' => $vendor->bookings()
+                ->whereBetween('created_at', [$startDate, $endDate])
+                ->where('payment_status', 'pending')
+                ->sum('total_amount'),
+        ];
+
+        return view('vendor.reports.sales', compact('vendor', 'bookings', 'stats', 'startDate', 'endDate'));
+    }
+
+    /**
+     * Rapport des voyages
+     *
+     * @param Request $request
+     * @return \Illuminate\View\View
+     */
+    public function tripsReport(Request $request)
+    {
+        $vendor = Auth::user()->vendor;
+
+        if (!$vendor) {
+            return redirect()->route('vendor.register');
+        }
+
+        // Filtres
+        $status = $request->input('status', 'all');
+
+        // Requête de base
+        $query = $vendor->trips()->with(['destination', 'travelType', 'availabilities']);
+
+        if ($status !== 'all') {
+            $query->where('status', $status);
+        }
+
+        $trips = $query->withCount([
+            'availabilities as upcoming_availabilities' => function($q) {
+                $q->upcoming();
+            },
+            'bookings as total_bookings' => function($q) {
+                $q->whereIn('status', ['confirmed', 'completed']);
+            }
+        ])->paginate(15);
+
+        // Statistiques globales
+        $stats = [
+            'total_trips' => $vendor->trips()->count(),
+            'active_trips' => $vendor->trips()->where('status', 'active')->count(),
+            'draft_trips' => $vendor->trips()->where('status', 'draft')->count(),
+            'inactive_trips' => $vendor->trips()->where('status', 'inactive')->count(),
+            'avg_price' => $vendor->trips()->avg('price') ?? 0,
+            'total_availabilities' => TripAvailability::whereIn('trip_id', $vendor->trips()->pluck('id'))->count(),
+        ];
+
+        return view('vendor.reports.trips', compact('vendor', 'trips', 'stats', 'status'));
+    }
+
+    /**
+     * Exporter le rapport des ventes en CSV
+     *
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\StreamedResponse
+     */
+    public function exportSalesReport(Request $request)
+    {
+        $vendor = Auth::user()->vendor;
+
+        if (!$vendor) {
+            return redirect()->route('vendor.register');
+        }
+
+        $startDate = $request->input('start_date', Carbon::now()->subDays(30)->format('Y-m-d'));
+        $endDate = $request->input('end_date', Carbon::now()->format('Y-m-d'));
+
+        $bookings = $vendor->bookings()
+            ->with(['trip', 'user', 'availability'])
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        $filename = 'ventes_' . $vendor->company_name . '_' . date('Y-m-d') . '.csv';
+
+        return response()->streamDownload(function() use ($bookings) {
+            $file = fopen('php://output', 'w');
+
+            // En-têtes CSV
+            fputcsv($file, [
+                'Numéro réservation',
+                'Date',
+                'Voyage',
+                'Client',
+                'Voyageurs',
+                'Montant',
+                'Statut',
+                'Paiement'
+            ]);
+
+            // Données
+            foreach ($bookings as $booking) {
+                fputcsv($file, [
+                    $booking->booking_number,
+                    $booking->created_at->format('Y-m-d H:i'),
+                    $booking->trip->title ?? 'N/A',
+                    $booking->user->name ?? 'N/A',
+                    $booking->number_of_travelers,
+                    number_format($booking->total_amount, 2) . '€',
+                    $booking->status,
+                    $booking->payment_status
+                ]);
+            }
+
+            fclose($file);
+        }, $filename, [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+        ]);
+    }
+
+    /**
+     * Exporter le rapport des voyages en CSV
+     *
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\StreamedResponse
+     */
+    public function exportTripsReport(Request $request)
+    {
+        $vendor = Auth::user()->vendor;
+
+        if (!$vendor) {
+            return redirect()->route('vendor.register');
+        }
+
+        $trips = $vendor->trips()
+            ->with(['destination', 'travelType'])
+            ->withCount([
+                'availabilities as upcoming_availabilities' => function($q) {
+                    $q->upcoming();
+                },
+                'bookings as total_bookings' => function($q) {
+                    $q->whereIn('status', ['confirmed', 'completed']);
+                }
+            ])
+            ->get();
+
+        $filename = 'voyages_' . $vendor->company_name . '_' . date('Y-m-d') . '.csv';
+
+        return response()->streamDownload(function() use ($trips) {
+            $file = fopen('php://output', 'w');
+
+            // En-têtes CSV
+            fputcsv($file, [
+                'Titre',
+                'Destination',
+                'Type',
+                'Prix',
+                'Statut',
+                'Disponibilités',
+                'Réservations',
+                'Note',
+                'Date création'
+            ]);
+
+            // Données
+            foreach ($trips as $trip) {
+                fputcsv($file, [
+                    $trip->title,
+                    $trip->destination->name ?? 'N/A',
+                    $trip->travelType->name ?? 'N/A',
+                    number_format($trip->price, 2) . '€',
+                    $trip->status,
+                    $trip->upcoming_availabilities ?? 0,
+                    $trip->total_bookings ?? 0,
+                    $trip->rating ?? 'N/A',
+                    $trip->created_at->format('Y-m-d')
+                ]);
+            }
+
+            fclose($file);
+        }, $filename, [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+        ]);
     }
 }

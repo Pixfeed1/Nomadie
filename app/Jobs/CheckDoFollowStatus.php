@@ -49,13 +49,26 @@ class CheckDoFollowStatus implements ShouldQueue
         if ($avgScore >= 78 && $avgReadingTime >= 4 && $totalComments >= 6) {
             // Passer en dofollow
             $this->user->update(['is_dofollow' => true]);
-            
+
             // Mettre à jour toutes les analyses
             SeoAnalysis::where('user_id', $this->user->id)
                 ->update(['is_dofollow' => true]);
-            
+
             // Envoyer notification
             $this->user->notify(new DoFollowAchieved($analyses->count()));
+
+            // Vérifier le badge "DoFollow Débloqué"
+            $doFollowBadge = \App\Models\Badge::where('code', 'dofollow_debloquer')->first();
+            if ($doFollowBadge) {
+                \App\Jobs\CheckUserBadges::dispatch($this->user, $doFollowBadge);
+
+                \Log::info("DoFollow badge check triggered", [
+                    'user_id' => $this->user->id,
+                    'avg_score' => $avgScore,
+                    'avg_reading_time' => $avgReadingTime,
+                    'total_comments' => $totalComments
+                ]);
+            }
         }
     }
 }

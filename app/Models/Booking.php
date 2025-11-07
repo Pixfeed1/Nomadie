@@ -217,6 +217,22 @@ class Booking extends Model
     }
 
     /**
+     * Relation avec les demandes de remboursement
+     */
+    public function refunds()
+    {
+        return $this->hasMany(Refund::class);
+    }
+
+    /**
+     * Relation avec la demande de remboursement active
+     */
+    public function activeRefund()
+    {
+        return $this->hasOne(Refund::class)->whereIn('status', ['requested', 'approved']);
+    }
+
+    /**
      * Scope pour les réservations confirmées
      */
     public function scopeConfirmed($query)
@@ -346,17 +362,101 @@ class Booking extends Model
         }
 
         $daysUntilStart = now()->diffInDays($this->availability->start_date, false);
-        
-        // Politique de remboursement (à adapter selon vos besoins)
-        if ($daysUntilStart >= 30) {
-            return $this->total_amount; // 100% de remboursement
-        } elseif ($daysUntilStart >= 14) {
-            return $this->total_amount * 0.5; // 50% de remboursement
-        } elseif ($daysUntilStart >= 7) {
-            return $this->total_amount * 0.25; // 25% de remboursement
+
+        // Politique de remboursement depuis la configuration
+        $policy = config('business.refund_policy');
+
+        foreach ($policy as $minDays => $percentage) {
+            if ($daysUntilStart >= $minDays) {
+                return $this->total_amount * $percentage;
+            }
         }
-        
+
         return 0; // Pas de remboursement
+    }
+
+    /**
+     * Créer une demande de remboursement
+     */
+    public function requestRefund($reason = null)
+    {
+        // Vérifier qu'il n'y a pas déjà une demande active
+        if ($this->activeRefund) {
+            return null;
+        }
+
+        // Calculer le montant du remboursement
+        $refundAmount = $this->calculateRefundAmount();
+
+        if ($refundAmount <= 0) {
+            return null;
+        }
+
+        // Créer la demande
+        $refund = $this->refunds()->create([
+            'user_id' => $this->user_id,
+            'status' => Refund::STATUS_REQUESTED,
+            'amount' => $refundAmount,
+            'original_amount' => $this->total_amount,
+            'reason' => $reason,
+            'requested_at' => now(),
+            'payment_intent_id' => $this->payment_intent_id,
+        ]);
+
+        // Annuler la réservation
+        $this->cancel('Demande de remboursement');
+
+        return $refund;
+    }
+
+    /**
+     * Vérifier si un remboursement peut être demandé
+     */
+    public function canRequestRefund()
+    {
+        // Pas de demande active
+        if ($this->activeRefund) {
+            return false;
+        }
+
+        // Réservation doit être payée et confirmée
+        if ($this->payment_status !== self::PAYMENT_PAID) {
+            return false;
+        }
+
+        if (!in_array($this->status, [self::STATUS_CONFIRMED, self::STATUS_CANCELLED])) {
+            return false;
+        }
+
+        // Le montant du remboursement doit être > 0
+        return $this->calculateRefundAmount() > 0;
+    }
+
+    /**
+     * Mutateurs pour validation des prix
+     */
+    public function setTotalAmountAttribute($value)
+    {
+        if ($value < 0) {
+            throw new \InvalidArgumentException('Le montant total ne peut pas être négatif.');
+        }
+        $this->attributes['total_amount'] = $value;
+    }
+
+    public function setAdultPriceAttribute($value)
+    {
+        if ($value < 0) {
+            throw new \InvalidArgumentException('Le prix adulte ne peut pas être négatif.');
+        }
+        $this->attributes['adult_price'] = $value;
+    }
+
+    public function setChildPriceAttribute($value)
+    {
+        if ($value < 0) {
+            throw new \InvalidArgumentException('Le prix enfant ne peut pas être négatif.');
+        }
+        $this->attributes['child_price'] = $value;
     }
 
     /**
