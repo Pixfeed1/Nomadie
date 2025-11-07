@@ -14,6 +14,22 @@ class User extends Authenticatable
     use HasApiTokens, HasFactory, Notifiable;
 
     /**
+     * Writer type constants
+     */
+    const WRITER_TYPE_COMMUNITY = 'community';
+    const WRITER_TYPE_CLIENT_CONTRIBUTOR = 'client_contributor';
+    const WRITER_TYPE_PARTNER = 'partner';
+    const WRITER_TYPE_TEAM = 'team';
+
+    /**
+     * Writer status constants
+     */
+    const WRITER_STATUS_PENDING = 'pending_validation';
+    const WRITER_STATUS_VALIDATED = 'validated';
+    const WRITER_STATUS_REJECTED = 'rejected';
+    const WRITER_STATUS_SUSPENDED = 'suspended';
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var array<int, string>
@@ -31,6 +47,12 @@ class User extends Authenticatable
         'email_verification_token',
         'email_verified_at',
         'google_id',
+        'writer_type',
+        'writer_status',
+        'writer_validated_at',
+        'writer_notes',
+        'verified_booking_id',
+        'partner_offer_url',
     ];
 
     /**
@@ -53,6 +75,7 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'newsletter' => 'boolean',
         'is_dofollow' => 'boolean',
+        'writer_validated_at' => 'datetime',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
@@ -279,5 +302,198 @@ class User extends Authenticatable
     public function scopeNewsletterSubscribers($query)
     {
         return $query->where('newsletter', true);
+    }
+
+    // ==========================================
+    // WRITER TYPE METHODS
+    // ==========================================
+
+    /**
+     * Check if user is a writer (has any writer_type)
+     */
+    public function isWriter()
+    {
+        return !is_null($this->writer_type);
+    }
+
+    /**
+     * Check if user is a community writer
+     */
+    public function isCommunityWriter()
+    {
+        return $this->writer_type === self::WRITER_TYPE_COMMUNITY;
+    }
+
+    /**
+     * Check if user is a client-contributor
+     */
+    public function isClientContributor()
+    {
+        return $this->writer_type === self::WRITER_TYPE_CLIENT_CONTRIBUTOR;
+    }
+
+    /**
+     * Check if user is a partner writer
+     */
+    public function isPartner()
+    {
+        return $this->writer_type === self::WRITER_TYPE_PARTNER;
+    }
+
+    /**
+     * Check if user is a team member
+     */
+    public function isTeamMember()
+    {
+        return $this->writer_type === self::WRITER_TYPE_TEAM;
+    }
+
+    /**
+     * Check if writer is validated
+     */
+    public function isValidatedWriter()
+    {
+        return $this->writer_status === self::WRITER_STATUS_VALIDATED;
+    }
+
+    /**
+     * Check if writer is pending validation
+     */
+    public function isPendingWriter()
+    {
+        return $this->writer_status === self::WRITER_STATUS_PENDING;
+    }
+
+    /**
+     * Check if writer is rejected
+     */
+    public function isRejectedWriter()
+    {
+        return $this->writer_status === self::WRITER_STATUS_REJECTED;
+    }
+
+    /**
+     * Check if writer is suspended
+     */
+    public function isSuspendedWriter()
+    {
+        return $this->writer_status === self::WRITER_STATUS_SUSPENDED;
+    }
+
+    /**
+     * Check if user can write articles (validated or team)
+     */
+    public function canWriteArticles()
+    {
+        // Team members can always write
+        if ($this->isTeamMember()) {
+            return true;
+        }
+
+        // Other writers need to be validated
+        return $this->isWriter() && $this->isValidatedWriter();
+    }
+
+    /**
+     * Check if user needs to submit a test article (community writers only)
+     */
+    public function needsTestArticle()
+    {
+        return $this->isCommunityWriter() &&
+               $this->writer_status === self::WRITER_STATUS_PENDING &&
+               $this->articles()->count() === 0;
+    }
+
+    /**
+     * Get writer type label
+     */
+    public function getWriterTypeLabel()
+    {
+        return match($this->writer_type) {
+            self::WRITER_TYPE_COMMUNITY => 'Rédacteur Communauté',
+            self::WRITER_TYPE_CLIENT_CONTRIBUTOR => 'Client-Contributeur',
+            self::WRITER_TYPE_PARTNER => 'Partenaire',
+            self::WRITER_TYPE_TEAM => 'Équipe Nomadie',
+            default => 'Non défini',
+        };
+    }
+
+    /**
+     * Get writer status label
+     */
+    public function getWriterStatusLabel()
+    {
+        return match($this->writer_status) {
+            self::WRITER_STATUS_PENDING => 'En attente de validation',
+            self::WRITER_STATUS_VALIDATED => 'Validé',
+            self::WRITER_STATUS_REJECTED => 'Refusé',
+            self::WRITER_STATUS_SUSPENDED => 'Suspendu',
+            default => 'Non défini',
+        };
+    }
+
+    /**
+     * Validate writer (admin action)
+     */
+    public function validateWriter()
+    {
+        $this->update([
+            'writer_status' => self::WRITER_STATUS_VALIDATED,
+            'writer_validated_at' => now()
+        ]);
+    }
+
+    /**
+     * Reject writer (admin action)
+     */
+    public function rejectWriter($reason = null)
+    {
+        $this->update([
+            'writer_status' => self::WRITER_STATUS_REJECTED,
+            'writer_notes' => $reason
+        ]);
+    }
+
+    /**
+     * Suspend writer (admin action)
+     */
+    public function suspendWriter($reason = null)
+    {
+        $this->update([
+            'writer_status' => self::WRITER_STATUS_SUSPENDED,
+            'writer_notes' => $reason
+        ]);
+    }
+
+    /**
+     * Scope to filter by writer type
+     */
+    public function scopeWriterType($query, $type)
+    {
+        return $query->where('writer_type', $type);
+    }
+
+    /**
+     * Scope to filter by writer status
+     */
+    public function scopeWriterStatus($query, $status)
+    {
+        return $query->where('writer_status', $status);
+    }
+
+    /**
+     * Scope to get all validated writers
+     */
+    public function scopeValidatedWriters($query)
+    {
+        return $query->where('writer_status', self::WRITER_STATUS_VALIDATED);
+    }
+
+    /**
+     * Scope to get all pending writers
+     */
+    public function scopePendingWriters($query)
+    {
+        return $query->where('writer_status', self::WRITER_STATUS_PENDING);
     }
 }

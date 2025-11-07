@@ -109,6 +109,9 @@ class Kernel extends HttpKernel
         // NOUVEAU : Middleware pour les clients
         'customer' => \App\Http\Middleware\CustomerMiddleware::class,
 
+        // Middleware pour les rédacteurs
+        'writer' => \App\Http\Middleware\WriterMiddleware::class,
+
         // Middleware pour les administrateurs
         'admin' => \App\Http\Middleware\AdminMiddleware::class,
     ];

@@ -434,9 +434,21 @@ Route::middleware(['auth', 'vendor_dashboard'])->prefix('vendor')->name('vendor.
 // ==========================================
 // ESPACE RÉDACTEURS
 // ==========================================
+// ==========================================
+// ROUTES INSCRIPTION RÉDACTEUR (auth seulement)
+// ==========================================
 Route::middleware(['auth'])->prefix('writer')->name('writer.')->group(function () {
+    Route::get('/register', [\App\Http\Controllers\Writer\RegistrationController::class, 'showForm'])->name('register');
+    Route::post('/register', [\App\Http\Controllers\Writer\RegistrationController::class, 'register'])->name('register.submit');
+    Route::get('/pending', [\App\Http\Controllers\Writer\RegistrationController::class, 'pending'])->name('pending');
+});
+
+// ==========================================
+// ROUTES ESPACE RÉDACTEUR (writer middleware)
+// ==========================================
+Route::middleware(['auth', 'writer'])->prefix('writer')->name('writer.')->group(function () {
     Route::get('/dashboard', [\App\Http\Controllers\Writer\DashboardController::class, 'index'])->name('dashboard');
-    
+
     Route::prefix('articles')->name('articles.')->group(function () {
         Route::get('/', [\App\Http\Controllers\Writer\ArticleController::class, 'index'])->name('index');
         Route::get('/create', [\App\Http\Controllers\Writer\ArticleController::class, 'create'])->name('create');
