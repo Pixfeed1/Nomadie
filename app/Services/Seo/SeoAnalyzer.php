@@ -1031,6 +1031,9 @@ class SeoAnalyzer
         
         // Analyser l'authenticité des images
         $this->analyzeImageAuthenticity();
+
+        // PHASE 6: Analyser le ratio images/contenu
+        $this->analyzeImageRatio();
     }
     
     /**
@@ -1175,7 +1178,83 @@ class SeoAnalyzer
         
         return "Mix d'images : {$authenticPercent}% originales, {$freePercent}% stock gratuit, {$paidPercent}% stock payant";
     }
-    
+
+    /**
+     * PHASE 6: Analyser le ratio images/contenu
+     * Règle: 1 image minimum tous les 300 mots pour une bonne lisibilité
+     */
+    protected function analyzeImageRatio()
+    {
+        $criterion = SeoCriterion::where('code', 'image_ratio')->first();
+        if (!$criterion) return;
+
+        // Récupérer le nombre de mots et d'images
+        $wordCount = $this->analysis->word_count ?? str_word_count(strip_tags($this->article->content));
+        $imageCount = $this->analysis->images_count ?? 0;
+
+        $rules = $criterion->validation_rules;
+        $wordsPerImage = $rules['words_per_image'] ?? 300;
+
+        // Calculer le nombre d'images recommandé
+        $recommendedImages = ceil($wordCount / $wordsPerImage);
+
+        // Calculer le ratio actuel vs optimal
+        $actualRatio = $imageCount > 0 ? $wordCount / $imageCount : $wordCount;
+        $ratioScore = $recommendedImages > 0 ? min(1, $imageCount / $recommendedImages) : 0;
+
+        // Calculer le score
+        $score = 0;
+        $passed = false;
+
+        if ($imageCount >= $recommendedImages) {
+            // Parfait ou mieux
+            $score = $criterion->max_score;
+            $passed = true;
+        } elseif ($ratioScore >= ($rules['min_ratio'] ?? 0.8)) {
+            // Acceptable (80%+ du ratio optimal)
+            $score = $criterion->max_score * $ratioScore;
+            $passed = true;
+        } else {
+            // Insuffisant
+            $score = $criterion->max_score * $ratioScore * 0.5;
+            $passed = false;
+        }
+
+        // Générer le feedback
+        $feedback = [
+            'message' => sprintf(
+                "%d image(s) pour %d mots (recommandé: %d images, soit 1/%d mots)",
+                $imageCount,
+                $wordCount,
+                $recommendedImages,
+                $wordsPerImage
+            ),
+            'suggestions' => []
+        ];
+
+        if (!$passed) {
+            $missingImages = $recommendedImages - $imageCount;
+            $feedback['suggestions'][] = sprintf(
+                "Ajoutez %d image(s) supplémentaire(s) pour atteindre le ratio optimal de 1 image/%d mots",
+                $missingImages,
+                $wordsPerImage
+            );
+            $feedback['suggestions'][] = "Les images améliorent la lisibilité et le temps de lecture";
+        } elseif ($imageCount > $recommendedImages * 1.5) {
+            // Trop d'images (bonus warning)
+            $feedback['suggestions'][] = "Attention: beaucoup d'images. Assurez-vous qu'elles apportent toutes de la valeur";
+        }
+
+        $this->saveDetail($criterion, $score, $passed, $feedback, [
+            'word_count' => $wordCount,
+            'image_count' => $imageCount,
+            'recommended_images' => $recommendedImages,
+            'actual_ratio' => round($actualRatio, 0),
+            'optimal_ratio' => $wordsPerImage,
+            'ratio_score' => round($ratioScore * 100, 1)
+        ]);
+    }
+
     /**
      * Analyser l'engagement
      */
