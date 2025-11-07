@@ -24,9 +24,9 @@ class Destination extends Model
         'image',
         'country_id',
         'is_active',
-        'active' // Pour la rétrocompatibilité
+        'active' // Alias pour rétrocompatibilité, syncé avec is_active via mutator
     ];
-    
+
     /**
      * Les attributs qui doivent être castés.
      *
@@ -34,7 +34,6 @@ class Destination extends Model
      */
     protected $casts = [
         'is_active' => 'boolean',
-        'active' => 'boolean',
     ];
     
     /**
@@ -91,9 +90,23 @@ class Destination extends Model
      */
     public function scopeActive($query)
     {
-        return $query->where(function($q) {
-            $q->where('is_active', true)
-              ->orWhere('active', true);
-        });
+        return $query->where('is_active', true);
+    }
+
+    /**
+     * Mutateur pour 'active' - sync avec 'is_active' pour rétrocompatibilité
+     */
+    public function setActiveAttribute($value)
+    {
+        $this->attributes['is_active'] = $value;
+        $this->attributes['active'] = $value;
+    }
+
+    /**
+     * Accesseur pour 'active' - retourne is_active pour rétrocompatibilité
+     */
+    public function getActiveAttribute()
+    {
+        return $this->attributes['is_active'] ?? false;
     }
 }
