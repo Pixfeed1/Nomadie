@@ -18,6 +18,7 @@ class Review extends Model
     protected $fillable = [
         'user_id',
         'trip_id',
+        'booking_id',
         'rating',
         'content',
         'travel_date',
@@ -48,6 +49,14 @@ class Review extends Model
     public function trip()
     {
         return $this->belongsTo(Trip::class);
+    }
+
+    /**
+     * Relation avec la réservation
+     */
+    public function booking()
+    {
+        return $this->belongsTo(Booking::class);
     }
 
     /**

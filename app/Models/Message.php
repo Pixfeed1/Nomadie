@@ -16,6 +16,10 @@ class Message extends Model
         'recipient_type', // customer, vendor
         'subject',
         'content',
+        'attachment',
+        'attachment_name',
+        'attachment_type',
+        'attachment_size',
         'is_read',
         'read_at',
         'booking_id',

@@ -38,7 +38,7 @@ class Payment extends Model
         'paid_at' => 'datetime',
         'refunded_at' => 'datetime',
         'metadata' => 'array',
-        'amount' => 'integer',
+        'amount' => 'float',
     ];
 
     /**
