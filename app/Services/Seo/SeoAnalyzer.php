@@ -660,36 +660,145 @@ class SeoAnalyzer
         // Open Graph
         $this->analyzeOpenGraph();
     }
-    
+
     /**
-     * Analyser la meta description
+     * PHASE 6: Analyser la qualité de la meta description
+     * Vérifie longueur, mots-clés, CTA et unicité
      */
     protected function analyzeMetaDescription()
     {
         $criterion = SeoCriterion::where('code', 'meta_description')->first();
         if (!$criterion) return;
-        
+
         $metaData = $this->article->meta_data ?? [];
         $description = $metaData['description'] ?? '';
+        $excerpt = $this->article->excerpt ?? '';
+        $title = $this->article->title ?? '';
         $length = strlen($description);
-        
+
         $rules = $criterion->validation_rules;
-        $score = 0;
-        $passed = false;
-        
-        if ($length >= $rules['min'] && $length <= $rules['max']) {
-            $score = $criterion->max_score;
-            $passed = true;
-        } elseif ($length > 0) {
-            $score = $criterion->max_score * 0.5;
+        $score = $criterion->max_score;
+        $passed = true;
+        $issues = [];
+        $suggestions = [];
+        $qualityChecks = [];
+
+        // 1. Vérifier la longueur (critère de base)
+        if ($length === 0) {
+            $score = 0;
+            $passed = false;
+            $issues[] = "Pas de meta description";
+            $suggestions[] = "Rédigez une meta description entre {$rules['min']} et {$rules['max']} caractères";
+        } elseif ($length < $rules['min'] || $length > $rules['max']) {
+            $score *= 0.7;
+            $passed = false;
+            $issues[] = "Longueur incorrecte ({$length} caractères)";
+            $suggestions[] = $length < $rules['min']
+                ? "Allongez votre meta description (actuel: {$length}, optimal: {$rules['min']}-{$rules['max']})"
+                : "Raccourcissez votre meta description (actuel: {$length}, optimal: {$rules['min']}-{$rules['max']})";
+        } else {
+            $qualityChecks['length'] = true;
         }
-        
+
+        if ($length > 0) {
+            $descriptionLower = strtolower($description);
+            $titleLower = strtolower($title);
+
+            // 2. PHASE 6: Vérifier présence mots-clés du titre
+            if ($rules['check_keywords'] ?? true) {
+                $titleWords = array_filter(
+                    str_word_count($titleLower, 1),
+                    fn($w) => strlen($w) > 3  // Mots de 4+ caractères
+                );
+
+                $keywordsMatched = 0;
+                $matchedWords = [];
+                foreach ($titleWords as $word) {
+                    if (strpos($descriptionLower, $word) !== false) {
+                        $keywordsMatched++;
+                        $matchedWords[] = $word;
+                    }
+                }
+
+                $minKeywords = $rules['min_keywords_match'] ?? 2;
+                if ($keywordsMatched >= $minKeywords) {
+                    $qualityChecks['keywords'] = true;
+                } else {
+                    $score *= 0.85;
+                    $passed = false;
+                    $issues[] = "Seulement {$keywordsMatched} mot(s)-clé du titre";
+                    $suggestions[] = "Incluez au moins {$minKeywords} mots-clés importants du titre dans la meta description";
+                }
+
+                $qualityChecks['keywords_matched'] = $keywordsMatched;
+                $qualityChecks['matched_words'] = array_slice($matchedWords, 0, 5);
+            }
+
+            // 3. PHASE 6: Vérifier présence CTA (Call To Action)
+            if ($rules['check_cta'] ?? true) {
+                $ctaWords = $rules['cta_words'] ?? [
+                    'découvrez', 'explorez', 'consultez', 'lisez', 'apprenez',
+                    'trouvez', 'visitez', 'réservez', 'planifiez', 'préparez'
+                ];
+
+                $hasCta = false;
+                $ctaFound = [];
+                foreach ($ctaWords as $cta) {
+                    if (strpos($descriptionLower, $cta) !== false) {
+                        $hasCta = true;
+                        $ctaFound[] = $cta;
+                    }
+                }
+
+                if ($hasCta) {
+                    $qualityChecks['has_cta'] = true;
+                    $qualityChecks['cta_words'] = $ctaFound;
+                } else {
+                    $score *= 0.9;
+                    $issues[] = "Pas de call-to-action";
+                    $suggestions[] = "Ajoutez un verbe d'action pour inciter au clic (découvrez, explorez, lisez, etc.)";
+                }
+            }
+
+            // 4. PHASE 6: Vérifier unicité (différente de l'excerpt)
+            if ($rules['check_uniqueness'] ?? true) {
+                if (!empty($excerpt)) {
+                    $similarity = similar_text($descriptionLower, strtolower($excerpt), $percent);
+
+                    if ($percent > 80) {
+                        $score *= 0.9;
+                        $issues[] = sprintf("Trop similaire à l'extrait (%.0f%% identique)", $percent);
+                        $suggestions[] = "Rédigez une meta description unique, différente de l'extrait";
+                    } else {
+                        $qualityChecks['unique'] = true;
+                    }
+
+                    $qualityChecks['similarity_with_excerpt'] = round($percent, 1);
+                } else {
+                    $qualityChecks['unique'] = true; // Pas d'excerpt = unique par défaut
+                }
+            }
+        }
+
+        // Calculer le score de qualité global
+        $qualityScore = count(array_filter($qualityChecks, fn($v) => $v === true));
+        $maxQualityChecks = 4; // length, keywords, cta, unique
+        $score = max(0, $score);
+
         $feedback = [
-            'message' => $length > 0 ? "Meta description: {$length} caractères" : "Pas de meta description",
-            'suggestions' => $passed ? [] : ['Rédigez une meta description entre 150 et 160 caractères']
+            'message' => $passed
+                ? sprintf("Meta description de qualité (%d/%d checks OK)", $qualityScore, $maxQualityChecks)
+                : 'Problèmes: ' . implode(', ', $issues),
+            'suggestions' => $suggestions
         ];
-        
-        $this->saveDetail($criterion, $score, $passed, $feedback, ['length' => $length]);
+
+        $this->saveDetail($criterion, $score, $passed, $feedback, [
+            'length' => $length,
+            'quality_checks' => $qualityChecks,
+            'quality_score' => $qualityScore,
+            'max_checks' => $maxQualityChecks,
+            'description_preview' => substr($description, 0, 100)
+        ]);
     }
     
     /**
