@@ -80,7 +80,7 @@ class Badge extends Model
                 'topic_proposals' => true
             ]
         ],
-        'dofollow_debloquer' => [
+        'dofollow_debloque' => [
             'name' => 'Dofollow Débloqué',
             'description' => 'Premier article qualifié pour liens dofollow',
             'color' => 'indigo',

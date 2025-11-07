@@ -31,7 +31,7 @@ class CheckDoFollowStatus implements ShouldQueue
 
         // Récupérer les analyses des 5 derniers articles
         $analyses = SeoAnalysis::where('user_id', $this->user->id)
-            ->where('status', 'published')
+            ->where('status', 'completed')
             ->orderBy('created_at', 'desc')
             ->limit(5)
             ->get();
@@ -58,7 +58,7 @@ class CheckDoFollowStatus implements ShouldQueue
             $this->user->notify(new DoFollowAchieved($analyses->count()));
 
             // Vérifier le badge "DoFollow Débloqué"
-            $doFollowBadge = \App\Models\Badge::where('code', 'dofollow_debloquer')->first();
+            $doFollowBadge = \App\Models\Badge::where('code', 'dofollow_debloque')->first();
             if ($doFollowBadge) {
                 \App\Jobs\CheckUserBadges::dispatch($this->user, $doFollowBadge);
 
