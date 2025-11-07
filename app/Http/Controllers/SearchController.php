@@ -17,16 +17,27 @@ class SearchController extends Controller
      */
     public function search(Request $request)
     {
+        // Validation des paramètres de recherche
+        $validated = $request->validate([
+            'destination' => 'nullable|string|max:100',
+            'date' => 'nullable|date|after_or_equal:today',
+            'travelers' => 'nullable|integer|min:1|max:100',
+            'price_min' => 'nullable|numeric|min:0',
+            'price_max' => 'nullable|numeric|min:0',
+            'duration' => 'nullable|string|max:20',
+            'travel_type' => 'nullable|string|max:50',
+        ]);
+
         // Récupération des paramètres de recherche
-        $destination = $request->input('destination');
-        $departureDate = $request->input('date');
-        $travelers = $request->input('travelers');
+        $destination = $validated['destination'] ?? null;
+        $departureDate = $validated['date'] ?? null;
+        $travelers = $validated['travelers'] ?? null;
         
         // Filtres supplémentaires (seront null s'ils ne sont pas fournis)
-        $priceMin = $request->input('price_min');
-        $priceMax = $request->input('price_max');
-        $duration = $request->input('duration');
-        $travelType = $request->input('travel_type');
+        $priceMin = $validated['price_min'] ?? null;
+        $priceMax = $validated['price_max'] ?? null;
+        $duration = $validated['duration'] ?? null;
+        $travelType = $validated['travel_type'] ?? null;
         
         // Initialisation de la requête
         $query = Trip::query();
