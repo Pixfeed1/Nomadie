@@ -61,9 +61,9 @@ class UserBadge extends Model
      */
     public function notifyUser()
     {
-        // Envoyer une notification (à implémenter)
-        // $this->user->notify(new BadgeUnlocked($this->badge));
-        
+        // Envoyer une notification
+        $this->user->notify(new BadgeUnlocked($this->badge));
+
         $this->notified_at = now();
         $this->save();
     }
