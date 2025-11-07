@@ -72,17 +72,62 @@ class BookingController extends Controller
     public function exportCsv()
     {
         $vendor = Auth::user()->vendor;
-        
+
         $bookings = Booking::whereHas('trip', function($query) use ($vendor) {
                 $query->where('vendor_id', $vendor->id);
             })
             ->with(['trip', 'user'])
+            ->orderBy('created_at', 'desc')
             ->get();
-        
-        // Logique d'export CSV
-        // À implémenter selon vos besoins
-        
-        return response()->download('bookings.csv');
+
+        // Générer le fichier CSV
+        $filename = 'reservations_' . date('Y-m-d_His') . '.csv';
+        $handle = fopen('php://temp', 'r+');
+
+        // En-têtes CSV
+        fputcsv($handle, [
+            'ID',
+            'Référence',
+            'Voyage',
+            'Client',
+            'Email',
+            'Date départ',
+            'Date retour',
+            'Adultes',
+            'Enfants',
+            'Montant total',
+            'Statut',
+            'Statut paiement',
+            'Date réservation',
+        ]);
+
+        // Données des réservations
+        foreach ($bookings as $booking) {
+            fputcsv($handle, [
+                $booking->id,
+                $booking->reference ?? 'N/A',
+                $booking->trip->title ?? 'N/A',
+                $booking->user->firstname . ' ' . $booking->user->lastname,
+                $booking->user->email,
+                $booking->start_date ? $booking->start_date->format('d/m/Y') : 'N/A',
+                $booking->end_date ? $booking->end_date->format('d/m/Y') : 'N/A',
+                $booking->adults ?? 0,
+                $booking->children ?? 0,
+                $booking->total_price ? number_format($booking->total_price, 2, ',', ' ') . ' €' : 'N/A',
+                $booking->status ?? 'N/A',
+                $booking->payment_status ?? 'N/A',
+                $booking->created_at->format('d/m/Y H:i'),
+            ]);
+        }
+
+        rewind($handle);
+        $csv = stream_get_contents($handle);
+        fclose($handle);
+
+        return response($csv, 200, [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+        ]);
     }
 
     /**
@@ -91,17 +136,25 @@ class BookingController extends Controller
     public function exportPdf()
     {
         $vendor = Auth::user()->vendor;
-        
+
         $bookings = Booking::whereHas('trip', function($query) use ($vendor) {
                 $query->where('vendor_id', $vendor->id);
             })
             ->with(['trip', 'user'])
+            ->orderBy('created_at', 'desc')
             ->get();
-        
-        // Logique d'export PDF
-        // À implémenter selon vos besoins
-        
-        return response()->download('bookings.pdf');
+
+        // Calculer les statistiques
+        $stats = [
+            'total' => $bookings->count(),
+            'confirmed' => $bookings->where('status', 'confirmed')->count(),
+            'pending' => $bookings->where('status', 'pending')->count(),
+            'cancelled' => $bookings->where('status', 'cancelled')->count(),
+            'revenue' => $bookings->where('payment_status', 'paid')->sum('total_price'),
+        ];
+
+        // Retourner une vue HTML formatée pour l'impression/PDF
+        return view('vendor.bookings.export-pdf', compact('bookings', 'vendor', 'stats'));
     }
 
     /**
