@@ -354,14 +354,6 @@ class User extends Authenticatable
     // ==========================================
 
     /**
-     * Check if user is a writer (has any writer_type)
-     */
-    public function isWriter()
-    {
-        return !is_null($this->writer_type);
-    }
-
-    /**
      * Check if user is a community writer
      */
     public function isCommunityWriter()
