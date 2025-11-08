@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('seo_configurations', function (Blueprint $table) {
             $table->id();
-            $table->enum('writer_type', ['communaute', 'client', 'partenaire', 'equipe']);
+            $table->enum('writer_type', ['community', 'client_contributor', 'partner', 'team']);
             $table->enum('mode', ['libre', 'commande_interne']);
             $table->foreignId('criterion_id')->constrained('seo_criteria')->cascadeOnDelete();
             $table->decimal('weight', 5, 2)->default(1.0); // Pondération (0.5 = 50%, 2.0 = 200%)
