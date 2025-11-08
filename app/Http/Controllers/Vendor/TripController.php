@@ -857,7 +857,19 @@ class TripController extends Controller
 
             // Gérer les images
             $currentImages = $trip->images ?? [];
-            
+
+            // Vérifier qu'il restera au minimum 5 images après suppression/ajout
+            $currentCount = count($currentImages);
+            $removeCount = count($validated['remove_images'] ?? []);
+            $newCount = $request->hasFile('images') ? count($request->file('images')) : 0;
+            $finalCount = $currentCount - $removeCount + $newCount;
+
+            if ($finalCount < 5) {
+                return back()->withErrors([
+                    'images' => "Vous devez avoir au minimum 5 images. Actuellement: {$currentCount}, à supprimer: {$removeCount}, à ajouter: {$newCount}. Total final: {$finalCount}."
+                ])->withInput();
+            }
+
             // Mettre à jour les légendes des images existantes
             if (!empty($validated['existing_captions'])) {
                 foreach ($currentImages as $index => &$image) {
@@ -866,7 +878,7 @@ class TripController extends Controller
                     }
                 }
             }
-            
+
             // Supprimer les images marquées pour suppression
             if (!empty($validated['remove_images'])) {
                 $remainingImages = [];

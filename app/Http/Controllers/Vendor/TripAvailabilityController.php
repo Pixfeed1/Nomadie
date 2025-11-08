@@ -112,14 +112,17 @@ class TripAvailabilityController extends Controller
         ]);
         
         // Vérifier que les dates correspondent à la durée du voyage
-        $startDate = Carbon::parse($validated['start_date']);
-        $endDate = Carbon::parse($validated['end_date']);
-        $duration = $startDate->diffInDays($endDate) + 1;
-        
-        if ($duration !== $trip->duration) {
-            return back()
-                ->withInput()
-                ->withErrors(['end_date' => "La durée calculée est de {$duration} jour(s), mais doit correspondre à {$trip->duration} jour(s)."]);
+        // (sauf pour les hébergements qui ont une durée flexible)
+        if ($trip->offer_type !== 'accommodation' && $trip->duration) {
+            $startDate = Carbon::parse($validated['start_date']);
+            $endDate = Carbon::parse($validated['end_date']);
+            $duration = $startDate->diffInDays($endDate) + 1;
+
+            if ($duration !== $trip->duration) {
+                return back()
+                    ->withInput()
+                    ->withErrors(['end_date' => "La durée calculée est de {$duration} jour(s), mais doit correspondre à {$trip->duration} jour(s)."]);
+            }
         }
         
         try {

@@ -86,14 +86,24 @@ class TripTypeSelectionController extends Controller
            'type' => 'required|in:location,sejour,activite,sur-mesure',
            'pricing_mode' => 'required'
        ]);
-       
+
+       // Mapper les types français vers les types anglais du système
+       $typeMapping = [
+           'location' => 'accommodation',
+           'sejour' => 'organized_trip',
+           'activite' => 'activity',
+           'sur-mesure' => 'custom'
+       ];
+
+       $mappedType = $typeMapping[$request->type] ?? 'custom';
+
        // Stocker le type en session pour le formulaire de création
        session([
-           'trip_creation_type' => $request->type,
+           'trip_creation_type' => $mappedType,
            'trip_pricing_mode' => $request->pricing_mode
        ]);
-       
-       // Rediriger vers le formulaire de création avec le type
-       return redirect()->route('vendor.trips.create', ['type' => $request->type]);
+
+       // Rediriger vers le formulaire de création avec le type mappé
+       return redirect()->route('vendor.trips.create', ['type' => $mappedType]);
    }
 }
