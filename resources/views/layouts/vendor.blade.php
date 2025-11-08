@@ -73,6 +73,17 @@
                         <a href="{{ route('vendor.settings.profile') }}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">
                             <i class="fas fa-user-cog mr-2"></i> Mon profil
                         </a>
+
+                        @if(Auth::user()->isWriter())
+                            <a href="{{ route('writer.dashboard') }}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">
+                                <i class="fas fa-pen-fancy mr-2"></i> Espace rédacteur
+                            </a>
+                        @else
+                            <a href="{{ route('writer.register') }}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">
+                                <i class="fas fa-pen-alt mr-2"></i> Devenir rédacteur
+                            </a>
+                        @endif
+
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
                             <button type="submit" class="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100">

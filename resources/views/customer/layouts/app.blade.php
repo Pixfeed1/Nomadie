@@ -132,7 +132,7 @@
                             Mon profil
                         </a>
 
-                        <a href="{{ route('customer.settings') }}" 
+                        <a href="{{ route('customer.settings') }}"
                            class="group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors
                                   {{ request()->routeIs('customer.settings*') ? 'nav-active' : 'text-text-secondary hover:text-primary hover:bg-primary/5' }}">
                             <svg class="mr-3 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -142,7 +142,28 @@
                             Paramètres
                         </a>
 
-                        <a href="{{ route('home') }}" 
+                        <hr class="my-3 border-gray-200">
+
+                        @if(Auth::user()->isWriter())
+                            <a href="{{ route('writer.dashboard') }}"
+                               class="group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors
+                                      {{ request()->routeIs('writer.*') ? 'nav-active' : 'text-text-secondary hover:text-primary hover:bg-primary/5' }}">
+                                <svg class="mr-3 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                </svg>
+                                Espace rédacteur
+                            </a>
+                        @else
+                            <a href="{{ route('writer.register') }}"
+                               class="group flex items-center px-2 py-2 text-sm font-medium rounded-md text-text-secondary hover:text-primary hover:bg-primary/5 transition-colors">
+                                <svg class="mr-3 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+                                </svg>
+                                Devenir rédacteur
+                            </a>
+                        @endif
+
+                        <a href="{{ route('home') }}"
                            class="group flex items-center px-2 py-2 text-sm font-medium rounded-md text-text-secondary hover:text-primary hover:bg-primary/5 transition-colors">
                             <svg class="mr-3 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/>
@@ -193,8 +214,8 @@
                                     </svg>
                                 </button>
 
-                                <div x-show="open" 
-                                     @click.away="open = false" 
+                                <div x-show="open"
+                                     @click.away="open = false"
                                      x-cloak
                                      class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
                                     <div class="py-1">
@@ -204,6 +225,16 @@
                                         <a href="{{ route('customer.settings') }}" class="block px-4 py-2 text-sm text-text-secondary hover:bg-gray-100">
                                             Paramètres
                                         </a>
+                                        <div class="border-t border-gray-100"></div>
+                                        @if(Auth::user()->isWriter())
+                                            <a href="{{ route('writer.dashboard') }}" class="block px-4 py-2 text-sm text-primary hover:bg-gray-100">
+                                                Espace rédacteur
+                                            </a>
+                                        @else
+                                            <a href="{{ route('writer.register') }}" class="block px-4 py-2 text-sm text-primary hover:bg-gray-100">
+                                                Devenir rédacteur
+                                            </a>
+                                        @endif
                                         <div class="border-t border-gray-100"></div>
                                         <form method="POST" action="{{ route('logout') }}">
                                             @csrf
