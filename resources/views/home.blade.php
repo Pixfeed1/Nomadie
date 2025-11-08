@@ -416,8 +416,13 @@
     </div>
 
     <!-- Section CTA Devenir Rédacteur -->
-    <div style="background-color: #1d5554;" class="py-16">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="relative text-white" style="background-color: #1d5554;">
+        <div class="absolute inset-0 overflow-hidden">
+            <div class="absolute inset-0 bg-black opacity-20"></div>
+            <!-- Image d'arrière-plan - À remplacer par une vraie image plus tard -->
+            <img src="{{ asset('images/writer-bg.jpg') }}" alt="Devenir rédacteur" class="w-full h-full object-cover" onerror="this.style.display='none'">
+        </div>
+        <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
             <div class="text-center">
                 <h2 class="text-3xl md:text-4xl font-bold text-white mb-6">Partagez vos expériences de voyage</h2>
                 <p class="text-xl text-white mb-8 max-w-3xl mx-auto">Rejoignez notre communauté de rédacteurs passionnés et obtenez des backlinks dofollow pour votre contenu de qualité.</p>
