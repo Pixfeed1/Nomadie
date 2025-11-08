@@ -142,13 +142,15 @@ class BriefTemplateSeeder extends Seeder
         ];
 
         foreach ($templates as $templateData) {
-            BriefTemplate::create(array_merge($templateData, [
-                'created_by' => $admin->id,
-                'is_active' => true,
-                'usage_count' => 0,
-            ]));
+            BriefTemplate::updateOrCreate(
+                ['slug' => $templateData['slug']],
+                array_merge($templateData, [
+                    'created_by' => $admin->id,
+                    'is_active' => true,
+                ])
+            );
         }
 
-        $this->command->info('✅ 5 brief templates créés avec succès !');
+        $this->command->info('✅ 5 brief templates créés/mis à jour avec succès !');
     }
 }
