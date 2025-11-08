@@ -84,14 +84,8 @@
                             <a href="{{ route('destinations.index') }}" class="border-transparent text-text-primary hover:text-primary hover:border-primary px-3 py-2 inline-flex items-center text-sm font-medium border-b-2 transition-colors">
                                 Destinations
                             </a>
-                            <a href="{{ route('about') }}" class="border-transparent text-text-primary hover:text-primary hover:border-primary px-3 py-2 inline-flex items-center text-sm font-medium border-b-2 transition-colors">
-                                À propos
-                            </a>
                             <a href="{{ route('blog') }}" class="border-transparent text-text-primary hover:text-primary hover:border-primary px-3 py-2 inline-flex items-center text-sm font-medium border-b-2 transition-colors">
                                 Blog
-                            </a>
-                            <a href="{{ route('contact') }}" class="border-transparent text-text-primary hover:text-primary hover:border-primary px-3 py-2 inline-flex items-center text-sm font-medium border-b-2 transition-colors">
-                                Contact
                             </a>
                         </nav>
                     </div>
@@ -222,19 +216,13 @@
                             </div>
                         @else
                             <!-- Utilisateur non connecté -->
-                            <a href="{{ route('writer.register') }}" class="flex items-center justify-center h-8 px-3 text-green-600 hover:text-green-700 font-medium text-xs md:text-sm transition-colors border border-green-600 hover:border-green-700 rounded">
+                            <a href="{{ route('writer.register') }}" class="flex items-center justify-center h-8 px-3 text-text-primary hover:text-primary font-medium text-xs md:text-sm transition-colors">
                                 Devenir rédacteur
                             </a>
-                            <a href="{{ route('login') }}" class="flex items-center justify-center h-8 px-3 text-text-primary hover:text-primary font-medium text-xs md:text-sm transition-colors border border-transparent hover:border-primary/20 rounded">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                </svg>
+                            <a href="{{ route('login') }}" class="flex items-center justify-center h-8 px-3 text-text-primary hover:text-primary font-medium text-xs md:text-sm transition-colors">
                                 Se connecter
                             </a>
                             <a href="{{ route('register.choose') }}" class="flex items-center justify-center h-8 px-3 bg-primary hover:bg-primary-dark text-white font-medium rounded text-xs md:text-sm transition-colors">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
-                                </svg>
                                 Créer un compte
                             </a>
                         @endauth
@@ -420,7 +408,7 @@
                                 <a href="{{ route('blog') }}" class="text-base text-text-secondary hover:text-primary transition-colors">Blog</a>
                             </li>
                             <li>
-                                <a href="{{ route('writer.register') }}" class="text-base text-green-600 hover:text-green-700 font-medium transition-colors">Devenir rédacteur</a>
+                                <a href="{{ route('writer.register') }}" class="text-base text-text-secondary hover:text-primary transition-colors">Devenir rédacteur</a>
                             </li>
                             <li>
                                 <a href="#" class="text-base text-text-secondary hover:text-primary transition-colors">Guide du voyageur</a>

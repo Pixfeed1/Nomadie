@@ -4,95 +4,121 @@
 
 @section('content')
 <div class="bg-bg-main min-h-screen py-12">
-    <div class="max-w-5xl mx-auto px-4">
-        <!-- En-tête -->
-        <div class="text-center mb-12">
-            <h1 class="text-3xl font-bold text-text-primary mb-4">Rejoignez Nomadie</h1>
-            <p class="text-lg text-text-secondary">Choisissez le type de compte qui correspond à vos besoins</p>
+    <div class="max-w-md mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-text-primary">Créer un compte</h1>
+            <p class="mt-3 text-lg text-text-secondary">Choisissez votre profil</p>
         </div>
 
-        <!-- Cartes de choix -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <!-- Carte Client -->
-            <div class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
-                <div class="bg-gradient-to-r from-primary to-primary-dark p-6 text-white">
-                    <div class="flex justify-center mb-4">
-                        <svg class="h-16 w-16" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-                        </svg>
-                    </div>
-                    <h2 class="text-2xl font-bold text-center">Je veux réserver</h2>
-                </div>
+        <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+            <div class="p-6 space-y-6">
+                <div class="space-y-4">
+                    <!-- Option Client -->
+                    <a href="{{ route('register') }}" class="block p-6 border-2 border-gray-200 rounded-lg hover:border-primary hover:bg-gray-50 transition-all">
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0">
+                                <div class="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
+                                    <svg class="h-6 w-6 text-primary" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="ml-4 flex-1">
+                                <h3 class="text-lg font-semibold text-text-primary mb-1">Je veux réserver</h3>
+                                <p class="text-sm text-text-secondary">
+                                    Découvrez et réservez des expériences uniques
+                                </p>
+                            </div>
+                            <div class="flex-shrink-0 ml-4">
+                                <svg class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </a>
 
-                <div class="p-6 space-y-4">
-                    <p class="text-text-secondary text-center">
-                        Découvrez et réservez des expériences uniques
-                    </p>
-
-                    <ul class="space-y-3">
-                        <x-checkmark-item color="success">Réservation sécurisée</x-checkmark-item>
-                        <x-checkmark-item color="success">Offres personnalisées</x-checkmark-item>
-                        <x-checkmark-item color="success">Support client 7j/7</x-checkmark-item>
-                    </ul>
-
-                    <div class="pt-4">
-                        <x-button href="{{ route('register') }}" variant="outline" size="lg" :fullWidth="true">
-                            Créer mon compte
-                        </x-button>
-                    </div>
+                    <!-- Option Organisateur -->
+                    <a href="{{ route('vendor.register') }}" class="block p-6 border-2 border-gray-200 rounded-lg hover:border-primary hover:bg-gray-50 transition-all">
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0">
+                                <div class="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
+                                    <svg class="h-6 w-6 text-primary" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm2 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="ml-4 flex-1">
+                                <h3 class="text-lg font-semibold text-text-primary mb-1">Je veux proposer</h3>
+                                <p class="text-sm text-text-secondary">
+                                    Devenez organisateur et proposez vos services
+                                </p>
+                            </div>
+                            <div class="flex-shrink-0 ml-4">
+                                <svg class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </a>
                 </div>
             </div>
 
-            <!-- Carte Organisateur -->
-            <div class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow border-2 border-primary/20">
-                <div class="bg-gradient-to-r from-primary-dark to-primary p-6 text-white relative overflow-hidden">
-                    <!-- Motif subtil pour différencier -->
-                    <div class="absolute inset-0 opacity-10">
-                        <svg class="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
-                            <pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse">
-                                <path d="M 10 0 L 0 0 0 10" fill="none" stroke="white" stroke-width="0.5"/>
-                            </pattern>
-                            <rect width="100" height="100" fill="url(#grid)" />
-                        </svg>
-                    </div>
-                    <div class="flex justify-center mb-4 relative">
-                        <svg class="h-16 w-16" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm2 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
-                        </svg>
-                    </div>
-                    <h2 class="text-2xl font-bold text-center relative">Je veux proposer</h2>
-                    <span class="absolute top-3 right-3 bg-white/20 backdrop-blur text-white text-xs px-2 py-1 rounded-full font-medium">Professionnel</span>
-                </div>
-                
-                <div class="p-6 space-y-4">
-                    <p class="text-text-secondary text-center">
-                        Devenez organisateur et proposez vos services
-                    </p>
-                    
-                    <ul class="space-y-3">
-                        <x-checkmark-item color="primary">Créez et gérez vos offres (hébergements, séjours, activités)</x-checkmark-item>
-                        <x-checkmark-item color="primary">Tableau de bord professionnel complet</x-checkmark-item>
-                        <x-checkmark-item color="primary">Gestion des réservations et paiements</x-checkmark-item>
-                        <x-checkmark-item color="primary">Visibilité auprès de milliers de clients</x-checkmark-item>
-                    </ul>
-
-                    <div class="pt-4">
-                        <x-button href="{{ route('vendor.register') }}" variant="outline" size="lg" :fullWidth="true">
-                            Devenir organisateur
-                        </x-button>
-                    </div>
-                </div>
+            <div class="px-6 py-4 bg-bg-alt border-t border-border text-center">
+                <p class="text-sm text-text-secondary">
+                    Déjà inscrit ?
+                    <a href="{{ route('login') }}" class="text-primary hover:text-primary-dark font-medium">
+                        Connectez-vous à votre compte
+                    </a>
+                </p>
             </div>
         </div>
 
-        <!-- Lien connexion -->
-        <div class="mt-12 text-center">
-            <p class="text-text-secondary">
-                Déjà inscrit ? 
-                <a href="{{ route('login') }}" class="text-primary hover:text-primary-dark font-medium">
-                    Connectez-vous à votre compte
-                </a>
-            </p>
+        <!-- Informations supplémentaires -->
+        <div class="mt-8 bg-white rounded-lg shadow-lg p-6">
+            <h2 class="text-lg font-semibold text-text-primary mb-4">Pourquoi rejoindre Nomadie ?</h2>
+            <div class="space-y-4">
+                <div class="flex items-start">
+                    <div class="flex-shrink-0">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <div class="ml-3">
+                        <h3 class="text-sm font-medium text-text-primary">Expériences authentiques</h3>
+                        <p class="text-xs text-text-secondary mt-1">
+                            Découvrez des voyages uniques et hors des sentiers battus.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="flex items-start">
+                    <div class="flex-shrink-0">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                        </svg>
+                    </div>
+                    <div class="ml-3">
+                        <h3 class="text-sm font-medium text-text-primary">Paiements sécurisés</h3>
+                        <p class="text-xs text-text-secondary mt-1">
+                            Toutes vos transactions sont protégées et sécurisées.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="flex items-start">
+                    <div class="flex-shrink-0">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                        </svg>
+                    </div>
+                    <div class="ml-3">
+                        <h3 class="text-sm font-medium text-text-primary">Support disponible</h3>
+                        <p class="text-xs text-text-secondary mt-1">
+                            Notre équipe est là pour vous accompagner 7j/7.
+                        </p>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>

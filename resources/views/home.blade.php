@@ -416,7 +416,7 @@
     </div>
 
     <!-- Section CTA Devenir Rédacteur -->
-    <div class="bg-gradient-to-r from-green-600 to-green-700 py-16">
+    <div style="background-color: #1d5554;" class="py-16">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center">
                 <h2 class="text-3xl md:text-4xl font-bold text-white mb-6">Partagez vos expériences de voyage</h2>
@@ -447,7 +447,7 @@
                     </div>
                 </div>
 
-                <a href="{{ route('writer.register') }}" class="inline-flex items-center justify-center px-8 py-4 border border-transparent text-lg font-medium rounded-md shadow-sm text-green-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white transition-colors">
+                <a href="{{ route('writer.register') }}" class="inline-flex items-center justify-center px-8 py-4 border border-transparent text-lg font-medium rounded-md shadow-sm bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white transition-colors" style="color: #1d5554;">
                     Devenir rédacteur
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
