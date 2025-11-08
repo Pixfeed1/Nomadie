@@ -216,7 +216,7 @@
                             </div>
                         @else
                             <!-- Utilisateur non connecté -->
-                            <a href="{{ route('writer.register') }}" class="flex items-center justify-center h-8 px-3 text-text-primary hover:text-primary font-medium text-xs md:text-sm transition-colors">
+                            <a href="{{ route('register') }}" class="flex items-center justify-center h-8 px-3 text-text-primary hover:text-primary font-medium text-xs md:text-sm transition-colors">
                                 Devenir rédacteur
                             </a>
                             <a href="{{ route('login') }}" class="flex items-center justify-center h-8 px-3 text-text-primary hover:text-primary font-medium text-xs md:text-sm transition-colors">
@@ -253,14 +253,8 @@
                     <a href="{{ route('destinations.index') }}" class="block pl-3 pr-4 py-2 text-text-primary hover:text-primary hover:bg-bg-alt font-medium transition-colors">
                         Destinations
                     </a>
-                    <a href="{{ route('about') }}" class="block pl-3 pr-4 py-2 text-text-primary hover:text-primary hover:bg-bg-alt font-medium transition-colors">
-                        À propos
-                    </a>
                     <a href="{{ route('blog') }}" class="block pl-3 pr-4 py-2 text-text-primary hover:text-primary hover:bg-bg-alt font-medium transition-colors">
                         Blog
-                    </a>
-                    <a href="{{ route('contact') }}" class="block pl-3 pr-4 py-2 text-text-primary hover:text-primary hover:bg-bg-alt font-medium transition-colors">
-                        Contact
                     </a>
                 </div>
                 
@@ -408,7 +402,7 @@
                                 <a href="{{ route('blog') }}" class="text-base text-text-secondary hover:text-primary transition-colors">Blog</a>
                             </li>
                             <li>
-                                <a href="{{ route('writer.register') }}" class="text-base text-text-secondary hover:text-primary transition-colors">Devenir rédacteur</a>
+                                <a href="{{ route('register') }}" class="text-base text-text-secondary hover:text-primary transition-colors">Devenir rédacteur</a>
                             </li>
                             <li>
                                 <a href="#" class="text-base text-text-secondary hover:text-primary transition-colors">Guide du voyageur</a>
