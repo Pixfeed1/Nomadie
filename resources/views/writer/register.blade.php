@@ -320,19 +320,11 @@
                 </div>
             </div>
 
-            <!-- Footer avec boutons -->
-            <div class="bg-bg-alt px-8 py-6 border-t border-border">
-                <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
-                    <a href="{{ route('home') }}" class="text-text-secondary hover:text-text-primary transition-colors flex items-center">
-                        <svg class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
-                        </svg>
-                        Retour à l'accueil
-                    </a>
-                    <button type="submit" class="bg-primary hover:bg-primary-dark text-white px-8 py-3 rounded-lg font-semibold transition-colors shadow-sm hover:shadow-md">
-                        Soumettre ma candidature
-                    </button>
-                </div>
+            <!-- Bouton de soumission -->
+            <div class="px-8 pb-8">
+                <button type="submit" class="bg-primary hover:bg-primary-dark text-white px-8 py-3 rounded-lg font-semibold transition-colors shadow-sm hover:shadow-md">
+                    Soumettre ma candidature
+                </button>
             </div>
         </form>
     </div>
