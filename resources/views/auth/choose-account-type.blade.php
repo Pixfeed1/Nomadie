@@ -12,7 +12,7 @@
         </div>
 
         <!-- Cartes de choix -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
             <!-- Carte Client -->
             <div class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
                 <div class="bg-gradient-to-r from-primary to-primary-dark p-6 text-white">
@@ -38,45 +38,6 @@
                     <div class="pt-4">
                         <x-button href="{{ route('register') }}" variant="outline" size="lg" :fullWidth="true">
                             Créer mon compte
-                        </x-button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Carte Rédacteur -->
-            <div class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow border-2 border-green-500/20">
-                <div class="bg-gradient-to-r from-green-600 to-green-700 p-6 text-white relative overflow-hidden">
-                    <div class="absolute inset-0 opacity-10">
-                        <svg class="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
-                            <pattern id="writer-pattern" width="10" height="10" patternUnits="userSpaceOnUse">
-                                <circle cx="5" cy="5" r="1" fill="white"/>
-                            </pattern>
-                            <rect width="100" height="100" fill="url(#writer-pattern)" />
-                        </svg>
-                    </div>
-                    <div class="flex justify-center mb-4 relative">
-                        <svg class="h-16 w-16" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
-                        </svg>
-                    </div>
-                    <h2 class="text-2xl font-bold text-center relative">Je veux écrire</h2>
-                    <span class="absolute top-3 right-3 bg-white/20 backdrop-blur text-white text-xs px-2 py-1 rounded-full font-medium">Contributeur</span>
-                </div>
-
-                <div class="p-6 space-y-4">
-                    <p class="text-text-secondary text-center">
-                        Partagez vos expériences et devenez rédacteur
-                    </p>
-
-                    <ul class="space-y-3">
-                        <x-checkmark-item color="success">Backlinks dofollow</x-checkmark-item>
-                        <x-checkmark-item color="success">Outil SEO gratuit</x-checkmark-item>
-                        <x-checkmark-item color="success">Visibilité maximale</x-checkmark-item>
-                    </ul>
-
-                    <div class="pt-4">
-                        <x-button href="{{ route('writer.register') }}" variant="outline" size="lg" :fullWidth="true">
-                            Devenir rédacteur
                         </x-button>
                     </div>
                 </div>
