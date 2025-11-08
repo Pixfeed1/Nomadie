@@ -13,9 +13,42 @@ class AdminVendorController extends Controller
      *
      * @return \Illuminate\View\View
      */
-    public function index()
+    public function index(Request $request)
     {
-        $vendors = Vendor::orderBy('created_at', 'desc')->get();
+        $query = Vendor::query();
+
+        // Filtre par statut
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        // Filtre par recherche (nom, email, entreprise)
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('company_name', 'LIKE', "%{$search}%")
+                    ->orWhere('email', 'LIKE', "%{$search}%")
+                    ->orWhere('contact_name', 'LIKE', "%{$search}%")
+                    ->orWhere('phone', 'LIKE', "%{$search}%");
+            });
+        }
+
+        // Filtre par date de création
+        if ($request->filled('date_from')) {
+            $query->whereDate('created_at', '>=', $request->date_from);
+        }
+
+        if ($request->filled('date_to')) {
+            $query->whereDate('created_at', '<=', $request->date_to);
+        }
+
+        // Tri
+        $sortBy = $request->get('sort_by', 'created_at');
+        $sortOrder = $request->get('sort_order', 'desc');
+        $query->orderBy($sortBy, $sortOrder);
+
+        $vendors = $query->paginate(20)->withQueryString();
+
         return view('admin.vendors.index', compact('vendors'));
     }
 

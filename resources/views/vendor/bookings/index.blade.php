@@ -1,93 +1,23 @@
-@extends('layouts.admin')
+@extends('layouts.vendor')
 
-@section('title', 'Gestion des Commandes')
-
-@section('page-title', 'Gestion des Commandes')
+@section('title', 'Mes Réservations')
 
 @section('content')
-<div class="space-y-6">
+<div class="container mx-auto px-4 py-8">
     <!-- En-tête -->
-    <div class="flex flex-col md:flex-row md:items-center md:justify-between space-y-3 md:space-y-0">
-        <div>
-            <h2 class="text-xl font-bold text-gray-900">Liste des commandes</h2>
-            <p class="text-sm text-gray-600 mt-1">Gérez toutes les réservations de votre marketplace</p>
-        </div>
-    </div>
-
-    <!-- Statistiques rapides -->
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div class="bg-white rounded-lg shadow-sm p-6">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-gray-600 text-sm">Total commandes</p>
-                    <p class="text-3xl font-bold text-gray-900 mt-1">{{ \App\Models\Booking::count() }}</p>
-                </div>
-                <div class="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center">
-                    <svg class="h-6 w-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
-                    </svg>
-                </div>
-            </div>
-        </div>
-
-        <div class="bg-white rounded-lg shadow-sm p-6">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-gray-600 text-sm">En attente</p>
-                    <p class="text-3xl font-bold text-yellow-600 mt-1">{{ \App\Models\Booking::where('status', 'pending')->count() }}</p>
-                </div>
-                <div class="h-12 w-12 rounded-full bg-yellow-100 flex items-center justify-center">
-                    <svg class="h-6 w-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                </div>
-            </div>
-        </div>
-
-        <div class="bg-white rounded-lg shadow-sm p-6">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-gray-600 text-sm">Confirmées</p>
-                    <p class="text-3xl font-bold text-green-600 mt-1">{{ \App\Models\Booking::where('status', 'confirmed')->count() }}</p>
-                </div>
-                <div class="h-12 w-12 rounded-full bg-green-100 flex items-center justify-center">
-                    <svg class="h-6 w-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                    </svg>
-                </div>
-            </div>
-        </div>
-
-        <div class="bg-white rounded-lg shadow-sm p-6">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-gray-600 text-sm">Chiffre d'affaires</p>
-                    <p class="text-3xl font-bold text-blue-600 mt-1">{{ number_format(\App\Models\Booking::where('payment_status', 'paid')->sum('total_price'), 0, ',', ' ') }} €</p>
-                </div>
-                <div class="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center">
-                    <svg class="h-6 w-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                </div>
-            </div>
-        </div>
+    <div class="mb-6">
+        <h1 class="text-3xl font-bold text-gray-900">Mes Réservations</h1>
+        <p class="text-gray-600 mt-1">Gérez toutes les réservations de vos voyages</p>
     </div>
 
     <!-- Formulaire de filtres -->
-    <div class="bg-white rounded-lg shadow p-4">
-        <form method="GET" action="{{ route('admin.orders.index') }}" class="grid grid-cols-1 md:grid-cols-5 gap-4">
-            <!-- Recherche -->
-            <div class="md:col-span-2">
-                <label for="search" class="block text-sm font-medium text-gray-700 mb-1">Rechercher</label>
-                <input type="text" name="search" id="search" value="{{ request('search') }}" placeholder="Client, email, référence, voyage..."
-                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-            </div>
-
-            <!-- Filtre statut -->
+    <div class="bg-white rounded-lg shadow p-6 mb-6">
+        <form method="GET" action="{{ route('vendor.bookings.index') }}" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <!-- Filtre par statut -->
             <div>
-                <label for="status" class="block text-sm font-medium text-gray-700 mb-1">Statut</label>
+                <label for="status" class="block text-sm font-medium text-gray-700 mb-2">Statut</label>
                 <select name="status" id="status" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    <option value="">Tous</option>
+                    <option value="">Tous les statuts</option>
                     <option value="pending" {{ request('status') === 'pending' ? 'selected' : '' }}>En attente</option>
                     <option value="confirmed" {{ request('status') === 'confirmed' ? 'selected' : '' }}>Confirmée</option>
                     <option value="cancelled" {{ request('status') === 'cancelled' ? 'selected' : '' }}>Annulée</option>
@@ -95,38 +25,46 @@
                 </select>
             </div>
 
-            <!-- Filtre paiement -->
+            <!-- Filtre par voyage -->
             <div>
-                <label for="payment_status" class="block text-sm font-medium text-gray-700 mb-1">Paiement</label>
-                <select name="payment_status" id="payment_status" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    <option value="">Tous</option>
-                    <option value="pending" {{ request('payment_status') === 'pending' ? 'selected' : '' }}>En attente</option>
-                    <option value="paid" {{ request('payment_status') === 'paid' ? 'selected' : '' }}>Payé</option>
-                    <option value="refunded" {{ request('payment_status') === 'refunded' ? 'selected' : '' }}>Remboursé</option>
-                    <option value="failed" {{ request('payment_status') === 'failed' ? 'selected' : '' }}>Échoué</option>
+                <label for="trip_id" class="block text-sm font-medium text-gray-700 mb-2">Voyage</label>
+                <select name="trip_id" id="trip_id" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="">Tous les voyages</option>
+                    @foreach(Auth::user()->vendor->trips as $trip)
+                        <option value="{{ $trip->id }}" {{ request('trip_id') == $trip->id ? 'selected' : '' }}>
+                            {{ $trip->title }}
+                        </option>
+                    @endforeach
                 </select>
             </div>
 
             <!-- Date début -->
             <div>
-                <label for="date_from" class="block text-sm font-medium text-gray-700 mb-1">Du</label>
+                <label for="date_from" class="block text-sm font-medium text-gray-700 mb-2">Du</label>
                 <input type="date" name="date_from" id="date_from" value="{{ request('date_from') }}"
                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
             </div>
 
+            <!-- Date fin -->
+            <div>
+                <label for="date_to" class="block text-sm font-medium text-gray-700 mb-2">Au</label>
+                <input type="date" name="date_to" id="date_to" value="{{ request('date_to') }}"
+                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+
             <!-- Boutons -->
-            <div class="md:col-span-5 flex gap-2">
+            <div class="md:col-span-4 flex gap-2">
                 <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium">
                     Filtrer
                 </button>
-                <a href="{{ route('admin.orders.index') }}" class="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-medium">
-                    Réinitialiser
+                <a href="{{ route('vendor.bookings.index') }}" class="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-medium">
+                    Réinitialiser les filtres
                 </a>
             </div>
         </form>
     </div>
 
-    <!-- Tableau des commandes -->
+    <!-- Tableau des réservations -->
     <div class="bg-white rounded-lg shadow overflow-hidden">
         @if($bookings->count() > 0)
             <div class="overflow-x-auto">
@@ -143,10 +81,10 @@
                                 Voyage
                             </th>
                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Vendeur
+                                Date départ
                             </th>
                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Date
+                                Participants
                             </th>
                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Montant
@@ -173,16 +111,13 @@
                                     <div class="text-sm text-gray-900">{{ $booking->trip->title ?? 'N/A' }}</div>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                    {{ $booking->vendor->company_name ?? 'N/A' }}
+                                    {{ $booking->start_date ? $booking->start_date->format('d/m/Y') : 'N/A' }}
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                    {{ $booking->created_at->format('d/m/Y') }}
+                                    {{ ($booking->adults ?? 0) + ($booking->children ?? 0) }} pers.
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">
                                     {{ number_format($booking->total_price ?? 0, 2, ',', ' ') }} €
-                                    @if($booking->payment_status === 'paid')
-                                        <div class="text-xs text-green-600">Payé</div>
-                                    @endif
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     @php
@@ -204,7 +139,7 @@
                                     </span>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                    <a href="{{ route('admin.orders.show', $booking) }}" class="text-blue-600 hover:text-blue-900">
+                                    <a href="{{ route('vendor.bookings.show', $booking) }}" class="text-blue-600 hover:text-blue-900">
                                         Voir détails
                                     </a>
                                 </td>
@@ -223,26 +158,36 @@
             <div class="p-12 text-center">
                 <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 mb-4">
                     <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
                     </svg>
                 </div>
-                <h3 class="text-lg font-medium text-gray-900 mb-2">Aucune commande trouvée</h3>
+                <h3 class="text-lg font-medium text-gray-900 mb-2">Aucune réservation trouvée</h3>
                 <p class="text-gray-500 mb-4">
-                    @if(request()->hasAny(['search', 'status', 'payment_status', 'date_from', 'date_to']))
-                        Aucune commande ne correspond aux filtres sélectionnés.
+                    @if(request()->hasAny(['status', 'trip_id', 'date_from', 'date_to']))
+                        Aucune réservation ne correspond aux filtres sélectionnés.
                         <br>
                         Essayez d'ajuster vos critères de recherche.
                     @else
-                        Aucune commande n'a été passée pour le moment.
+                        Vous n'avez pas encore de réservations pour vos voyages.
                     @endif
                 </p>
-                @if(request()->hasAny(['search', 'status', 'payment_status', 'date_from', 'date_to']))
-                    <a href="{{ route('admin.orders.index') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                @if(request()->hasAny(['status', 'trip_id', 'date_from', 'date_to']))
+                    <a href="{{ route('vendor.bookings.index') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
                         Réinitialiser les filtres
                     </a>
                 @endif
             </div>
         @endif
+    </div>
+
+    <!-- Actions rapides -->
+    <div class="mt-6 flex gap-4">
+        <a href="{{ route('vendor.bookings.exportCsv') }}" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium">
+            Exporter CSV
+        </a>
+        <a href="{{ route('vendor.bookings.exportPdf') }}" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium">
+            Exporter PDF
+        </a>
     </div>
 </div>
 @endsection
