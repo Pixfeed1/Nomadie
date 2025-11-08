@@ -3,23 +3,13 @@
 @section('title', 'Créer un compte')
 
 @section('content')
-<!-- Hero Banner -->
-<div class="relative text-white" style="background-color: #1d5554;">
-    <div class="absolute inset-0 overflow-hidden">
-        <!-- Image d'arrière-plan - À remplacer par une vraie image plus tard -->
-        <img src="{{ asset('images/register-bg.jpg') }}" alt="Créer un compte" class="w-full h-full object-cover" onerror="this.style.display='none'">
-    </div>
-    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-20">
-        <div class="max-w-2xl mx-auto text-center">
-            <h1 class="text-3xl md:text-4xl font-bold text-white mb-4">Rejoignez Nomadie</h1>
-            <p class="text-lg md:text-xl text-white/90">Choisissez votre profil et commencez votre aventure</p>
-        </div>
-    </div>
-</div>
-
-<!-- Content Section -->
-<div class="bg-bg-main py-12">
+<div class="bg-bg-main min-h-screen py-12">
     <div class="max-w-md mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-text-primary">Créer un compte</h1>
+            <p class="mt-3 text-lg text-text-secondary">Choisissez votre profil</p>
+        </div>
+
         <div class="bg-white rounded-lg shadow-lg overflow-hidden">
             <div class="p-6 space-y-6">
                 <div class="space-y-4">
