@@ -1,4 +1,4 @@
-@extends('vendor.layouts.app')
+@extends('layouts.writer')
 
 @section('title', 'Modifier l\'article')
 
