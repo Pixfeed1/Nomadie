@@ -71,7 +71,7 @@
                     <ul class="space-y-3">
                         <x-checkmark-item color="success">Backlinks dofollow</x-checkmark-item>
                         <x-checkmark-item color="success">Outil SEO gratuit</x-checkmark-item>
-                        <x-checkmark-item color="success">Rémunération possible</x-checkmark-item>
+                        <x-checkmark-item color="success">Visibilité maximale</x-checkmark-item>
                     </ul>
 
                     <div class="pt-4">

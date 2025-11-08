@@ -473,8 +473,8 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                             </svg>
                             <div>
-                                <p class="text-white font-semibold">Rémunération possible</p>
-                                <p class="text-white/80 text-sm">Collaborations payées pour les meilleurs</p>
+                                <p class="text-white font-semibold">Badges et récompenses</p>
+                                <p class="text-white/80 text-sm">Système gamifié pour progresser</p>
                             </div>
                         </div>
                     </div>
@@ -486,7 +486,7 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
                             </svg>
                         </a>
-                        <a href="{{ route('blog') }}" class="inline-flex items-center justify-center px-6 py-3 border border-white text-base font-medium rounded-md shadow-sm text-white bg-transparent hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white transition-colors">
+                        <a href="{{ route('blog') }}" class="inline-flex items-center justify-center px-6 py-3 border border-white text-base font-medium rounded-md shadow-sm text-white bg-white/20 hover:bg-white/30 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white transition-colors">
                             Lire nos articles
                         </a>
                     </div>

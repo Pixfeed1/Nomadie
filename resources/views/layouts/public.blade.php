@@ -425,7 +425,7 @@
                                 <a href="{{ route('blog') }}" class="text-base text-text-secondary hover:text-primary transition-colors">Blog</a>
                             </li>
                             <li>
-                                <a href="{{ route('writer.register') }}" class="text-base text-green-600 hover:text-green-700 font-medium transition-colors">✍️ Devenir rédacteur</a>
+                                <a href="{{ route('writer.register') }}" class="text-base text-green-600 hover:text-green-700 font-medium transition-colors">Devenir rédacteur</a>
                             </li>
                             <li>
                                 <a href="#" class="text-base text-text-secondary hover:text-primary transition-colors">Guide du voyageur</a>
