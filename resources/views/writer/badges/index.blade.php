@@ -225,7 +225,7 @@
                         
                         @if($item['is_unlocked'])
                             <p class="mt-1 text-sm text-green-600">
-                                ✓ Débloqué le {{ $item['unlocked_at']->format('d F Y') }}
+                                ✓ Débloqué le {{ \Carbon\Carbon::parse($item['unlocked_at'])->format('d F Y') }}
                             </p>
                         @endif
                         
