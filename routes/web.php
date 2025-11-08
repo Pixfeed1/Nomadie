@@ -494,7 +494,17 @@ Route::middleware(['auth', 'writer'])->prefix('writer')->name('writer.')->group(
         Route::post('/{article}/record-share', [\App\Http\Controllers\Writer\ArticleController::class, 'recordShare'])->name('record-share');
         Route::get('/{article}/share-status', [\App\Http\Controllers\Writer\ArticleController::class, 'getShareStatus'])->name('share-status');
     });
-    
+
+    // PHASE 7.3: Briefs - Interface Rédacteur
+    Route::prefix('briefs')->name('briefs.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Writer\WriterBriefController::class, 'index'])->name('index');
+        Route::get('/{brief}', [\App\Http\Controllers\Writer\WriterBriefController::class, 'show'])->name('show');
+        Route::post('/{brief}/start', [\App\Http\Controllers\Writer\WriterBriefController::class, 'start'])->name('start');
+        Route::post('/{brief}/submit', [\App\Http\Controllers\Writer\WriterBriefController::class, 'submit'])->name('submit');
+        Route::post('/{brief}/notes', [\App\Http\Controllers\Writer\WriterBriefController::class, 'updateNotes'])->name('update-notes');
+        Route::get('/api/my-articles', [\App\Http\Controllers\Writer\WriterBriefController::class, 'getMyArticles'])->name('my-articles');
+    });
+
     Route::prefix('badges')->name('badges.')->group(function () {
         Route::get('/', [\App\Http\Controllers\Writer\BadgeController::class, 'index'])->name('index');
         Route::post('/{badge}/feature', [\App\Http\Controllers\Writer\BadgeController::class, 'feature'])->name('feature');
