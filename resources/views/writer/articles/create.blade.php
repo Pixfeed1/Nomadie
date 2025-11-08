@@ -2,6 +2,17 @@
 
 @section('title', 'Nouvel article')
 
+@push('styles')
+<style>
+    /* Masquer la pub TinyMCE "Get all features" */
+    .tox-promotion,
+    .tox-statusbar__text-container,
+    .tox-statusbar a[href*="tiny.cloud"] {
+        display: none !important;
+    }
+</style>
+@endpush
+
 @section('content')
 <div x-data="articleEditor()" class="max-w-7xl mx-auto px-4 py-8">
     <form method="POST" action="{{ route('writer.articles.store') }}" enctype="multipart/form-data" @submit="handleSubmit">
