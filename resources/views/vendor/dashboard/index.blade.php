@@ -115,6 +115,53 @@
         </div>
     </div>
 
+    <!-- Activité récente -->
+    <div class="bg-white rounded-lg shadow p-6 mb-8">
+        <h2 class="text-lg font-semibold text-gray-900 mb-4">Activité récente</h2>
+        <div class="space-y-3">
+            @forelse($recentActivity as $activity)
+            <div class="flex items-start space-x-3 p-3 rounded-lg hover:bg-gray-50 transition">
+                <!-- Icon -->
+                <div class="flex-shrink-0">
+                    @if($activity['type'] === 'trip_created')
+                    <div class="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
+                        <svg class="h-5 w-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path>
+                        </svg>
+                    </div>
+                    @elseif($activity['type'] === 'availability_created')
+                    <div class="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center">
+                        <svg class="h-5 w-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                        </svg>
+                    </div>
+                    @else
+                    <div class="h-10 w-10 rounded-full bg-gray-100 flex items-center justify-center">
+                        <svg class="h-5 w-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    @endif
+                </div>
+
+                <!-- Content -->
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-medium text-gray-900">{{ $activity['title'] }}</p>
+                    <p class="text-sm text-gray-600">{{ $activity['description'] }}</p>
+                    <p class="text-xs text-gray-400 mt-1">{{ $activity['date']->diffForHumans() }}</p>
+                </div>
+            </div>
+            @empty
+            <div class="text-center py-8">
+                <svg class="h-12 w-12 mx-auto text-gray-400 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <p class="text-gray-500">Aucune activité récente</p>
+            </div>
+            @endforelse
+        </div>
+    </div>
+
     <!-- Actions rapides -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <a href="{{ route('vendor.trips.create') }}" class="bg-blue-600 hover:bg-blue-700 text-white rounded-lg p-6 text-center transition">
