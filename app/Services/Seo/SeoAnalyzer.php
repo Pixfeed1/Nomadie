@@ -1390,6 +1390,9 @@ class SeoAnalyzer
 
         // PHASE 6: Analyser le ratio images/contenu
         $this->analyzeImageRatio();
+
+        // Analyser l'optimisation des images (poids, format)
+        $this->analyzeImageOptimization();
     }
     
     /**
@@ -1397,7 +1400,7 @@ class SeoAnalyzer
      */
     protected function analyzeImageAuthenticity()
     {
-        $criterion = SeoCriterion::where('code', 'authentic_images')->first();
+        $criterion = SeoCriterion::where('code', 'image_quality')->first();
         if (!$criterion) return;
         
         // Stock payant complet
@@ -1612,18 +1615,148 @@ class SeoAnalyzer
     }
 
     /**
+     * Analyser l'optimisation des images (poids et format)
+     * Vérifie que les images sont optimisées pour le web
+     */
+    protected function analyzeImageOptimization()
+    {
+        $criterion = SeoCriterion::where('code', 'image_optimization')->first();
+        if (!$criterion) return;
+
+        // Extraire les URLs d'images
+        $imageUrls = [];
+        preg_match_all('/<img[^>]+src=["\']([^"\']+)["\'][^>]*>/i', $this->article->content, $matches);
+        if (isset($matches[1])) {
+            $imageUrls = $matches[1];
+        }
+
+        // Ajouter l'image à la une si elle existe
+        if ($this->article->featured_image) {
+            $imageUrls[] = $this->article->featured_image;
+        }
+
+        $totalImages = count($imageUrls);
+        if ($totalImages === 0) {
+            // Pas d'images = score neutre
+            $this->saveDetail($criterion, $criterion->max_score * 0.5, false, [
+                'message' => "Aucune image à optimiser",
+                'suggestions' => ['Ajoutez des images pour illustrer votre contenu']
+            ]);
+            return;
+        }
+
+        $rules = $criterion->validation_rules;
+        $maxSizeKb = $rules['max_size_kb'] ?? 200;
+
+        $optimizedCount = 0;
+        $heavyImages = [];
+        $unsupportedFormats = [];
+        $totalWeight = 0;
+
+        foreach ($imageUrls as $url) {
+            // Vérifier si c'est une URL complète ou relative
+            if (strpos($url, 'http') === 0) {
+                // URL externe - on skip (on ne peut pas vérifier)
+                continue;
+            }
+
+            // Construire le chemin vers le fichier
+            $filePath = null;
+            if (strpos($url, '/storage/') === 0) {
+                $filePath = public_path($url);
+            } elseif (strpos($url, 'storage/') === 0) {
+                $filePath = public_path('/' . $url);
+            }
+
+            if ($filePath && file_exists($filePath)) {
+                $sizeKb = filesize($filePath) / 1024;
+                $totalWeight += $sizeKb;
+
+                // Vérifier le format
+                $extension = strtolower(pathinfo($filePath, PATHINFO_EXTENSION));
+                $supportedFormats = ['jpg', 'jpeg', 'png', 'webp', 'svg'];
+
+                if (!in_array($extension, $supportedFormats)) {
+                    $unsupportedFormats[] = basename($filePath);
+                }
+
+                // Vérifier le poids
+                if ($sizeKb <= $maxSizeKb) {
+                    $optimizedCount++;
+                } else {
+                    $heavyImages[] = [
+                        'name' => basename($filePath),
+                        'size_kb' => round($sizeKb, 1)
+                    ];
+                }
+            }
+        }
+
+        // Calculer le score
+        $checkableImages = $totalImages; // Simplification: on compte toutes les images
+        $optimizationRate = $checkableImages > 0 ? $optimizedCount / $checkableImages : 0;
+        $score = $criterion->max_score * $optimizationRate;
+        $passed = $optimizationRate >= 0.8; // 80% des images doivent être optimisées
+
+        // Générer le feedback
+        $message = sprintf(
+            "%d/%d images optimisées (poids moyen: %s KB)",
+            $optimizedCount,
+            $checkableImages,
+            $checkableImages > 0 ? round($totalWeight / $checkableImages, 1) : 0
+        );
+
+        $suggestions = [];
+        if (count($heavyImages) > 0) {
+            $suggestions[] = sprintf(
+                "%d image(s) dépassent %d KB: utilisez un outil de compression",
+                count($heavyImages),
+                $maxSizeKb
+            );
+            $suggestions[] = "Outils recommandés: TinyPNG, ImageOptim, Squoosh";
+        }
+
+        if (count($unsupportedFormats) > 0) {
+            $suggestions[] = sprintf(
+                "%d image(s) dans un format non optimal. Privilégiez WEBP, JPG ou PNG",
+                count($unsupportedFormats)
+            );
+        }
+
+        if ($passed && count($heavyImages) === 0) {
+            $suggestions[] = "Excellente optimisation des images !";
+        }
+
+        $this->saveDetail($criterion, $score, $passed, [
+            'message' => $message,
+            'suggestions' => $suggestions
+        ], [
+            'total_images' => $totalImages,
+            'checkable_images' => $checkableImages,
+            'optimized_count' => $optimizedCount,
+            'heavy_images' => $heavyImages,
+            'unsupported_formats' => $unsupportedFormats,
+            'avg_weight_kb' => $checkableImages > 0 ? round($totalWeight / $checkableImages, 1) : 0,
+            'optimization_rate' => round($optimizationRate * 100, 1)
+        ]);
+    }
+
+    /**
      * Analyser l'engagement
      */
     protected function analyzeEngagement()
     {
         $content = $this->article->content;
-        
+
         // CTA Presence
         $this->analyzeCTA($content);
-        
+
         // Questions to Reader
         $this->analyzeQuestions($content);
-        
+
+        // Scannable Structure (listes, tableaux)
+        $this->analyzeScannableStructure($content);
+
         // Hook Intro
         $this->analyzeHookIntro($content);
     }
@@ -1663,19 +1796,84 @@ class SeoAnalyzer
     {
         $criterion = SeoCriterion::where('code', 'questions_to_reader')->first();
         if (!$criterion) return;
-        
+
         $questionCount = substr_count($content, '?');
-        
+
         $rules = $criterion->validation_rules;
         $score = min($criterion->max_score, ($questionCount / $rules['min']) * $criterion->max_score);
         $passed = $questionCount >= $rules['min'];
-        
+
         $this->saveDetail($criterion, $score, $passed, [
             'message' => "{$questionCount} questions au lecteur",
             'suggestions' => $passed ? [] : ['Posez des questions pour engager vos lecteurs']
         ], ['count' => $questionCount]);
     }
-    
+
+    /**
+     * Analyser la structure scannable (listes et tableaux)
+     */
+    protected function analyzeScannableStructure($content)
+    {
+        $criterion = SeoCriterion::where('code', 'scannable_structure')->first();
+        if (!$criterion) return;
+
+        // Compter les listes à puces
+        $ulCount = substr_count($content, '<ul');
+
+        // Compter les listes numérotées
+        $olCount = substr_count($content, '<ol');
+
+        // Compter les tableaux
+        $tableCount = substr_count($content, '<table');
+
+        $totalScannableElements = $ulCount + $olCount + $tableCount;
+
+        $rules = $criterion->validation_rules;
+        $minRequired = $rules['min'] ?? 2;
+
+        // Calculer le score proportionnellement
+        if ($totalScannableElements >= $minRequired) {
+            $score = $criterion->max_score;
+            $passed = true;
+        } else {
+            $score = ($totalScannableElements / $minRequired) * $criterion->max_score;
+            $passed = false;
+        }
+
+        $suggestions = [];
+        if (!$passed) {
+            $suggestions[] = sprintf(
+                "Ajoutez au moins %d éléments de structure (listes ou tableaux) pour améliorer la lisibilité",
+                $minRequired
+            );
+            if ($ulCount === 0 && $olCount === 0) {
+                $suggestions[] = "Utilisez des listes à puces pour structurer l'information";
+            }
+            if ($tableCount === 0) {
+                $suggestions[] = "Les tableaux sont excellents pour comparer des données";
+            }
+        }
+
+        $message = sprintf(
+            "%d éléments scannables détectés (%d listes à puces, %d listes numérotées, %d tableaux)",
+            $totalScannableElements,
+            $ulCount,
+            $olCount,
+            $tableCount
+        );
+
+        $this->saveDetail($criterion, $score, $passed, [
+            'message' => $message,
+            'suggestions' => $suggestions
+        ], [
+            'total_scannable' => $totalScannableElements,
+            'ul_count' => $ulCount,
+            'ol_count' => $olCount,
+            'table_count' => $tableCount,
+            'min_required' => $minRequired
+        ]);
+    }
+
     /**
      * Analyser l'accroche d'introduction
      */
@@ -1717,12 +1915,18 @@ class SeoAnalyzer
         if ($this->writerType === 'partenaire') {
             $this->analyzeAutoPromo();
         }
-        
+
         // Emotional Words
         $this->analyzeEmotionalWords();
-        
+
         // Personal Experience
         $this->analyzePersonalExperience();
+
+        // Geographic Coherence
+        $this->analyzeGeoCoherence();
+
+        // Source Quality
+        $this->analyzeSourceQuality();
     }
     
     /**
@@ -1959,7 +2163,181 @@ class SeoAnalyzer
             'suggestions' => $passed ? [] : ['Partagez plus d\'anecdotes et expériences personnelles']
         ], ['count' => $count]);
     }
-    
+
+    /**
+     * Analyser la cohérence géographique
+     */
+    protected function analyzeGeoCoherence()
+    {
+        $criterion = SeoCriterion::where('code', 'geo_coherence')->first();
+        if (!$criterion) return;
+
+        $content = $this->article->content;
+        $plainContent = strip_tags($content);
+
+        // Mots-clés de localisation
+        $locationKeywords = [
+            'ville', 'pays', 'région', 'quartier', 'arrondissement',
+            'capitale', 'province', 'département', 'canton', 'district',
+            'nord', 'sud', 'est', 'ouest', 'centre',
+            'km', 'kilomètres', 'mètres', 'altitude'
+        ];
+
+        // Indicateurs de localisation précise
+        $preciseLocationIndicators = [
+            'situé à', 'se trouve à', 'localisé à', 'dans le', 'près de',
+            'à proximité de', 'au cœur de', 'au centre de', 'coordonnées',
+            'latitude', 'longitude', 'adresse'
+        ];
+
+        $locationScore = 0;
+        $preciseLocationScore = 0;
+
+        foreach ($locationKeywords as $keyword) {
+            $locationScore += substr_count(strtolower($plainContent), $keyword);
+        }
+
+        foreach ($preciseLocationIndicators as $indicator) {
+            $preciseLocationScore += substr_count(strtolower($plainContent), $indicator);
+        }
+
+        // Détecter les noms propres potentiels (mots commençant par une majuscule)
+        preg_match_all('/\b[A-ZÀÂÄÇÉÈÊËÏÎÔÙÛÜ][a-zàâäçéèêëïîôùûüÿ]{2,}\b/', $plainContent, $properNouns);
+        $properNounCount = count($properNouns[0] ?? []);
+
+        $totalGeoReferences = $locationScore + $preciseLocationScore;
+
+        // Calculer le score
+        if ($totalGeoReferences >= 10 && $properNounCount >= 5) {
+            $score = $criterion->max_score;
+            $passed = true;
+        } elseif ($totalGeoReferences >= 5 || $properNounCount >= 3) {
+            $score = $criterion->max_score * 0.7;
+            $passed = true;
+        } else {
+            $score = $criterion->max_score * 0.4;
+            $passed = false;
+        }
+
+        $suggestions = [];
+        if (!$passed) {
+            $suggestions[] = "Ajoutez plus de références géographiques précises (noms de lieux, distances, directions)";
+            if ($preciseLocationScore < 3) {
+                $suggestions[] = "Utilisez des indicateurs de localisation: 'situé à', 'se trouve à', 'près de', etc.";
+            }
+            if ($properNounCount < 3) {
+                $suggestions[] = "Mentionnez des noms de lieux spécifiques (villes, monuments, quartiers)";
+            }
+        }
+
+        $message = sprintf(
+            "%d références géographiques détectées (%d noms de lieux)",
+            $totalGeoReferences,
+            $properNounCount
+        );
+
+        $this->saveDetail($criterion, $score, $passed, [
+            'message' => $message,
+            'suggestions' => $suggestions
+        ], [
+            'location_keywords' => $locationScore,
+            'precise_indicators' => $preciseLocationScore,
+            'proper_nouns' => $properNounCount,
+            'total_references' => $totalGeoReferences
+        ]);
+    }
+
+    /**
+     * Analyser la qualité des sources
+     */
+    protected function analyzeSourceQuality()
+    {
+        $criterion = SeoCriterion::where('code', 'source_quality')->first();
+        if (!$criterion) return;
+
+        $content = $this->article->content;
+
+        // Extraire les liens externes
+        preg_match_all('/<a[^>]+href=["\']([^"\']+)["\'][^>]*>/i', $content, $linkMatches);
+        $links = $linkMatches[1] ?? [];
+
+        // Filtrer les liens externes (pas les liens internes ni #)
+        $externalLinks = array_filter($links, function($link) {
+            return strpos($link, 'http') === 0 &&
+                   strpos($link, config('app.url')) === false &&
+                   strpos($link, '#') !== 0;
+        });
+
+        // Domaines de qualité reconnus
+        $qualityDomains = [
+            'wikipedia.org', 'gov', '.edu', 'unesco.org',
+            'nationalgeographic', 'lonelyplanet', 'routard.com',
+            'tripadvisor', 'booking.com', 'airbnb'
+        ];
+
+        $qualityLinksCount = 0;
+        foreach ($externalLinks as $link) {
+            foreach ($qualityDomains as $domain) {
+                if (stripos($link, $domain) !== false) {
+                    $qualityLinksCount++;
+                    break;
+                }
+            }
+        }
+
+        // Indicateurs de citations
+        $citationIndicators = [
+            'selon', 'd\'après', 'source', 'étude', 'recherche',
+            'rapport', 'données', 'statistiques', 'chiffres officiels'
+        ];
+
+        $citationCount = 0;
+        $plainContent = strip_tags($content);
+        foreach ($citationIndicators as $indicator) {
+            $citationCount += substr_count(strtolower($plainContent), $indicator);
+        }
+
+        $totalExternalLinks = count($externalLinks);
+
+        // Calculer le score
+        if ($qualityLinksCount >= 2 && $citationCount >= 3) {
+            $score = $criterion->max_score;
+            $passed = true;
+        } elseif ($qualityLinksCount >= 1 || $citationCount >= 2) {
+            $score = $criterion->max_score * 0.7;
+            $passed = true;
+        } else {
+            $score = $criterion->max_score * 0.4;
+            $passed = false;
+        }
+
+        $suggestions = [];
+        if (!$passed) {
+            $suggestions[] = "Citez des sources fiables pour appuyer vos informations";
+            if ($qualityLinksCount === 0) {
+                $suggestions[] = "Ajoutez des liens vers des sources reconnues (sites officiels, Wikipedia, National Geographic, etc.)";
+            }
+            if ($citationCount < 2) {
+                $suggestions[] = "Utilisez des formules comme 'selon', 'd'après', 'source' pour référencer vos informations";
+            }
+        }
+
+        $message = sprintf(
+            "%d source(s) de qualité, %d citation(s) détectée(s)",
+            $qualityLinksCount,
+            $citationCount
+        );
+
+        $this->saveDetail($criterion, $score, $passed, [
+            'message' => $message,
+            'suggestions' => $suggestions
+        ], [
+            'quality_links' => $qualityLinksCount,
+            'total_external_links' => $totalExternalLinks,
+            'citation_count' => $citationCount
+        ]);
+    }
+
     /**
      * Calculer les scores par catégorie
      */
