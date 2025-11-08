@@ -190,9 +190,8 @@ Route::get('/offres', [TripController::class, 'index'])->name('trips.index');
 Route::get('/offres/{slug}', [TripController::class, 'show'])->name('trips.show');
 Route::get('/offres/{slug}/galerie', [TripController::class, 'gallery'])->name('trips.gallery');
 Route::get('/offres/{slug}/itineraire', [TripController::class, 'itinerary'])->name('trips.itinerary');
-Route::get('/offres/{slug}/reserver', [TripController::class, 'showBookingForm'])->name('trips.booking.form');
-Route::post('/offres/{slug}/reserver', [TripController::class, 'processBooking'])->name('trips.booking.process');
-Route::post('/offres/{slug}/book', [TripController::class, 'book'])->name('trips.book');
+Route::get('/offres/{slug}/reserver', [TripController::class, 'bookingForm'])->name('trips.booking.form');
+Route::post('/offres/{slug}/reserver', [TripController::class, 'book'])->name('trips.booking.process');
 Route::get('/offres/{slug}/confirmation', [TripController::class, 'confirmation'])->name('trips.confirmation');
 
 // Paiements offres
@@ -201,6 +200,14 @@ Route::prefix('offres/paiement')->name('trips.payment.')->group(function () {
     Route::post('/{slug}/initiate', [PaymentController::class, 'initiateTripPayment'])->name('initiate');
     Route::get('/{slug}/success', [PaymentController::class, 'tripPaymentSuccess'])->name('success');
     Route::get('/{slug}/cancel', [PaymentController::class, 'tripPaymentCancel'])->name('cancel');
+});
+
+// Paiements réservations (après création de booking)
+Route::middleware(['auth'])->prefix('reservations')->name('bookings.')->group(function () {
+    Route::get('/{booking}/paiement', [PaymentController::class, 'showBookingPaymentPage'])->name('payment');
+    Route::post('/{booking}/paiement/initiate', [PaymentController::class, 'initiateBookingPayment'])->name('payment.initiate');
+    Route::get('/{booking}/paiement/success', [PaymentController::class, 'bookingPaymentSuccess'])->name('payment.success');
+    Route::get('/{booking}/paiement/cancel', [PaymentController::class, 'bookingPaymentCancel'])->name('payment.cancel');
 });
 
 // Avis

@@ -598,6 +598,184 @@ class PaymentController extends Controller
     }
 
     // ===============================================
+    // MÉTHODES POUR LES PAIEMENTS DE RÉSERVATIONS
+    // ===============================================
+
+    /**
+     * Affiche la page de paiement pour une réservation
+     */
+    public function showBookingPaymentPage(Request $request, $bookingId)
+    {
+        if (!auth()->check()) {
+            return redirect()->route('login');
+        }
+
+        $booking = \App\Models\Booking::with(['trip', 'availability'])
+            ->where('id', $bookingId)
+            ->where('user_id', auth()->id())
+            ->firstOrFail();
+
+        Log::info('Booking payment page requested', [
+            'booking_id' => $booking->id,
+            'user_id' => auth()->id(),
+            'amount' => $booking->total_amount
+        ]);
+
+        return view('bookings.payment', compact('booking'));
+    }
+
+    /**
+     * Initie le processus de paiement pour une réservation
+     */
+    public function initiateBookingPayment(Request $request, $bookingId)
+    {
+        if (!auth()->check()) {
+            return redirect()->route('login');
+        }
+
+        $booking = \App\Models\Booking::with(['trip', 'availability'])
+            ->where('id', $bookingId)
+            ->where('user_id', auth()->id())
+            ->firstOrFail();
+
+        Log::info('Booking payment initiation requested', [
+            'booking_id' => $booking->id,
+            'user_id' => auth()->id(),
+            'amount' => $booking->total_amount
+        ]);
+
+        try {
+            // URLs de redirection
+            $successUrl = route('bookings.payment.success', $booking->id) . '?session_id={CHECKOUT_SESSION_ID}';
+            $cancelUrl = route('bookings.payment.cancel', $booking->id);
+
+            // Créer la session Stripe
+            $stripeSecretKey = $this->getStripeSecretKey();
+            $stripe = new \Stripe\StripeClient($stripeSecretKey);
+
+            $session = $stripe->checkout->sessions->create([
+                'payment_method_types' => ['card'],
+                'line_items' => [[
+                    'price_data' => [
+                        'currency' => 'eur',
+                        'product_data' => [
+                            'name' => $booking->trip->title,
+                            'description' => $booking->trip->short_description ?? 'Réservation',
+                        ],
+                        'unit_amount' => (int)($booking->total_amount * 100),
+                    ],
+                    'quantity' => 1,
+                ]],
+                'mode' => 'payment',
+                'success_url' => $successUrl,
+                'cancel_url' => $cancelUrl,
+                'client_reference_id' => 'booking_' . $booking->id,
+                'metadata' => [
+                    'booking_id' => $booking->id,
+                    'user_id' => auth()->id(),
+                    'trip_id' => $booking->trip_id,
+                ]
+            ]);
+
+            Log::info('Stripe session created for booking', [
+                'booking_id' => $booking->id,
+                'session_id' => $session->id
+            ]);
+
+            return response()->json([
+                'sessionId' => $session->id,
+                'url' => $session->url
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Error creating Stripe session for booking', [
+                'error' => $e->getMessage(),
+                'booking_id' => $booking->id
+            ]);
+
+            return response()->json([
+                'error' => 'Erreur lors de la création de la session de paiement: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Gère le retour de paiement réussi pour une réservation
+     */
+    public function bookingPaymentSuccess(Request $request, $bookingId)
+    {
+        if (!auth()->check()) {
+            return redirect()->route('login');
+        }
+
+        $sessionId = $request->query('session_id');
+
+        $booking = \App\Models\Booking::where('id', $bookingId)
+            ->where('user_id', auth()->id())
+            ->firstOrFail();
+
+        Log::info('Booking payment success callback', [
+            'booking_id' => $booking->id,
+            'session_id' => $sessionId
+        ]);
+
+        try {
+            // Vérifier la session Stripe
+            $stripeSecretKey = $this->getStripeSecretKey();
+            $stripe = new \Stripe\StripeClient($stripeSecretKey);
+            $session = $stripe->checkout->sessions->retrieve($sessionId);
+
+            if ($session->payment_status === 'paid') {
+                // Mettre à jour le statut de la réservation
+                $booking->update([
+                    'status' => 'confirmed',
+                    'payment_status' => 'paid',
+                    'payment_method' => 'stripe',
+                    'paid_at' => now()
+                ]);
+
+                Log::info('Booking confirmed after successful payment', [
+                    'booking_id' => $booking->id
+                ]);
+
+                return redirect()->route('customer.bookings.show', $booking->id)
+                    ->with('success', 'Paiement effectué avec succès ! Votre réservation est confirmée.');
+            }
+
+            return redirect()->route('bookings.payment', $booking->id)
+                ->with('error', 'Le paiement n\'a pas pu être traité.');
+
+        } catch (\Exception $e) {
+            Log::error('Error processing booking payment success', [
+                'error' => $e->getMessage(),
+                'booking_id' => $booking->id
+            ]);
+
+            return redirect()->route('bookings.payment', $booking->id)
+                ->with('error', 'Erreur lors de la vérification du paiement.');
+        }
+    }
+
+    /**
+     * Gère l'annulation du paiement pour une réservation
+     */
+    public function bookingPaymentCancel(Request $request, $bookingId)
+    {
+        if (!auth()->check()) {
+            return redirect()->route('login');
+        }
+
+        $booking = \App\Models\Booking::where('id', $bookingId)
+            ->where('user_id', auth()->id())
+            ->firstOrFail();
+
+        Log::info('Booking payment cancelled', ['booking_id' => $booking->id]);
+
+        return redirect()->route('bookings.payment', $booking->id)
+            ->with('warning', 'Paiement annulé. Vous pouvez réessayer quand vous le souhaitez.');
+    }
+
+    // ===============================================
     // WEBHOOK STRIPE
     // ===============================================
 
