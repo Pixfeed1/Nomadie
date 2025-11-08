@@ -72,7 +72,9 @@ class DashboardController extends Controller
         // Compter les voyages
         $totalTrips = Trip::count();
         $activeTrips = Trip::where('status', 'active')
-            ->where('departure_date', '>', now())
+            ->whereHas('availabilities', function($q) {
+                $q->where('start_date', '>', now());
+            })
             ->count();
         
         // Revenus (à adapter selon votre modèle)
