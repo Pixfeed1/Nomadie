@@ -557,28 +557,28 @@ function articleEditor() {
                     /* Fond et conteneur comme sur le site */
                     body {
                         max-width: 800px;
-                        margin: 0 auto;
-                        padding: 3rem 2rem;
+                        margin: 0;
+                        padding: 1rem;
                         background: #ffffff;
                         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-                        font-size: 17px;
-                        line-height: 1.8;
+                        font-size: 16px;
+                        line-height: 1.6;
                         color: #1F2937;
                     }
 
                     /* Titres style Nomadie */
                     h1 {
-                        font-size: 2.5rem;
+                        font-size: 2rem;
                         font-weight: 700;
                         color: #1F2937;
-                        margin: 2rem 0 1.5rem 0;
+                        margin: 1.5rem 0 0.75rem 0;
                         line-height: 1.2;
                     }
                     h2 {
-                        font-size: 2rem;
+                        font-size: 1.75rem;
                         font-weight: 600;
                         color: #38B2AC;
-                        margin: 2.5rem 0 1rem 0;
+                        margin: 1.5rem 0 0.5rem 0;
                         padding-bottom: 0.5rem;
                         border-bottom: 2px solid #38B2AC20;
                     }
@@ -586,17 +586,17 @@ function articleEditor() {
                         font-size: 1.5rem;
                         font-weight: 600;
                         color: #2C9A94;
-                        margin: 2rem 0 1rem 0;
+                        margin: 1.25rem 0 0.5rem 0;
                     }
                     h4, h5, h6 {
                         font-weight: 600;
                         color: #1F2937;
-                        margin: 1.5rem 0 1rem 0;
+                        margin: 1rem 0 0.5rem 0;
                     }
 
                     /* Paragraphes */
                     p {
-                        margin-bottom: 1.5rem;
+                        margin: 0 0 1rem 0;
                         color: #374151;
                     }
 
@@ -614,31 +614,31 @@ function articleEditor() {
                     img {
                         max-width: 100%;
                         height: auto;
-                        border-radius: 12px;
-                        margin: 2rem auto;
+                        border-radius: 8px;
+                        margin: 1rem auto;
                         display: block;
-                        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
                     }
 
                     /* Citations */
                     blockquote {
                         border-left: 4px solid #38B2AC;
-                        padding-left: 1.5rem;
-                        margin: 2rem 0;
+                        padding-left: 1rem;
+                        margin: 1rem 0;
                         font-style: italic;
                         color: #6B7280;
                         background: #F3F4F6;
-                        padding: 1.5rem;
-                        border-radius: 8px;
+                        padding: 1rem;
+                        border-radius: 6px;
                     }
 
                     /* Listes */
                     ul, ol {
-                        margin: 1.5rem 0;
-                        padding-left: 2rem;
+                        margin: 1rem 0;
+                        padding-left: 1.5rem;
                     }
                     li {
-                        margin-bottom: 0.75rem;
+                        margin-bottom: 0.5rem;
                         color: #374151;
                     }
                     ul li::marker {
@@ -659,17 +659,17 @@ function articleEditor() {
                     table {
                         width: 100%;
                         border-collapse: collapse;
-                        margin: 2rem 0;
+                        margin: 1rem 0;
                     }
                     th {
                         background: #38B2AC;
                         color: white;
-                        padding: 1rem;
+                        padding: 0.75rem;
                         text-align: left;
                         font-weight: 600;
                     }
                     td {
-                        padding: 1rem;
+                        padding: 0.75rem;
                         border-bottom: 1px solid #E5E7EB;
                     }
                     tr:hover {
@@ -680,7 +680,7 @@ function articleEditor() {
                     hr {
                         border: none;
                         border-top: 2px solid #E5E7EB;
-                        margin: 3rem 0;
+                        margin: 1.5rem 0;
                     }
 
                     /* Strong et emphasis */
