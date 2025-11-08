@@ -137,7 +137,7 @@
                     @if($item['is_unlocked'])
                         <div class="flex items-center justify-between text-xs">
                             <span class="text-green-600 font-medium">✓ Débloqué</span>
-                            <span class="text-text-secondary">{{ $item['unlocked_at']->format('d/m/Y') }}</span>
+                            <span class="text-text-secondary">{{ \Carbon\Carbon::parse($item['unlocked_at'])->format('d/m/Y') }}</span>
                         </div>
                         
                         @if($stats['featured_badge'] && $stats['featured_badge']->id === $item['badge']->id)
