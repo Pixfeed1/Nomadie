@@ -59,7 +59,8 @@ class ArticleController extends Controller
             'slug' => 'nullable|string|max:255',
             'category' => 'nullable|string',
             'tags' => 'nullable|string',
-            'status' => 'nullable|in:draft,pending,published', // Ajout des statuts
+            'status' => 'nullable|in:draft,pending,published,scheduled',
+            'scheduled_at' => 'nullable|date|after:now',
             'is_test_article' => 'nullable|boolean' // PHASE 5: Article test pour community writers
         ]);
 
@@ -81,9 +82,11 @@ class ArticleController extends Controller
             $article->is_test_article = true;
         }
 
-        // Si publié, définir la date de publication
-        if ($validated['status'] === 'published' && !$article->published_at) {
+        // Gestion de la publication
+        if ($article->status === 'published' && !$article->published_at) {
             $article->published_at = now();
+        } elseif ($article->status === 'scheduled' && isset($validated['scheduled_at'])) {
+            $article->scheduled_at = $validated['scheduled_at'];
         }
         
         // Handle featured image
@@ -182,7 +185,8 @@ class ArticleController extends Controller
             'slug' => 'nullable|string|max:255',
             'category' => 'nullable|string',
             'tags' => 'nullable|string',
-            'status' => 'nullable|in:draft,pending,published'
+            'status' => 'nullable|in:draft,pending,published,scheduled',
+            'scheduled_at' => 'nullable|date|after:now'
         ]);
 
         // Stocker l'ancien score pour comparaison
@@ -214,6 +218,8 @@ class ArticleController extends Controller
             $article->status = $validated['status'];
             if ($validated['status'] === 'published' && !$article->published_at) {
                 $article->published_at = now();
+            } elseif ($validated['status'] === 'scheduled' && isset($validated['scheduled_at'])) {
+                $article->scheduled_at = $validated['scheduled_at'];
             }
         }
 

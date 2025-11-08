@@ -24,13 +24,15 @@ class Article extends Model
         'shares_count',
         'comments_count',
         'meta_data',
-        'published_at'
+        'published_at',
+        'scheduled_at'
     ];
 
     protected $casts = [
         'meta_data' => 'array',
         'tags' => 'array',
         'published_at' => 'datetime',
+        'scheduled_at' => 'datetime',
         'created_at' => 'datetime',
         'updated_at' => 'datetime'
     ];
