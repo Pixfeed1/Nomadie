@@ -421,7 +421,7 @@
             <!-- Image d'arrière-plan - À remplacer par une vraie image plus tard -->
             <img src="{{ asset('images/writer-bg.jpg') }}" alt="Devenir rédacteur" class="w-full h-full object-cover" onerror="this.style.display='none'">
         </div>
-        <div class="absolute inset-0" style="background-color: rgba(29, 85, 84, 0.7);"></div>
+        <div class="absolute inset-0" style="background-color: rgba(29, 85, 84, 0.5);"></div>
         <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
             <div class="text-center">
                 <h2 class="text-3xl md:text-4xl font-bold text-white mb-6">Partagez vos expériences de voyage</h2>
