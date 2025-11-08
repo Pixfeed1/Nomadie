@@ -33,7 +33,7 @@ class AdminUserController extends Controller
             }
         }
 
-        $users = $query->orderBy('created_at', 'desc')->paginate(20);
+        $users = $query->orderBy('created_at', 'desc')->paginate(20)->withQueryString();
 
         // Stats
         $stats = [

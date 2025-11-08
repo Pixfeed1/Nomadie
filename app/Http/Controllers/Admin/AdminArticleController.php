@@ -36,7 +36,7 @@ class AdminArticleController extends Controller
             });
         }
 
-        $articles = $query->orderBy('created_at', 'desc')->paginate(20);
+        $articles = $query->orderBy('created_at', 'desc')->paginate(20)->withQueryString();
 
         // Stats
         $stats = [
@@ -46,7 +46,13 @@ class AdminArticleController extends Controller
             'pending' => Article::where('status', 'pending')->count(),
         ];
 
-        return view('admin.articles.index', compact('articles', 'stats'));
+        // Liste des auteurs ayant écrit au moins un article
+        $authors = \App\Models\User::whereHas('articles')
+            ->select('id', 'name')
+            ->orderBy('name')
+            ->get();
+
+        return view('admin.articles.index', compact('articles', 'stats', 'authors'));
     }
 
     /**

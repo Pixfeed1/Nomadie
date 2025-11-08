@@ -78,6 +78,15 @@
                 <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>En attente</option>
             </select>
 
+            <select name="author" class="px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
+                <option value="">Tous les auteurs</option>
+                @foreach($authors as $author)
+                    <option value="{{ $author->id }}" {{ request('author') == $author->id ? 'selected' : '' }}>
+                        {{ $author->name }}
+                    </option>
+                @endforeach
+            </select>
+
             <button type="submit" class="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors btn">
                 Filtrer
             </button>
