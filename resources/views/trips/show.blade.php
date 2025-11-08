@@ -750,7 +750,7 @@
 <!-- Modal premier message -->
 @auth
 @if(Auth::user()->role === 'customer')
-<div id="messageModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+<div id="messageModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-[9999]">
     <div class="bg-white rounded-lg max-w-md w-full p-6 m-4">
         <div class="flex justify-between items-center mb-4">
             <h3 class="text-lg font-semibold text-text-primary">Contacter {{ $trip->vendor->company_name }}</h3>
