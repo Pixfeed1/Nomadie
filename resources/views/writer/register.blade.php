@@ -321,7 +321,7 @@
             </div>
 
             <!-- Bouton de soumission -->
-            <div class="px-8 pb-8">
+            <div class="px-8 pb-8 pt-6">
                 <button type="submit" class="bg-primary hover:bg-primary-dark text-white px-8 py-3 rounded-lg font-semibold transition-colors shadow-sm hover:shadow-md">
                     Soumettre ma candidature
                 </button>
