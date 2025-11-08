@@ -353,18 +353,60 @@
             <!-- Sidebar Analyse SEO (1/3) -->
             <div class="lg:col-span-1">
                 <div class="bg-white rounded-lg shadow-sm sticky top-6">
-                    <div class="bg-gradient-to-r from-primary to-primary-dark p-4 text-white">
-                        <h3 class="text-lg font-bold flex items-center">
-                            <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
-                            </svg>
-                            Analyse SEO
-                        </h3>
-                        <p class="text-sm opacity-90 mt-1">En temps réel</p>
-                    </div>
+                    @if(auth()->user()->writer_type === 'team')
+                        <!-- Version Équipe Nomadie - DoFollow automatique -->
+                        <div class="bg-gradient-to-r from-indigo-500 to-purple-600 p-4 text-white">
+                            <h3 class="text-lg font-bold flex items-center">
+                                <svg class="h-5 w-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                                </svg>
+                                Équipe Nomadie
+                            </h3>
+                            <p class="text-sm opacity-90 mt-1">DoFollow automatique ✓</p>
+                        </div>
 
-                    <div class="p-6 space-y-6">
-                        <!-- Score global -->
+                        <div class="p-6 space-y-4">
+                            <!-- Badge DoFollow -->
+                            <div class="bg-green-50 border-2 border-green-500 rounded-lg p-4 text-center">
+                                <svg class="h-12 w-12 text-green-500 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                                <p class="font-bold text-green-700">DoFollow activé</p>
+                                <p class="text-xs text-green-600 mt-1">Vos liens sont toujours DoFollow</p>
+                            </div>
+
+                            <!-- Statistiques simplifiées -->
+                            <div class="space-y-3">
+                                <div class="flex justify-between text-sm">
+                                    <span class="text-text-secondary">Nombre de mots :</span>
+                                    <span class="font-medium text-text-primary" x-text="wordCount"></span>
+                                </div>
+                                <div class="flex justify-between text-sm">
+                                    <span class="text-text-secondary">Temps de lecture :</span>
+                                    <span class="font-medium text-text-primary" x-text="readingTime + ' min'"></span>
+                                </div>
+                            </div>
+
+                            <!-- Message info -->
+                            <div class="bg-indigo-50 border border-indigo-200 rounded-lg p-3 text-xs text-indigo-700">
+                                <p class="font-medium mb-1">💡 Mode Équipe</p>
+                                <p>Pas de contraintes SEO. Concentrez-vous sur la qualité du contenu !</p>
+                            </div>
+                        </div>
+                    @else
+                        <!-- Version standard avec analyse SEO -->
+                        <div class="bg-gradient-to-r from-primary to-primary-dark p-4 text-white">
+                            <h3 class="text-lg font-bold flex items-center">
+                                <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                                </svg>
+                                Analyse SEO
+                            </h3>
+                            <p class="text-sm opacity-90 mt-1">En temps réel</p>
+                        </div>
+
+                        <div class="p-6 space-y-6">
+                            <!-- Score global -->
                         <div class="text-center">
                             <div class="relative inline-flex">
                                 <svg class="transform -rotate-90 w-32 h-32">
@@ -478,6 +520,7 @@
                             </ul>
                         </div>
                     </div>
+                    @endif
                 </div>
             </div>
         </div>
@@ -551,8 +594,7 @@ function articleEditor() {
                 quickbars_insert_toolbar: 'quickimage quicktable',
                 contextmenu: 'link image table',
 
-                // Charger le CSS réel du site pour un vrai WYSIWYG
-                content_css: '/build/assets/app.css',
+                // Styles personnalisés pour WYSIWYG Nomadie
                 content_style: `
                     /* Fond et conteneur comme sur le site */
                     body {
