@@ -127,47 +127,15 @@ class SeoAnalysis extends Model
      */
     public function checkDoFollowEligibility()
     {
-        // Logique pour vérifier l'éligibilité au dofollow
-        $user = $this->user;
-        
-        // Récupérer les analyses précédentes de l'utilisateur
-        $previousAnalyses = static::where('user_id', $user->id)
-                                  ->where('id', '!=', $this->id)
-                                  ->completed()
-                                  ->orderBy('created_at', 'desc')
-                                  ->limit(5)
-                                  ->get();
+        // Déléguer la vérification au job CheckDoFollowStatus
+        // qui contient toute la logique stricte (score, commentaires, partages, etc.)
+        \App\Jobs\CheckDoFollowStatus::dispatch($this->user);
 
-        // Critères pour passer en dofollow (basé sur tes docs)
-        $criteria = [
-            'min_articles' => 3,
-            'min_average_score' => 78,
-            'min_engagement' => true // À définir selon les métriques
-        ];
-
-        // Si c'est au moins le 4e article
-        if ($previousAnalyses->count() >= $criteria['min_articles']) {
-            // Calculer le score moyen incluant l'analyse actuelle
-            $totalScore = $previousAnalyses->sum('global_score') + $this->global_score;
-            $averageScore = $totalScore / ($previousAnalyses->count() + 1);
-
-            if ($averageScore >= $criteria['min_average_score']) {
-                // Vérifier l'engagement (à implémenter selon tes besoins)
-                $this->is_dofollow = true;
-                $this->saveQuietly(); // Save sans déclencher les events
-                
-                // Marquer aussi les futurs articles comme dofollow
-                $this->markUserAsDoFollowEligible();
-            }
+        // Mettre à jour le statut dofollow de cette analyse basé sur le statut utilisateur
+        if ($this->user->hasDoFollowLinks()) {
+            $this->is_dofollow = true;
+            $this->saveQuietly();
         }
-    }
-
-    protected function markUserAsDoFollowEligible()
-    {
-        // Logique pour marquer l'utilisateur comme éligible au dofollow
-        // Tu peux ajouter un champ dans la table users ou créer une table séparée
-        $user = $this->user;
-        // $user->update(['is_dofollow_eligible' => true]);
     }
 
     public function calculateGlobalScore()
@@ -210,7 +178,7 @@ class SeoAnalysis extends Model
         ];
 
         // Ajustements selon le type de rédacteur
-        if ($this->writer_type === 'partenaire') {
+        if ($this->writer_type === 'partner') {
             // Plus de poids sur l'authenticité pour les partenaires
             $defaultWeights['authenticity'] = 0.30;
             $defaultWeights['content'] = 0.25;

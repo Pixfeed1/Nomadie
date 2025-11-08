@@ -140,17 +140,9 @@ class SeoAnalyzer
      */
     protected function determineWriterType()
     {
-        // Logique pour déterminer le type basé sur l'utilisateur
-        // Pour l'instant, on simplifie
-        if ($this->user->hasRole('admin') || $this->user->hasRole('editor')) {
-            $this->writerType = 'equipe';
-        } elseif ($this->user->hasRole('partner')) {
-            $this->writerType = 'partenaire';
-        } elseif ($this->user->hasRole('client')) {
-            $this->writerType = 'client';
-        } else {
-            $this->writerType = 'communaute';
-        }
+        // Utiliser le writer_type de la base de données
+        // Valeurs possibles: 'team', 'partner', 'client_contributor', 'community'
+        $this->writerType = $this->user->writer_type ?? 'community';
     }
     
     /**
@@ -1912,7 +1904,7 @@ class SeoAnalyzer
     protected function analyzeAuthenticity()
     {
         // Pour les partenaires, vérifier l'auto-promo
-        if ($this->writerType === 'partenaire') {
+        if ($this->writerType === 'partner') {
             $this->analyzeAutoPromo();
         }
 
