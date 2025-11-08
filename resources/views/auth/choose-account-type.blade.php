@@ -6,7 +6,6 @@
 <!-- Hero Banner -->
 <div class="relative text-white" style="background-color: #1d5554;">
     <div class="absolute inset-0 overflow-hidden">
-        <div class="absolute inset-0 bg-black opacity-20"></div>
         <!-- Image d'arrière-plan - À remplacer par une vraie image plus tard -->
         <img src="{{ asset('images/register-bg.jpg') }}" alt="Créer un compte" class="w-full h-full object-cover" onerror="this.style.display='none'">
     </div>
