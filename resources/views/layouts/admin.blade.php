@@ -154,46 +154,95 @@
             </div>
 
             <!-- Navigation -->
-            <nav class="p-4 space-y-2 overflow-y-auto">
+            <nav class="p-4 space-y-2 overflow-y-auto max-h-screen pb-20">
                 <p class="px-4 text-xs font-semibold text-text-secondary uppercase tracking-wider">Principal</p>
-                
+
                 <a href="{{ route('admin.dashboard') }}" class="sidebar-link flex items-center px-4 py-3 rounded-lg text-text-primary hover:text-primary transition-colors {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                     </svg>
                     <span>Dashboard</span>
                 </a>
-                
+
+                <p class="mt-6 px-4 text-xs font-semibold text-text-secondary uppercase tracking-wider">Utilisateurs</p>
+
+                <a href="{{ route('admin.users.index') }}" class="sidebar-link flex items-center px-4 py-3 rounded-lg text-text-primary hover:text-primary transition-colors {{ request()->routeIs('admin.users*') ? 'active' : '' }}">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                    <span>Clients</span>
+                </a>
+
                 <a href="{{ route('admin.vendors.index') }}" class="sidebar-link flex items-center px-4 py-3 rounded-lg text-text-primary hover:text-primary transition-colors {{ request()->routeIs('admin.vendors*') ? 'active' : '' }}">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                     </svg>
-                    <span>Vendeurs</span>
+                    <span>Organisateurs</span>
                 </a>
-                
-                <p class="mt-6 px-4 text-xs font-semibold text-text-secondary uppercase tracking-wider">Gestion</p>
-                
+
+                <a href="{{ route('admin.writers.index') }}" class="sidebar-link flex items-center px-4 py-3 rounded-lg text-text-primary hover:text-primary transition-colors {{ request()->routeIs('admin.writers*') ? 'active' : '' }}">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                    <span>Rédacteurs</span>
+                </a>
+
+                <p class="mt-6 px-4 text-xs font-semibold text-text-secondary uppercase tracking-wider">Contenu</p>
+
+                <a href="{{ route('admin.articles.index') }}" class="sidebar-link flex items-center px-4 py-3 rounded-lg text-text-primary hover:text-primary transition-colors {{ request()->routeIs('admin.articles*') ? 'active' : '' }}">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
+                    </svg>
+                    <span>Articles</span>
+                </a>
+
+                <a href="{{ route('admin.briefs.index') }}" class="sidebar-link flex items-center px-4 py-3 rounded-lg text-text-primary hover:text-primary transition-colors {{ request()->routeIs('admin.briefs*') ? 'active' : '' }}">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    <span>Briefs</span>
+                </a>
+
+                <a href="{{ route('admin.comments.index') }}" class="sidebar-link flex items-center px-4 py-3 rounded-lg text-text-primary hover:text-primary transition-colors {{ request()->routeIs('admin.comments*') ? 'active' : '' }}">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+                    </svg>
+                    <span>Commentaires</span>
+                </a>
+
+                <p class="mt-6 px-4 text-xs font-semibold text-text-secondary uppercase tracking-wider">Commerce</p>
+
                 <a href="{{ route('admin.destinations.index') }}" class="sidebar-link flex items-center px-4 py-3 rounded-lg text-text-primary hover:text-primary transition-colors {{ request()->routeIs('admin.destinations*') ? 'active' : '' }}">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                     <span>Destinations</span>
                 </a>
-                
+
+                <a href="{{ route('admin.orders.index') }}" class="sidebar-link flex items-center px-4 py-3 rounded-lg text-text-primary hover:text-primary transition-colors {{ request()->routeIs('admin.orders*') ? 'active' : '' }}">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                    </svg>
+                    <span>Réservations</span>
+                </a>
+
                 <a href="{{ route('admin.subscriptions.index') }}" class="sidebar-link flex items-center px-4 py-3 rounded-lg text-text-primary hover:text-primary transition-colors {{ request()->routeIs('admin.subscriptions*') ? 'active' : '' }}">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
                     </svg>
                     <span>Abonnements</span>
                 </a>
-                
-                <a href="{{ route('admin.orders.index') }}" class="sidebar-link flex items-center px-4 py-3 rounded-lg text-text-primary hover:text-primary transition-colors {{ request()->routeIs('admin.orders*') ? 'active' : '' }}">
+
+                <p class="mt-6 px-4 text-xs font-semibold text-text-secondary uppercase tracking-wider">Système</p>
+
+                <a href="{{ route('admin.settings.index') }}" class="sidebar-link flex items-center px-4 py-3 rounded-lg text-text-primary hover:text-primary transition-colors {{ request()->routeIs('admin.settings*') ? 'active' : '' }}">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
-                    <span>Commandes</span>
+                    <span>Paramètres</span>
                 </a>
-                
+
                 <!-- ✅ DÉCONNEXION SIDEBAR - ROUGE -->
                 <div class="pt-6 mt-6 border-t border-border">
                     <form method="POST" action="{{ route('logout') }}" class="inline w-full">

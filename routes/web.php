@@ -322,6 +322,32 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::post('/orders/{id}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
     Route::post('/orders/{id}/refund', [OrderController::class, 'refund'])->name('orders.refund');
     
+    // Users/Clients
+    Route::prefix('users')->name('users.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\AdminUserController::class, 'index'])->name('index');
+        Route::get('/{user}', [\App\Http\Controllers\Admin\AdminUserController::class, 'show'])->name('show');
+        Route::patch('/{user}/suspend', [\App\Http\Controllers\Admin\AdminUserController::class, 'suspend'])->name('suspend');
+        Route::patch('/{user}/activate', [\App\Http\Controllers\Admin\AdminUserController::class, 'activate'])->name('activate');
+        Route::delete('/{user}', [\App\Http\Controllers\Admin\AdminUserController::class, 'destroy'])->name('destroy');
+    });
+
+    // Articles
+    Route::prefix('articles')->name('articles.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\AdminArticleController::class, 'index'])->name('index');
+        Route::get('/{article}', [\App\Http\Controllers\Admin\AdminArticleController::class, 'show'])->name('show');
+        Route::patch('/{article}/publish', [\App\Http\Controllers\Admin\AdminArticleController::class, 'publish'])->name('publish');
+        Route::patch('/{article}/unpublish', [\App\Http\Controllers\Admin\AdminArticleController::class, 'unpublish'])->name('unpublish');
+        Route::delete('/{article}', [\App\Http\Controllers\Admin\AdminArticleController::class, 'destroy'])->name('destroy');
+    });
+
+    // Paramètres
+    Route::prefix('settings')->name('settings.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\AdminSettingsController::class, 'index'])->name('index');
+        Route::patch('/general', [\App\Http\Controllers\Admin\AdminSettingsController::class, 'updateGeneral'])->name('update.general');
+        Route::patch('/seo', [\App\Http\Controllers\Admin\AdminSettingsController::class, 'updateSeo'])->name('update.seo');
+        Route::patch('/email', [\App\Http\Controllers\Admin\AdminSettingsController::class, 'updateEmail'])->name('update.email');
+    });
+
     // Rapports
     Route::get('/reports/sales', [DashboardController::class, 'salesReport'])->name('reports.sales');
     Route::get('/reports/vendors', [DashboardController::class, 'vendorsReport'])->name('reports.vendors');
