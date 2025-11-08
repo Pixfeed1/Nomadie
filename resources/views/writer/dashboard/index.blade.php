@@ -188,7 +188,7 @@
                         </div>
                         <div class="ml-3 flex-1 min-w-0">
                             <p class="text-sm font-medium text-text-primary truncate">{{ $badge->name }}</p>
-                            <p class="text-xs text-text-secondary">{{ $badge->pivot->unlocked_at->diffForHumans() }}</p>
+                            <p class="text-xs text-text-secondary">{{ \Carbon\Carbon::parse($badge->pivot->unlocked_at)->diffForHumans() }}</p>
                         </div>
                     </div>
                     @endforeach
