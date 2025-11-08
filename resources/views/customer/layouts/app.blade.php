@@ -132,7 +132,7 @@
                             Mon profil
                         </a>
 
-                        <a href="{{ route('customer.settings') }}" 
+                        <a href="{{ route('customer.settings') }}"
                            class="group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors
                                   {{ request()->routeIs('customer.settings*') ? 'nav-active' : 'text-text-secondary hover:text-primary hover:bg-primary/5' }}">
                             <svg class="mr-3 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -142,7 +142,18 @@
                             Paramètres
                         </a>
 
-                        <a href="{{ route('home') }}" 
+                        <hr class="my-3 border-gray-200">
+
+                        <a href="{{ route('writer.register') }}"
+                           class="group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors
+                                  {{ request()->routeIs('writer.register*') ? 'nav-active' : 'text-text-secondary hover:text-primary hover:bg-primary/5' }}">
+                            <svg class="mr-3 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+                            </svg>
+                            Devenir rédacteur
+                        </a>
+
+                        <a href="{{ route('home') }}"
                            class="group flex items-center px-2 py-2 text-sm font-medium rounded-md text-text-secondary hover:text-primary hover:bg-primary/5 transition-colors">
                             <svg class="mr-3 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/>
