@@ -124,6 +124,12 @@ class WriterBriefController extends Controller
             $brief->update(['writer_notes' => $request->writer_notes]);
         }
 
+        // Notify all admins
+        $admins = \App\Models\User::where('role', 'admin')->get();
+        foreach ($admins as $admin) {
+            $admin->notify(new \App\Notifications\BriefSubmittedForReview($brief));
+        }
+
         return redirect()->route('writer.briefs.index')
             ->with('success', 'Article soumis pour review ! L\'équipe admin va examiner votre travail. ✅');
     }

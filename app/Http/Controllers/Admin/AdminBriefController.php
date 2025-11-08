@@ -186,7 +186,8 @@ class AdminBriefController extends Controller
 
         $brief->assignTo($writer);
 
-        // TODO: Notification au rédacteur
+        // Notification au rédacteur
+        $writer->notify(new \App\Notifications\BriefAssigned($brief));
 
         return back()->with('success', "Brief assigné à {$writer->name} !");
     }
@@ -207,6 +208,11 @@ class AdminBriefController extends Controller
             $brief->article->update(['status' => 'published']);
         }
 
+        // Notification au rédacteur
+        if ($brief->assignedTo) {
+            $brief->assignedTo->notify(new \App\Notifications\BriefApproved($brief));
+        }
+
         return redirect()->route('admin.briefs.index')
             ->with('success', 'Brief approuvé et complété !');
     }
@@ -222,7 +228,10 @@ class AdminBriefController extends Controller
 
         $brief->requestRevision($request->notes);
 
-        // TODO: Notification au rédacteur
+        // Notification au rédacteur
+        if ($brief->assignedTo) {
+            $brief->assignedTo->notify(new \App\Notifications\RevisionRequested($brief, $request->notes));
+        }
 
         return back()->with('success', 'Révision demandée au rédacteur.');
     }
