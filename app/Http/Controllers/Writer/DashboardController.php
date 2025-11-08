@@ -26,7 +26,7 @@ class DashboardController extends Controller
         // Statistiques SEO
         $seoStats = [
             'average_score' => $user->seoAnalyses()->avg('global_score') ?? 0,
-            'dofollow_status' => $user->is_dofollow,
+            'dofollow_status' => $user->hasDoFollowLinks(),
             'best_score' => $user->seoAnalyses()->max('global_score') ?? 0,
             'articles_above_78' => $user->seoAnalyses()->where('global_score', '>=', 78)->count(),
         ];
@@ -100,10 +100,15 @@ class DashboardController extends Controller
     
     private function calculateDoFollowProgress($user)
     {
+        // Rédacteurs de l'équipe Nomadie: dofollow automatique
+        if ($user->writer_type === 'team') {
+            return 100;
+        }
+
         if ($user->is_dofollow) {
             return 100;
         }
-        
+
         $progress = 0;
         $criteria = 4; // Nombre de critères pour dofollow
         

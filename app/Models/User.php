@@ -150,6 +150,35 @@ class User extends Authenticatable
     }
 
     /**
+     * Check if the user is a writer.
+     */
+    public function isWriter()
+    {
+        return in_array($this->writer_type, [
+            self::WRITER_TYPE_COMMUNITY,
+            self::WRITER_TYPE_CLIENT_CONTRIBUTOR,
+            self::WRITER_TYPE_PARTNER,
+            self::WRITER_TYPE_TEAM
+        ]) && $this->writer_status === self::WRITER_STATUS_VALIDATED;
+    }
+
+    /**
+     * Check if the user has dofollow links.
+     * Les rédacteurs de l'équipe Nomadie ont automatiquement le dofollow.
+     * Les autres doivent remplir les critères.
+     */
+    public function hasDoFollowLinks()
+    {
+        // Rédacteurs de l'équipe Nomadie: dofollow automatique
+        if ($this->writer_type === self::WRITER_TYPE_TEAM) {
+            return true;
+        }
+
+        // Autres rédacteurs: vérifier l'attribut is_dofollow
+        return $this->is_dofollow ?? false;
+    }
+
+    /**
      * Check if email is verified.
      */
     public function hasVerifiedEmail()
