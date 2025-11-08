@@ -474,7 +474,7 @@
 </div>
 
 <!-- TinyMCE et JavaScript -->
-<script src="https://cdn.tiny.cloud/1/YOUR_TINYMCE_KEY/tinymce/6/tinymce.min.js"></script>
+<script src="{{ asset('vendor/tinymce/tinymce.min.js') }}"></script>
 <script>
 function articleEditor() {
     return {
@@ -515,6 +515,9 @@ function articleEditor() {
             // Initialiser TinyMCE
             tinymce.init({
                 selector: '#content',
+                license_key: 'gpl',
+                base_url: '/vendor/tinymce',
+                suffix: '.min',
                 height: 500,
                 menubar: false,
                 plugins: [
@@ -525,6 +528,38 @@ function articleEditor() {
                 toolbar: 'undo redo | blocks | bold italic underline | alignleft aligncenter alignright | bullist numlist | link image | removeformat | code',
                 content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 16px; line-height: 1.6; }',
                 language: 'fr_FR',
+                images_upload_url: '/writer/articles/upload-image',
+                automatic_uploads: true,
+                images_upload_handler: function (blobInfo, success, failure) {
+                    const xhr = new XMLHttpRequest();
+                    xhr.open('POST', '/writer/articles/upload-image');
+                    xhr.setRequestHeader('X-CSRF-TOKEN', document.querySelector('meta[name="csrf-token"]').content);
+
+                    xhr.onload = function() {
+                        if (xhr.status === 403) {
+                            failure('HTTP Error: ' + xhr.status, { remove: true });
+                            return;
+                        }
+                        if (xhr.status < 200 || xhr.status >= 300) {
+                            failure('HTTP Error: ' + xhr.status);
+                            return;
+                        }
+                        const json = JSON.parse(xhr.responseText);
+                        if (!json || typeof json.location != 'string') {
+                            failure('Invalid JSON: ' + xhr.responseText);
+                            return;
+                        }
+                        success(json.location);
+                    };
+
+                    xhr.onerror = function () {
+                        failure('Image upload failed due to a XHR Transport error. Code: ' + xhr.status);
+                    };
+
+                    const formData = new FormData();
+                    formData.append('file', blobInfo.blob(), blobInfo.filename());
+                    xhr.send(formData);
+                },
                 setup: (editor) => {
                     editor.on('change keyup', () => {
                         this.article.content = editor.getContent();
