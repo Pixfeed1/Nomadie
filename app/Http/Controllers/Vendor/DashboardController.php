@@ -141,12 +141,12 @@ class DashboardController extends Controller
 
         // Nombre total de réservations
         $totalBookings = $vendor->bookings()
-            ->whereIn('status', ['confirmed', 'completed'])
+            ->whereIn('bookings.status', ['confirmed', 'completed'])
             ->count();
 
         // Revenus totaux
         $totalRevenue = $vendor->bookings()
-            ->whereIn('status', ['confirmed', 'completed'])
+            ->whereIn('bookings.status', ['confirmed', 'completed'])
             ->where('payment_status', 'paid')
             ->sum('total_amount');
 
@@ -283,7 +283,7 @@ class DashboardController extends Controller
             // Compter les réservations ce mois-ci
             $bookingsCount = $vendor->bookings()
                 ->whereBetween('created_at', [$monthStart, $monthEnd])
-                ->whereIn('status', ['confirmed', 'completed'])
+                ->whereIn('bookings.status', ['confirmed', 'completed'])
                 ->count();
 
             // Revenus du mois
@@ -505,7 +505,7 @@ class DashboardController extends Controller
             // Réservations du mois
             $bookings = $vendor->bookings()
                 ->whereBetween('created_at', [$monthStart, $monthEnd])
-                ->whereIn('status', ['confirmed', 'completed'])
+                ->whereIn('bookings.status', ['confirmed', 'completed'])
                 ->count();
 
             // Revenus du mois
@@ -562,11 +562,11 @@ class DashboardController extends Controller
                 ->count(),
             'confirmed_bookings' => $vendor->bookings()
                 ->whereBetween('created_at', [$startDate, $endDate])
-                ->whereIn('status', ['confirmed', 'completed'])
+                ->whereIn('bookings.status', ['confirmed', 'completed'])
                 ->count(),
             'cancelled_bookings' => $vendor->bookings()
                 ->whereBetween('created_at', [$startDate, $endDate])
-                ->where('status', 'cancelled')
+                ->where('bookings.status', 'cancelled')
                 ->count(),
             'total_revenue' => $vendor->bookings()
                 ->whereBetween('created_at', [$startDate, $endDate])
@@ -610,7 +610,7 @@ class DashboardController extends Controller
                 $q->upcoming();
             },
             'bookings as total_bookings' => function($q) {
-                $q->whereIn('status', ['confirmed', 'completed']);
+                $q->whereIn('bookings.status', ['confirmed', 'completed']);
             }
         ])->paginate(15);
 
@@ -709,7 +709,7 @@ class DashboardController extends Controller
                     $q->upcoming();
                 },
                 'bookings as total_bookings' => function($q) {
-                    $q->whereIn('status', ['confirmed', 'completed']);
+                    $q->whereIn('bookings.status', ['confirmed', 'completed']);
                 }
             ])
             ->get();
