@@ -8,3 +8,4 @@
 [12-Jul-2025 07:40:27 UTC] PHP Fatal error:  Cannot declare class App\Http\Controllers\Vendor\PaymentController, because the name is already in use in /home/jurojinn/test2.jewelme.fr/app/Models/Payment.php on line 0
 [13-Jul-2025 10:46:02 UTC] PHP Fatal error:  Cannot declare class App\Http\Controllers\Vendor\HelpController, because the name is already in use in /home/jurojinn/test2.jewelme.fr/storage/framework/views/0f4fa73ef489d1c508be183d7067be1de78ea80e.php on line 8
 [13-Jul-2025 10:58:39 UTC] PHP Fatal error:  Cannot declare class App\Http\Controllers\Vendor\HelpController, because the name is already in use in /home/jurojinn/test2.jewelme.fr/storage/framework/views/0f4fa73ef489d1c508be183d7067be1de78ea80e.php on line 8
+[08-Nov-2025 16:35:29 UTC] PHP Fatal error:  Cannot redeclare App\Models\User::isWriter() in /home/jurojinn/test2.jewelme.fr/app/Models/User.php on line 359

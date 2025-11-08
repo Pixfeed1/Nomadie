@@ -20,3 +20,4 @@ Stack trace:
 [19-Sep-2025 11:52:31 UTC] PHP Fatal error:  Cannot declare class CreateLanguagesTable, because the name is already in use in /home/jurojinn/test2.jewelme.fr/database/migrations/2025_06_10_072810_create_languages_table.php on line 7
 [19-Sep-2025 14:46:21 UTC] PHP Fatal error:  Cannot declare class App\Console\Commands\CheckDoFollowCommand, because the name is already in use in /home/jurojinn/test2.jewelme.fr/database/migrations/2025_09_19_115340_add_missing_user_fields.php on line 9
 [19-Sep-2025 16:59:47 UTC] PHP Fatal error:  Cannot declare class App\Console\Commands\CheckDoFollowCommand, because the name is already in use in /home/jurojinn/test2.jewelme.fr/database/migrations/2025_09_19_115340_add_missing_user_fields.php on line 9
+[08-Nov-2025 16:36:29 UTC] PHP Fatal error:  Cannot redeclare App\Models\User::isWriter() in /home/jurojinn/test2.jewelme.fr/app/Models/User.php on line 359
