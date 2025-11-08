@@ -275,4 +275,126 @@ class AdminBriefController extends Controller
     {
         return redirect()->route('admin.briefs.create', ['template_id' => $template->id]);
     }
+
+    /**
+     * Dashboard analytics & statistiques
+     */
+    public function analytics(Request $request)
+    {
+        // Période par défaut: 30 derniers jours
+        $period = $request->get('period', 30);
+        $startDate = now()->subDays($period);
+
+        // Stats globales
+        $stats = [
+            'total' => ContentBrief::count(),
+            'active' => ContentBrief::active()->count(),
+            'completed' => ContentBrief::where('status', ContentBrief::STATUS_COMPLETED)->count(),
+            'overdue' => ContentBrief::overdue()->count(),
+            'completion_rate' => 0,
+        ];
+
+        if ($stats['total'] > 0) {
+            $stats['completion_rate'] = round(($stats['completed'] / $stats['total']) * 100, 1);
+        }
+
+        // Briefs par statut (pour graphique)
+        $briefsByStatus = ContentBrief::selectRaw('status, COUNT(*) as count')
+            ->groupBy('status')
+            ->get()
+            ->pluck('count', 'status')
+            ->toArray();
+
+        // Briefs par type
+        $briefsByType = ContentBrief::selectRaw('type, COUNT(*) as count')
+            ->groupBy('type')
+            ->get()
+            ->pluck('count', 'type')
+            ->toArray();
+
+        // Briefs complétés par mois (6 derniers mois)
+        $completedByMonth = ContentBrief::selectRaw('DATE_FORMAT(completed_at, "%Y-%m") as month, COUNT(*) as count')
+            ->where('status', ContentBrief::STATUS_COMPLETED)
+            ->where('completed_at', '>=', now()->subMonths(6))
+            ->groupBy('month')
+            ->orderBy('month')
+            ->get();
+
+        // Performance par rédacteur
+        $writerStats = User::where('writer_type', User::WRITER_TYPE_TEAM)
+            ->where('writer_status', User::WRITER_STATUS_VALIDATED)
+            ->withCount([
+                'assignedBriefs as total_briefs',
+                'assignedBriefs as completed_briefs' => function ($query) {
+                    $query->where('status', ContentBrief::STATUS_COMPLETED);
+                },
+                'assignedBriefs as in_progress_briefs' => function ($query) {
+                    $query->where('status', ContentBrief::STATUS_IN_PROGRESS);
+                },
+                'assignedBriefs as overdue_briefs' => function ($query) {
+                    $query->where('deadline', '<', now())
+                        ->whereNotIn('status', [ContentBrief::STATUS_COMPLETED, ContentBrief::STATUS_CANCELLED]);
+                },
+            ])
+            ->get()
+            ->map(function ($writer) {
+                $writer->completion_rate = $writer->total_briefs > 0
+                    ? round(($writer->completed_briefs / $writer->total_briefs) * 100, 1)
+                    : 0;
+
+                // Temps moyen de complétion (en jours)
+                $completedBriefs = ContentBrief::where('assigned_to', $writer->id)
+                    ->where('status', ContentBrief::STATUS_COMPLETED)
+                    ->whereNotNull('assigned_at')
+                    ->whereNotNull('completed_at')
+                    ->get();
+
+                if ($completedBriefs->count() > 0) {
+                    $totalDays = $completedBriefs->sum(function ($brief) {
+                        return $brief->assigned_at->diffInDays($brief->completed_at);
+                    });
+                    $writer->avg_completion_days = round($totalDays / $completedBriefs->count(), 1);
+                } else {
+                    $writer->avg_completion_days = 0;
+                }
+
+                return $writer;
+            })
+            ->sortByDesc('completed_briefs');
+
+        // Temps moyen global de complétion
+        $avgCompletionTime = ContentBrief::where('status', ContentBrief::STATUS_COMPLETED)
+            ->whereNotNull('assigned_at')
+            ->whereNotNull('completed_at')
+            ->get()
+            ->avg(function ($brief) {
+                return $brief->assigned_at->diffInDays($brief->completed_at);
+            });
+
+        $stats['avg_completion_days'] = round($avgCompletionTime ?? 0, 1);
+
+        // Briefs en attente par priorité
+        $pendingByPriority = ContentBrief::active()
+            ->selectRaw('priority, COUNT(*) as count')
+            ->groupBy('priority')
+            ->get()
+            ->pluck('count', 'priority')
+            ->toArray();
+
+        // Templates les plus utilisés
+        $topTemplates = BriefTemplate::orderBy('usage_count', 'desc')
+            ->limit(5)
+            ->get();
+
+        return view('admin.briefs.analytics', compact(
+            'stats',
+            'briefsByStatus',
+            'briefsByType',
+            'completedByMonth',
+            'writerStats',
+            'pendingByPriority',
+            'topTemplates',
+            'period'
+        ));
+    }
 }

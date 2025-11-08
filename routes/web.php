@@ -276,6 +276,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
         Route::post('/{brief}/request-revision', [\App\Http\Controllers\Admin\AdminBriefController::class, 'requestRevision'])->name('request-revision');
         Route::post('/{brief}/cancel', [\App\Http\Controllers\Admin\AdminBriefController::class, 'cancel'])->name('cancel');
 
+        // Analytics
+        Route::get('/analytics', [\App\Http\Controllers\Admin\AdminBriefController::class, 'analytics'])->name('analytics');
+
         // Templates
         Route::get('/templates/index', [\App\Http\Controllers\Admin\AdminBriefController::class, 'templates'])->name('templates');
         Route::post('/templates/{template}/use', [\App\Http\Controllers\Admin\AdminBriefController::class, 'createFromTemplate'])->name('create-from-template');

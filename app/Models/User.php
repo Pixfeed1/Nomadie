@@ -208,6 +208,14 @@ class User extends Authenticatable
     }
 
     /**
+     * Relation avec les briefs assignés (rédacteur)
+     */
+    public function assignedBriefs()
+    {
+        return $this->hasMany(\App\Models\ContentBrief::class, 'assigned_to');
+    }
+
+    /**
      * Relations avec les badges
      */
     public function badges()

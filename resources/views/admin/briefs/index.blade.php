@@ -11,6 +11,11 @@
             <p class="text-gray-600 mt-1">Gérer les briefs de contenu pour la team de rédaction</p>
         </div>
         <div class="flex gap-3">
+            <a href="{{ route('admin.briefs.analytics') }}"
+               class="px-4 py-2 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 flex items-center gap-2">
+                <span>📊</span>
+                <span>Analytics</span>
+            </a>
             <a href="{{ route('admin.briefs.templates') }}"
                class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 flex items-center gap-2">
                 <span>📋</span>
