@@ -17,10 +17,15 @@ class BadgeController extends Controller
     public function index()
     {
         $user = Auth::user();
-        
-        // Récupérer tous les badges avec la progression de l'utilisateur
-        $badges = Badge::active()->ordered()->get();
-        
+
+        // Les rédacteurs de l'équipe Nomadie voient uniquement leur badge "Team Nomadie"
+        if ($user->writer_type === 'team') {
+            $badges = Badge::active()->where('code', 'team_nomadie')->get();
+        } else {
+            // Autres rédacteurs : tous les badges sauf "Team Nomadie"
+            $badges = Badge::active()->where('code', '!=', 'team_nomadie')->ordered()->get();
+        }
+
         // Récupérer les badges débloqués
         $unlockedBadges = $user->badges()->get()->keyBy('id');
         

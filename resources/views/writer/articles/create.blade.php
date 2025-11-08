@@ -512,28 +512,72 @@ function articleEditor() {
         minDateTime: '',
 
         init() {
-            // Initialiser TinyMCE
+            // Initialiser TinyMCE en mode visuel WordPress
             tinymce.init({
                 selector: '#content',
                 license_key: 'gpl',
                 base_url: '/vendor/tinymce',
                 suffix: '.min',
                 height: 500,
-                menubar: false,
+                menubar: 'edit view insert format tools table',
+                menu: {
+                    edit: { title: 'Édition', items: 'undo redo | cut copy paste | selectall | searchreplace' },
+                    view: { title: 'Affichage', items: 'code | visualaid visualchars visualblocks | preview fullscreen' },
+                    insert: { title: 'Insérer', items: 'image link media template codesample inserttable | charmap emoticons hr | pagebreak nonbreaking anchor | insertdatetime' },
+                    format: { title: 'Format', items: 'bold italic underline strikethrough superscript subscript codeformat | styles blocks fontfamily fontsize align lineheight | forecolor backcolor | language | removeformat' },
+                    tools: { title: 'Outils', items: 'spellchecker spellcheckerlanguage | a11ycheck code wordcount' },
+                    table: { title: 'Tableau', items: 'inserttable | cell row column | advtablesort | tableprops deletetable' }
+                },
                 plugins: [
                     'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
-                    'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
-                    'insertdatetime', 'media', 'table', 'help', 'wordcount'
+                    'anchor', 'searchreplace', 'visualblocks', 'visualchars', 'code', 'fullscreen',
+                    'insertdatetime', 'media', 'table', 'help', 'wordcount', 'emoticons',
+                    'codesample', 'quickbars', 'autoresize'
                 ],
-                toolbar: 'undo redo | blocks | bold italic underline | alignleft aligncenter alignright | bullist numlist | link image | removeformat | code',
-                content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 16px; line-height: 1.6; }',
+                toolbar: 'undo redo | styles | bold italic underline strikethrough | forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image media table | emoticons charmap | removeformat code fullscreen',
+                toolbar_mode: 'sliding',
+                quickbars_selection_toolbar: 'bold italic | quicklink h2 h3 blockquote',
+                quickbars_insert_toolbar: 'quickimage quicktable',
+                contextmenu: 'link image table',
+                content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 16px; line-height: 1.6; color: #333; padding: 1rem; } img { max-width: 100%; height: auto; border-radius: 8px; }',
                 language: 'fr_FR',
+
+                // Options images améliorées
                 images_upload_url: '/writer/articles/upload-image',
                 automatic_uploads: true,
-                images_upload_handler: function (blobInfo, success, failure) {
+                image_caption: true,
+                image_title: true,
+                image_description: true,
+                image_advtab: true,
+                file_picker_types: 'image',
+
+                // Palette de couleurs personnalisée Nomadie
+                color_map: [
+                    '#38B2AC', 'Primary (Teal)',
+                    '#2C9A94', 'Primary Dark',
+                    '#F59E0B', 'Accent (Amber)',
+                    '#10B981', 'Success (Green)',
+                    '#EF4444', 'Error (Red)',
+                    '#1F2937', 'Text Primary',
+                    '#6B7280', 'Text Secondary',
+                    '#FFFFFF', 'White',
+                    '#000000', 'Black',
+                    '#F3F4F6', 'Background',
+                    '#3B82F6', 'Blue',
+                    '#8B5CF6', 'Purple',
+                    '#EC4899', 'Pink',
+                    '#F59E0B', 'Orange',
+                ],
+                color_cols: 7,
+                // Upload d'images amélioré
+                images_upload_handler: function (blobInfo, success, failure, progress) {
                     const xhr = new XMLHttpRequest();
                     xhr.open('POST', '/writer/articles/upload-image');
                     xhr.setRequestHeader('X-CSRF-TOKEN', document.querySelector('meta[name="csrf-token"]').content);
+
+                    xhr.upload.onprogress = function(e) {
+                        progress(e.loaded / e.total * 100);
+                    };
 
                     xhr.onload = function() {
                         if (xhr.status === 403) {
@@ -553,13 +597,21 @@ function articleEditor() {
                     };
 
                     xhr.onerror = function () {
-                        failure('Image upload failed due to a XHR Transport error. Code: ' + xhr.status);
+                        failure('Erreur lors du téléchargement de l\'image. Code: ' + xhr.status);
                     };
 
                     const formData = new FormData();
                     formData.append('file', blobInfo.blob(), blobInfo.filename());
                     xhr.send(formData);
                 },
+
+                // Style du dialogue d'insertion d'image
+                image_class_list: [
+                    {title: 'Responsive', value: 'img-responsive'},
+                    {title: 'Arrondie', value: 'rounded-lg'},
+                    {title: 'Ombre', value: 'shadow-lg'},
+                    {title: 'Centrée', value: 'mx-auto block'}
+                ],
                 setup: (editor) => {
                     editor.on('change keyup', () => {
                         this.article.content = editor.getContent();
