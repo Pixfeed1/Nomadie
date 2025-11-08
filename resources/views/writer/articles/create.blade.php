@@ -539,7 +539,22 @@ function articleEditor() {
                 quickbars_selection_toolbar: 'bold italic | quicklink h2 h3 blockquote',
                 quickbars_insert_toolbar: 'quickimage quicktable',
                 contextmenu: 'link image table',
-                content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 16px; line-height: 1.6; color: #333; padding: 1rem; } img { max-width: 100%; height: auto; border-radius: 8px; }',
+
+                // Charger le CSS réel du site pour un vrai WYSIWYG
+                content_css: '/build/assets/app.css',
+                content_style: `
+                    body {
+                        max-width: 800px;
+                        margin: 0 auto;
+                        padding: 2rem;
+                        background: white;
+                    }
+                    img {
+                        max-width: 100%;
+                        height: auto;
+                        border-radius: 8px;
+                    }
+                `,
                 language: 'fr_FR',
 
                 // Options images améliorées
@@ -601,7 +616,7 @@ function articleEditor() {
                     };
 
                     const formData = new FormData();
-                    formData.append('file', blobInfo.blob(), blobInfo.filename());
+                    formData.append('image', blobInfo.blob(), blobInfo.filename());
                     xhr.send(formData);
                 },
 
