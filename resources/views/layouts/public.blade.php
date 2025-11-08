@@ -90,6 +90,14 @@
                             <a href="{{ route('blog') }}" class="border-transparent text-text-primary hover:text-primary hover:border-primary px-3 py-2 inline-flex items-center text-sm font-medium border-b-2 transition-colors">
                                 Blog
                             </a>
+                            @guest
+                            <a href="{{ route('writer.register') }}" class="border-transparent text-green-600 hover:text-green-700 hover:border-green-600 px-3 py-2 inline-flex items-center text-sm font-medium border-b-2 transition-colors">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                </svg>
+                                Devenir rédacteur
+                            </a>
+                            @endguest
                             <a href="{{ route('contact') }}" class="border-transparent text-text-primary hover:text-primary hover:border-primary px-3 py-2 inline-flex items-center text-sm font-medium border-b-2 transition-colors">
                                 Contact
                             </a>
@@ -415,6 +423,9 @@
                         <ul class="mt-4 space-y-4">
                             <li>
                                 <a href="{{ route('blog') }}" class="text-base text-text-secondary hover:text-primary transition-colors">Blog</a>
+                            </li>
+                            <li>
+                                <a href="{{ route('writer.register') }}" class="text-base text-green-600 hover:text-green-700 font-medium transition-colors">✍️ Devenir rédacteur</a>
                             </li>
                             <li>
                                 <a href="#" class="text-base text-text-secondary hover:text-primary transition-colors">Guide du voyageur</a>

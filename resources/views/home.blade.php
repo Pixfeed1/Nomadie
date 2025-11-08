@@ -415,6 +415,137 @@
         </div>
     </div>
 
+    <!-- Section CTA Devenir Rédacteur -->
+    <div class="bg-gradient-to-r from-green-600 to-green-700 py-16 relative overflow-hidden">
+        <!-- Motif de fond -->
+        <div class="absolute inset-0 opacity-10">
+            <svg class="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+                <pattern id="writer-bg-pattern" width="20" height="20" patternUnits="userSpaceOnUse">
+                    <circle cx="10" cy="10" r="2" fill="white"/>
+                </pattern>
+                <rect width="100" height="100" fill="url(#writer-bg-pattern)" />
+            </svg>
+        </div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="lg:grid lg:grid-cols-2 lg:gap-8 items-center">
+                <!-- Texte -->
+                <div class="mb-8 lg:mb-0">
+                    <div class="inline-flex items-center px-4 py-2 bg-white/20 backdrop-blur rounded-full mb-6">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                        </svg>
+                        <span class="text-white font-medium">Programme rédacteur</span>
+                    </div>
+                    <h2 class="text-3xl md:text-4xl font-bold text-white mb-6">Partagez vos expériences de voyage</h2>
+                    <p class="text-xl text-white/90 mb-8">Rejoignez notre communauté de rédacteurs passionnés et obtenez des backlinks dofollow pour votre contenu de qualité.</p>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+                        <div class="flex items-start">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-200 mr-3 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                            <div>
+                                <p class="text-white font-semibold">Backlinks dofollow</p>
+                                <p class="text-white/80 text-sm">Après 3-5 articles de qualité</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-200 mr-3 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                            <div>
+                                <p class="text-white font-semibold">Outil SEO gratuit</p>
+                                <p class="text-white/80 text-sm">NomadSEO pour optimiser vos articles</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-200 mr-3 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                            <div>
+                                <p class="text-white font-semibold">Visibilité maximale</p>
+                                <p class="text-white/80 text-sm">Milliers de lecteurs passionnés</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-200 mr-3 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                            <div>
+                                <p class="text-white font-semibold">Rémunération possible</p>
+                                <p class="text-white/80 text-sm">Collaborations payées pour les meilleurs</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <a href="{{ route('writer.register') }}" class="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-green-700 bg-white hover:bg-green-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white transition-colors">
+                            Devenir rédacteur
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                            </svg>
+                        </a>
+                        <a href="{{ route('blog') }}" class="inline-flex items-center justify-center px-6 py-3 border border-white text-base font-medium rounded-md shadow-sm text-white bg-transparent hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white transition-colors">
+                            Lire nos articles
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Image/Illustration -->
+                <div class="relative">
+                    <div class="bg-white/10 backdrop-blur rounded-2xl p-8 border border-white/20">
+                        <div class="space-y-6">
+                            <div class="flex items-center justify-between p-4 bg-white/90 rounded-lg">
+                                <div class="flex items-center">
+                                    <div class="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center text-green-700 font-bold mr-3">
+                                        M
+                                    </div>
+                                    <div>
+                                        <p class="font-semibold text-gray-900 text-sm">Marie Dubois</p>
+                                        <p class="text-xs text-gray-500">Rédactrice Communauté</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center text-xs">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-yellow-400 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                    </svg>
+                                    <span class="font-semibold text-gray-900">Score: 92/100</span>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center justify-between p-4 bg-white/80 rounded-lg">
+                                <div class="flex items-center">
+                                    <div class="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold mr-3">
+                                        T
+                                    </div>
+                                    <div>
+                                        <p class="font-semibold text-gray-900 text-sm">Thomas Martin</p>
+                                        <p class="text-xs text-gray-500">Client-Contributeur</p>
+                                    </div>
+                                </div>
+                                <span class="px-3 py-1 bg-green-100 text-green-700 text-xs font-semibold rounded-full">DoFollow ✓</span>
+                            </div>
+
+                            <div class="flex items-center justify-between p-4 bg-white/70 rounded-lg">
+                                <div class="flex items-center">
+                                    <div class="h-10 w-10 rounded-full bg-purple-100 flex items-center justify-center text-purple-700 font-bold mr-3">
+                                        S
+                                    </div>
+                                    <div>
+                                        <p class="font-semibold text-gray-900 text-sm">Sophie Bernard</p>
+                                        <p class="text-xs text-gray-500">Partenaire-Rédactrice</p>
+                                    </div>
+                                </div>
+                                <span class="px-3 py-1 bg-blue-100 text-blue-700 text-xs font-semibold rounded-full">15 articles</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Testimonials Section with Auto-Scrolling Carousel -->
     <div class="bg-white py-16 overflow-hidden">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
