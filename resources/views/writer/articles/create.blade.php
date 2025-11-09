@@ -77,6 +77,13 @@ document.addEventListener('alpine:init', () => {
         color: #111827;
     }
 
+    /* Placeholder personnalisé pour Editor.js (pour éviter le doublon) */
+    .codex-editor--empty .ce-block:first-child .ce-paragraph[data-placeholder]:empty:before {
+        content: 'Commencez à écrire votre article...' !important;
+        color: #D1D5DB;
+        font-weight: 400;
+    }
+
     /* Inputs style Gutenberg */
     .gutenberg-title {
         font-size: 32px;
@@ -963,7 +970,7 @@ function articleEditor() {
             this.editor = new EditorJS({
                 holder: 'editorjs',
                 autofocus: true,
-                placeholder: 'Commencez à écrire votre article...',
+                placeholder: '', // Vide pour éviter le doublon
 
                 tools: {
                     header: {
