@@ -99,12 +99,29 @@
         overflow-y: auto;
         transform: translateX(100%);
         transition: transform 0.3s ease;
+        box-shadow: -2px 0 8px rgba(0, 0, 0, 0.1);
     }
 
     .settings-sidebar.open {
         transform: translateX(0);
     }
 
+    /* Sur desktop : sidebar pousse le contenu */
+    @media (min-width: 1024px) {
+        .content-area {
+            transition: margin-right 0.3s ease;
+        }
+
+        .content-area.sidebar-open {
+            margin-right: 380px;
+        }
+
+        .settings-sidebar {
+            box-shadow: -2px 0 4px rgba(0, 0, 0, 0.05);
+        }
+    }
+
+    /* Sur mobile : sidebar en overlay */
     @media (max-width: 1024px) {
         .settings-sidebar {
             width: 100%;
@@ -177,7 +194,7 @@
         </div>
 
         <!-- Contenu principal centré (style Gutenberg) -->
-        <div class="flex-1 overflow-y-auto">
+        <div class="flex-1 overflow-y-auto content-area" :class="settingsSidebarOpen ? 'sidebar-open' : ''">
             <div class="max-w-[840px] mx-auto px-6 py-12">
                 <!-- Titre -->
                 <div class="mb-6">
@@ -426,7 +443,7 @@
             </div>
         </div>
 
-        <!-- Overlay quand sidebar est ouverte -->
+        <!-- Overlay quand sidebar est ouverte (mobile uniquement) -->
         <div x-show="settingsSidebarOpen"
              @click="settingsSidebarOpen = false"
              x-transition:enter="transition-opacity ease-out duration-300"
@@ -435,7 +452,7 @@
              x-transition:leave="transition-opacity ease-in duration-200"
              x-transition:leave-start="opacity-100"
              x-transition:leave-end="opacity-0"
-             class="fixed inset-0 bg-black bg-opacity-25 z-40"
+             class="fixed inset-0 bg-black bg-opacity-25 z-40 lg:hidden"
              x-cloak></div>
     </form>
 </div>
