@@ -22,6 +22,7 @@
     </style>
 
     @stack('styles')
+    @stack('head')
 </head>
 
 <body x-data="{ sidebarOpen: false }" class="bg-gray-50">
