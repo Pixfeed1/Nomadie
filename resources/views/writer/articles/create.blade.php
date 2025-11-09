@@ -155,9 +155,9 @@
     <form method="POST" action="{{ route('writer.articles.store') }}" enctype="multipart/form-data" @submit="handleSubmit">
         @csrf
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <!-- Formulaire principal (2/3) -->
-            <div class="lg:col-span-2">
+        <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+            <!-- Formulaire principal (3/5) -->
+            <div class="lg:col-span-3">
                 <!-- Navigation par onglets -->
                 <div class="bg-white rounded-lg shadow-sm overflow-hidden">
                     <div class="border-b border-border">
@@ -215,6 +215,26 @@
                                     </span>
                                     <span x-show="article.title.length >= 30 && article.title.length <= 60" class="text-success">✓ Longueur optimale</span>
                                     <span x-show="article.title.length > 60" class="text-error">Titre trop long</span>
+                                </div>
+                            </div>
+
+                            <!-- Sous-titre -->
+                            <div>
+                                <label for="subtitle" class="block text-sm font-medium text-text-primary mb-2">
+                                    Sous-titre
+                                </label>
+                                <input type="text"
+                                       id="subtitle"
+                                       name="subtitle"
+                                       x-model="article.subtitle"
+                                       class="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
+                                       placeholder="Ex: Découvrez les meilleurs spots et conseils pratiques">
+                                <div class="mt-2 flex items-center justify-between text-xs">
+                                    <span class="text-text-secondary">
+                                        <span x-text="article.subtitle ? article.subtitle.length : 0"></span>/120 caractères recommandés
+                                    </span>
+                                    <span x-show="article.subtitle && article.subtitle.length >= 50 && article.subtitle.length <= 120" class="text-success">✓ Longueur optimale</span>
+                                    <span x-show="article.subtitle && article.subtitle.length > 120" class="text-error">Sous-titre trop long</span>
                                 </div>
                             </div>
 
@@ -326,31 +346,48 @@
                                     <label for="category" class="block text-sm font-medium text-text-primary mb-2">
                                         Catégorie
                                     </label>
-                                    <select id="category"
-                                            name="category"
-                                            x-model="article.category"
-                                            class="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
-                                        <option value="">Sélectionner...</option>
-                                        <option value="destinations">Destinations</option>
-                                        <option value="conseils">Conseils de voyage</option>
-                                        <option value="gastronomie">Gastronomie</option>
-                                        <option value="ecotourisme">Écotourisme</option>
-                                        <option value="culture">Culture & Traditions</option>
-                                        <option value="activites">Activités & Sports</option>
-                                    </select>
+                                    <input type="text"
+                                           id="category"
+                                           name="category"
+                                           list="category-suggestions"
+                                           x-model="article.category"
+                                           class="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                                           placeholder="Choisir ou créer une catégorie...">
+                                    <datalist id="category-suggestions">
+                                        <option value="Destinations">
+                                        <option value="Conseils de voyage">
+                                        <option value="Gastronomie">
+                                        <option value="Écotourisme">
+                                        <option value="Culture & Traditions">
+                                        <option value="Activités & Sports">
+                                    </datalist>
+                                    <p class="mt-1 text-xs text-text-secondary">💡 Vous pouvez créer une nouvelle catégorie</p>
                                 </div>
 
                                 <div>
                                     <label for="tags" class="block text-sm font-medium text-text-primary mb-2">
-                                        Tags
+                                        Étiquettes (Tags)
                                     </label>
                                     <input type="text"
                                            id="tags"
                                            name="tags"
+                                           list="tag-suggestions"
                                            x-model="article.tags"
                                            class="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
                                            placeholder="voyage, bali, plage">
-                                    <p class="mt-1 text-xs text-text-secondary">Séparez les tags par des virgules</p>
+                                    <datalist id="tag-suggestions">
+                                        <option value="voyage">
+                                        <option value="destination">
+                                        <option value="plage">
+                                        <option value="culture">
+                                        <option value="gastronomie">
+                                        <option value="écotourisme">
+                                        <option value="aventure">
+                                        <option value="famille">
+                                        <option value="budget">
+                                        <option value="luxe">
+                                    </datalist>
+                                    <p class="mt-1 text-xs text-text-secondary">💡 Séparez les tags par des virgules - vous pouvez créer de nouveaux tags</p>
                                 </div>
                             </div>
 
@@ -478,19 +515,19 @@
                 </div>
             </div>
 
-            <!-- Sidebar Analyse SEO (1/3) -->
-            <div class="lg:col-span-1">
+            <!-- Sidebar Analyse SEO (2/5) -->
+            <div class="lg:col-span-2">
                 <div class="bg-white rounded-lg shadow-sm sticky top-6">
                     @if(auth()->user()->writer_type === 'team')
                         <!-- Version Équipe Nomadie - Focus qualité -->
-                        <div class="bg-gradient-to-r from-indigo-500 to-purple-600 p-4 text-white">
-                            <h3 class="text-lg font-bold flex items-center">
+                        <div class="bg-primary p-4 border-b border-primary/20">
+                            <h3 class="text-lg font-bold flex items-center text-white">
                                 <svg class="h-5 w-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
                                     <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
                                 </svg>
                                 Qualité de l'article
                             </h3>
-                            <p class="text-sm opacity-90 mt-1">Indicateurs en temps réel</p>
+                            <p class="text-sm text-white/90 mt-1">Indicateurs en temps réel</p>
                         </div>
 
                         <div class="p-6 space-y-6">
@@ -759,6 +796,7 @@ function articleEditor() {
         activeTab: 'content',
         article: {
             title: '',
+            subtitle: '',
             content: '',
             meta_description: '',
             slug: '',
