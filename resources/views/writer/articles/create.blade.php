@@ -354,43 +354,141 @@
             <div class="lg:col-span-1">
                 <div class="bg-white rounded-lg shadow-sm sticky top-6">
                     @if(auth()->user()->writer_type === 'team')
-                        <!-- Version Équipe Nomadie - DoFollow automatique -->
+                        <!-- Version Équipe Nomadie - Focus qualité -->
                         <div class="bg-gradient-to-r from-indigo-500 to-purple-600 p-4 text-white">
                             <h3 class="text-lg font-bold flex items-center">
                                 <svg class="h-5 w-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
                                     <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
                                 </svg>
-                                Équipe Nomadie
+                                Qualité de l'article
                             </h3>
-                            <p class="text-sm opacity-90 mt-1">DoFollow automatique ✓</p>
+                            <p class="text-sm opacity-90 mt-1">Indicateurs en temps réel</p>
                         </div>
 
-                        <div class="p-6 space-y-4">
-                            <!-- Badge DoFollow -->
-                            <div class="bg-green-50 border-2 border-green-500 rounded-lg p-4 text-center">
-                                <svg class="h-12 w-12 text-green-500 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                </svg>
-                                <p class="font-bold text-green-700">DoFollow activé</p>
-                                <p class="text-xs text-green-600 mt-1">Vos liens sont toujours DoFollow</p>
+                        <div class="p-6 space-y-6">
+                            <!-- Badge DoFollow discret -->
+                            <div class="bg-green-50 border border-green-300 rounded-lg p-3 text-center">
+                                <p class="text-xs text-green-600 flex items-center justify-center">
+                                    <svg class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                    </svg>
+                                    DoFollow activé automatiquement
+                                </p>
                             </div>
 
-                            <!-- Statistiques simplifiées -->
-                            <div class="space-y-3">
-                                <div class="flex justify-between text-sm">
-                                    <span class="text-text-secondary">Nombre de mots :</span>
-                                    <span class="font-medium text-text-primary" x-text="wordCount"></span>
+                            <!-- Indicateurs de qualité -->
+                            <div class="space-y-4">
+                                <h4 class="text-sm font-semibold text-text-primary">Indicateurs de qualité</h4>
+
+                                <!-- Titre -->
+                                <div class="space-y-2">
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-xs font-medium text-text-secondary">Titre</span>
+                                        <span class="text-xs" :class="{
+                                            'text-success': scores.title >= 15,
+                                            'text-accent': scores.title >= 10 && scores.title < 15,
+                                            'text-text-secondary': scores.title < 10
+                                        }">
+                                            <span x-text="scores.title >= 15 ? '✓ Optimal' : scores.title >= 10 ? '⚠ À améliorer' : '· Incomplet'"></span>
+                                        </span>
+                                    </div>
+                                    <div class="w-full bg-gray-200 rounded-full h-1.5">
+                                        <div class="bg-indigo-500 h-1.5 rounded-full transition-all"
+                                             :style="`width: ${scores.title * 5}%`"></div>
+                                    </div>
                                 </div>
-                                <div class="flex justify-between text-sm">
-                                    <span class="text-text-secondary">Temps de lecture :</span>
-                                    <span class="font-medium text-text-primary" x-text="readingTime + ' min'"></span>
+
+                                <!-- Contenu -->
+                                <div class="space-y-2">
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-xs font-medium text-text-secondary">Contenu</span>
+                                        <span class="text-xs font-medium text-text-primary" x-text="wordCount + ' mots'"></span>
+                                    </div>
+                                    <div class="w-full bg-gray-200 rounded-full h-1.5">
+                                        <div class="bg-indigo-500 h-1.5 rounded-full transition-all"
+                                             :style="`width: ${Math.min(100, scores.content * 3.33)}%`"></div>
+                                    </div>
+                                    <p class="text-xs text-text-secondary" x-show="wordCount < 1500">
+                                        Recommandé : 1500 mots minimum
+                                    </p>
+                                </div>
+
+                                <!-- Meta Description -->
+                                <div class="space-y-2">
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-xs font-medium text-text-secondary">Meta Description</span>
+                                        <span class="text-xs" :class="{
+                                            'text-success': scores.meta >= 12,
+                                            'text-accent': scores.meta >= 8 && scores.meta < 12,
+                                            'text-text-secondary': scores.meta < 8
+                                        }">
+                                            <span x-text="scores.meta >= 12 ? '✓' : scores.meta >= 8 ? '⚠' : '·'"></span>
+                                        </span>
+                                    </div>
+                                    <div class="w-full bg-gray-200 rounded-full h-1.5">
+                                        <div class="bg-indigo-500 h-1.5 rounded-full transition-all"
+                                             :style="`width: ${scores.meta * 6.67}%`"></div>
+                                    </div>
+                                </div>
+
+                                <!-- Images -->
+                                <div class="space-y-2">
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-xs font-medium text-text-secondary">Images</span>
+                                        <span class="text-xs" :class="{
+                                            'text-success': scores.images >= 12,
+                                            'text-accent': scores.images >= 8 && scores.images < 12,
+                                            'text-text-secondary': scores.images < 8
+                                        }">
+                                            <span x-text="scores.images >= 12 ? '✓' : scores.images >= 8 ? '⚠' : '·'"></span>
+                                        </span>
+                                    </div>
+                                    <div class="w-full bg-gray-200 rounded-full h-1.5">
+                                        <div class="bg-indigo-500 h-1.5 rounded-full transition-all"
+                                             :style="`width: ${scores.images * 6.67}%`"></div>
+                                    </div>
+                                </div>
+
+                                <!-- Lisibilité -->
+                                <div class="space-y-2">
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-xs font-medium text-text-secondary">Lisibilité</span>
+                                        <span class="text-xs" :class="{
+                                            'text-success': scores.readability >= 15,
+                                            'text-accent': scores.readability >= 10 && scores.readability < 15,
+                                            'text-text-secondary': scores.readability < 10
+                                        }">
+                                            <span x-text="scores.readability >= 15 ? '✓' : scores.readability >= 10 ? '⚠' : '·'"></span>
+                                        </span>
+                                    </div>
+                                    <div class="w-full bg-gray-200 rounded-full h-1.5">
+                                        <div class="bg-indigo-500 h-1.5 rounded-full transition-all"
+                                             :style="`width: ${scores.readability * 5}%`"></div>
+                                    </div>
                                 </div>
                             </div>
 
-                            <!-- Message info -->
-                            <div class="bg-indigo-50 border border-indigo-200 rounded-lg p-3 text-xs text-indigo-700">
-                                <p class="font-medium mb-1">💡 Mode Équipe</p>
-                                <p>Pas de contraintes SEO. Concentrez-vous sur la qualité du contenu !</p>
+                            <!-- Temps de lecture -->
+                            <div class="border-t border-border pt-4">
+                                <div class="flex justify-between text-sm">
+                                    <span class="text-text-secondary">Temps de lecture</span>
+                                    <span class="font-medium text-indigo-600" x-text="readingTime + ' min'"></span>
+                                </div>
+                            </div>
+
+                            <!-- Suggestions qualité -->
+                            <div x-show="allSuggestions.length > 0" class="border-t border-border pt-4">
+                                <h4 class="text-sm font-medium text-text-primary mb-3">💡 Suggestions qualité</h4>
+                                <ul class="space-y-2">
+                                    <template x-for="suggestion in allSuggestions.slice(0, 3)" :key="suggestion">
+                                        <li class="flex items-start text-xs text-text-secondary">
+                                            <svg class="h-4 w-4 mr-2 mt-0.5 text-indigo-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                            </svg>
+                                            <span x-text="suggestion"></span>
+                                        </li>
+                                    </template>
+                                </ul>
                             </div>
                         </div>
                     @else
