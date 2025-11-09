@@ -158,12 +158,6 @@
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <!-- Formulaire principal (2/3) -->
             <div class="lg:col-span-2">
-                <!-- Header -->
-                <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
-                    <h1 class="text-2xl font-bold text-text-primary">Créer un article</h1>
-                    <p class="text-sm text-text-secondary mt-1">Rédigez et optimisez votre contenu</p>
-                </div>
-
                 <!-- Navigation par onglets -->
                 <div class="bg-white rounded-lg shadow-sm overflow-hidden">
                     <div class="border-b border-border">
