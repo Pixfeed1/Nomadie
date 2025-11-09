@@ -965,6 +965,11 @@ function articleEditor() {
                 autofocus: true,
                 placeholder: 'Commencez à écrire votre article...',
 
+                // Données initiales vides pour éviter les erreurs de bloc invalide
+                data: {
+                    blocks: []
+                },
+
                 tools: {
                     header: {
                         class: Header,
@@ -1128,6 +1133,11 @@ function articleEditor() {
 
                 onChange: () => {
                     this.debounceAnalyze();
+                },
+
+                onReady: () => {
+                    // Lancer l'analyse initiale au chargement
+                    this.debounceAnalyze();
                 }
             });
 
@@ -1147,6 +1157,11 @@ function articleEditor() {
             this.$watch('seoScore', (value) => {
                 Alpine.store('article').seoScore = value;
             });
+
+            // Initialiser les valeurs par défaut
+            this.wordCount = 0;
+            this.readingTime = 0;
+            this.seoScore = 0;
         },
 
         saveEditorContent(e) {
@@ -1192,29 +1207,38 @@ function articleEditor() {
 
         async analyzeSEO() {
             try {
+                // Vérifier que l'éditeur est prêt
+                if (!this.editor || !this.editor.save) {
+                    console.warn('Éditeur pas encore prêt');
+                    return;
+                }
+
                 const editorData = await this.editor.save();
 
                 // Compter les mots et extraire le contenu
                 let textContent = '';
                 let headings = [];
                 let sentences = [];
-                editorData.blocks.forEach(block => {
-                    if (block.type === 'paragraph') {
-                        textContent += block.data.text + ' ';
-                        // Diviser en phrases
-                        const blockSentences = block.data.text.split(/[.!?]+/).filter(s => s.trim().length > 0);
-                        sentences.push(...blockSentences);
-                    } else if (block.type === 'header') {
-                        textContent += block.data.text + ' ';
-                        headings.push(block.data.text.toLowerCase());
-                    } else if (block.type === 'list') {
-                        textContent += block.data.items.join(' ') + ' ';
-                    }
-                });
+
+                if (editorData && editorData.blocks) {
+                    editorData.blocks.forEach(block => {
+                        if (block.type === 'paragraph' && block.data && block.data.text) {
+                            textContent += block.data.text + ' ';
+                            // Diviser en phrases
+                            const blockSentences = block.data.text.split(/[.!?]+/).filter(s => s.trim().length > 0);
+                            sentences.push(...blockSentences);
+                        } else if (block.type === 'header' && block.data && block.data.text) {
+                            textContent += block.data.text + ' ';
+                            headings.push(block.data.text.toLowerCase());
+                        } else if (block.type === 'list' && block.data && block.data.items) {
+                            textContent += block.data.items.join(' ') + ' ';
+                        }
+                    });
+                }
 
                 const words = textContent.trim().split(/\s+/).filter(word => word.length > 0);
                 this.wordCount = words.length;
-                this.readingTime = Math.ceil(this.wordCount / 200);
+                this.readingTime = this.wordCount > 0 ? Math.ceil(this.wordCount / 200) : 0;
 
                 // Analyser mot-clé principal
                 if (this.focusKeyphrase) {
