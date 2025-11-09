@@ -268,7 +268,8 @@
 
         <!-- Contenu principal -->
         <div class="flex-1 overflow-hidden">
-            <!-- Header -->
+            <!-- Header - Masqué sur pages création/édition article -->
+            @unless(request()->routeIs('writer.articles.create') || request()->routeIs('writer.articles.edit'))
             <header class="bg-white shadow-sm border-b border-gray-200">
                 <div class="px-6 py-4">
                     <div class="flex items-center justify-between">
@@ -314,6 +315,7 @@
                     </div>
                 </div>
             </header>
+            @endunless
 
             <!-- Main Content -->
             <main class="flex-1 overflow-y-auto p-6">

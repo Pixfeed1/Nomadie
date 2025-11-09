@@ -2,9 +2,6 @@
 
 @section('title', 'Modifier l\'article')
 
-@section('page-title', 'Modifier l\'article')
-@section('page-description', 'Optimisez votre contenu avec NomadSEO')
-
 @push('head')
 <!-- Editor.js Scripts - Bundles UMD -->
 <script src="https://cdn.jsdelivr.net/npm/@editorjs/editorjs@latest/dist/editorjs.umd.min.js"></script>
