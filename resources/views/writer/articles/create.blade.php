@@ -515,8 +515,8 @@
                 </div>
             </div>
 
-            <!-- Sidebar Analyse SEO (2/5) -->
-            <div class="lg:col-span-2">
+            <!-- Sidebar Analyse SEO (2/5) - Masquée en mobile -->
+            <div class="hidden lg:block lg:col-span-2">
                 <div class="bg-white rounded-lg shadow-sm sticky top-6">
                     @if(auth()->user()->writer_type === 'team')
                         <!-- Version Équipe Nomadie - Focus qualité -->

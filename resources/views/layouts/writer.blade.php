@@ -25,10 +25,13 @@
     @stack('head')
 </head>
 
-<body x-data="{ sidebarOpen: false }" class="bg-gray-50">
+<body x-data="{
+    sidebarOpen: false,
+    sidebarHidden: {{ request()->routeIs('writer.articles.create') || request()->routeIs('writer.articles.edit') ? 'true' : 'false' }}
+}" class="bg-gray-50">
     <div class="min-h-screen flex">
         <!-- Sidebar desktop -->
-        <div class="hidden lg:flex lg:flex-shrink-0">
+        <div x-show="!sidebarHidden" class="hidden lg:flex lg:flex-shrink-0" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 -translate-x-full" x-transition:enter-end="opacity-100 translate-x-0" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 translate-x-0" x-transition:leave-end="opacity-0 -translate-x-full">
             <div class="flex flex-col w-64">
                 <div class="flex flex-col flex-grow bg-white border-r border-gray-200 pt-5 pb-4 overflow-y-auto">
                     <!-- Logo -->
@@ -316,6 +319,29 @@
                 </div>
             </header>
             @endunless
+
+            <!-- Bouton toggle sidebar pour pages création/édition -->
+            @if(request()->routeIs('writer.articles.create') || request()->routeIs('writer.articles.edit'))
+            <div class="sticky top-0 z-10 bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between">
+                <button @click="sidebarHidden = !sidebarHidden"
+                        class="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-100 transition-colors group">
+                    <svg class="h-6 w-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+                    </svg>
+                    <div class="hidden lg:block">
+                        <span class="text-sm font-bold text-text-primary">{{ config('app.name') }}</span>
+                        <span class="block text-xs text-text-secondary">Cliquer pour toggle le menu</span>
+                    </div>
+                </button>
+
+                <!-- Menu burger mobile pour ouvrir sidebar -->
+                <button @click="sidebarOpen = true" class="lg:hidden p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                    </svg>
+                </button>
+            </div>
+            @endif
 
             <!-- Main Content -->
             <main class="flex-1 overflow-y-auto p-6">
