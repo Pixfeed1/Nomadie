@@ -173,11 +173,28 @@ document.addEventListener('alpine:init', () => {
 @endsection
 
 @section('header-center')
-    <div class="flex items-center space-x-2 text-sm text-text-secondary">
-        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-        </svg>
-        <span x-text="$store.article.status === 'draft' ? 'Brouillon' : 'Publié'"></span>
+    <div class="flex items-center space-x-1">
+        <!-- Bouton Undo (Annuler) -->
+        <button type="button"
+                @click="undo()"
+                x-ref="undoButton"
+                class="p-2 rounded-lg hover:bg-gray-100 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                title="Annuler (Ctrl+Z)">
+            <svg class="h-5 w-5 text-text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/>
+            </svg>
+        </button>
+
+        <!-- Bouton Redo (Refaire) -->
+        <button type="button"
+                @click="redo()"
+                x-ref="redoButton"
+                class="p-2 rounded-lg hover:bg-gray-100 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                title="Refaire (Ctrl+Y)">
+            <svg class="h-5 w-5 text-text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 10h-10a8 8 0 00-8 8v2M21 10l-6 6m6-6l-6-6"/>
+            </svg>
+        </button>
     </div>
 @endsection
 
@@ -1118,6 +1135,22 @@ function articleEditor() {
             if (this.wordCount >= 300) return 10;
             if (this.wordCount > 0) return 5;
             return 0;
+        },
+
+        // Fonction Undo (Annuler)
+        undo() {
+            if (this.editor && this.editor.blocks) {
+                // Editor.js n'a pas d'API undo native, on utilise le comportement natif du navigateur
+                document.execCommand('undo');
+            }
+        },
+
+        // Fonction Redo (Refaire)
+        redo() {
+            if (this.editor && this.editor.blocks) {
+                // Editor.js n'a pas d'API redo native, on utilise le comportement natif du navigateur
+                document.execCommand('redo');
+            }
         }
     };
 }
