@@ -624,6 +624,111 @@ tinymce.init({
     suffix: '.min',
     language: 'fr_FR',
     height: 600,
+
+    // Traductions personnalisées pour compléter fr_FR
+    language_url: false,
+    setup: function(editor) {
+        // Traductions manuelles des éléments manquants
+        if (tinymce.util.I18n) {
+            tinymce.util.I18n.add('fr_FR', {
+                'Insert link': 'Insérer un lien',
+                'Add link': 'Ajouter un lien',
+                'Insert/edit link': 'Insérer/modifier un lien',
+                'Link': 'Lien',
+                'URL': 'URL',
+                'Text to display': 'Texte à afficher',
+                'Title': 'Titre',
+                'Target': 'Cible',
+                'Open link in...': 'Ouvrir le lien dans...',
+                'None': 'Aucun',
+                'New window': 'Nouvelle fenêtre',
+                'Remove link': 'Supprimer le lien',
+                'Insert/edit image': 'Insérer/modifier une image',
+                'Insert image': 'Insérer une image',
+                'Image': 'Image',
+                'Source': 'Source',
+                'Alternative description': 'Description alternative',
+                'Dimensions': 'Dimensions',
+                'Width': 'Largeur',
+                'Height': 'Hauteur',
+                'Constrain proportions': 'Conserver les proportions',
+            });
+        }
+
+        // Forcer l'alt à l'insertion d'image
+        editor.on('BeforeSetContent', function(e) {
+            if (e.content.includes('<img')) {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(e.content, 'text/html');
+                const images = doc.querySelectorAll('img:not([alt])');
+
+                images.forEach(img => {
+                    img.setAttribute('alt', '');
+                });
+
+                e.content = doc.body.innerHTML;
+            }
+        });
+
+        // Vérifier l'alt après insertion d'image
+        editor.on('NodeChange', function(e) {
+            if (e.element && e.element.tagName === 'IMG') {
+                const currentAlt = e.element.getAttribute('alt');
+                if (!currentAlt || currentAlt === '') {
+                    setTimeout(() => {
+                        editor.windowManager.open({
+                            title: 'Description de l\'image requise (SEO)',
+                            body: {
+                                type: 'panel',
+                                items: [
+                                    {
+                                        type: 'input',
+                                        name: 'alt',
+                                        label: 'Texte alternatif',
+                                        placeholder: 'Décrivez cette image pour le SEO'
+                                    },
+                                    {
+                                        type: 'htmlpanel',
+                                        html: '<p style="font-size: 12px; color: #666;">Le texte alternatif est crucial pour le SEO et l\'accessibilité. Décrivez ce que montre l\'image.</p>'
+                                    }
+                                ]
+                            },
+                            buttons: [
+                                {
+                                    type: 'cancel',
+                                    text: 'Annuler'
+                                },
+                                {
+                                    type: 'submit',
+                                    text: 'Valider',
+                                    primary: true
+                                }
+                            ],
+                            onSubmit: function(dialog) {
+                                const data = dialog.getData();
+                                if (data.alt && data.alt.trim() !== '') {
+                                    e.element.setAttribute('alt', data.alt.trim());
+                                    dialog.close();
+                                } else {
+                                    editor.windowManager.alert('Le texte alternatif est obligatoire pour le SEO');
+                                    return false;
+                                }
+                            }
+                        });
+                    }, 100);
+                }
+            }
+        });
+
+        // Déclencher l'analyse Alpine
+        editor.on('change keyup', function() {
+            const alpineData = Alpine.$data(document.querySelector('[x-data]'));
+            if (alpineData) {
+                alpineData.debounceAnalyze();
+            }
+        });
+    },
+
     plugins: [
         'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
         'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
