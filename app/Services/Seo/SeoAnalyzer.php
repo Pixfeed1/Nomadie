@@ -172,7 +172,7 @@ class SeoAnalyzer
         // Nouvelles analyses Nomad SEO (synchronisation frontend)
         $this->analyzeFocusKeyphrase();
         $this->analyzeTransitionWords();
-        $this->analyzeLinks();
+        // Note: analyzeLinks() est déjà appelé dans analyzeTechnical()
     }
     
     /**
@@ -2561,44 +2561,5 @@ class SeoAnalyzer
         $keywordData['transitions_count'] = $transitionCount;
         $keywordData['transitions_percentage'] = round($transitionsPercentage, 2);
         $this->analysis->keyword_data = $keywordData;
-    }
-
-    /**
-     * Analyser les liens internes et externes
-     * Synchronisation avec le frontend Nomad SEO
-     */
-    protected function analyzeLinks()
-    {
-        $content = $this->article->content;
-        $internalLinks = 0;
-        $externalLinks = 0;
-
-        // Extraire tous les liens <a href="...">
-        if (preg_match_all('/<a[^>]*href=["\'](.*?)["\'][^>]*>/i', $content, $matches)) {
-            foreach ($matches[1] as $url) {
-                // Nettoyer l'URL
-                $url = trim($url);
-
-                // Lien externe si commence par http:// ou https://
-                if (preg_match('/^https?:\/\//i', $url)) {
-                    // Vérifier si c'est un lien interne (même domaine) ou externe
-                    $domain = parse_url(config('app.url'), PHP_URL_HOST);
-                    $linkDomain = parse_url($url, PHP_URL_HOST);
-
-                    if ($linkDomain && $linkDomain !== $domain) {
-                        $externalLinks++;
-                    } else {
-                        $internalLinks++;
-                    }
-                } else {
-                    // Lien relatif = lien interne
-                    $internalLinks++;
-                }
-            }
-        }
-
-        // Stocker les compteurs
-        $this->analysis->internal_links_count = $internalLinks;
-        $this->analysis->external_links_count = $externalLinks;
     }
 }
