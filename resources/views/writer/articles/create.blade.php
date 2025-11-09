@@ -2,6 +2,20 @@
 
 @section('title', 'Nouvel article')
 
+@push('head')
+<!-- Editor.js Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/@editorjs/editorjs@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/@editorjs/header@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/@editorjs/list@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/@editorjs/image@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/@editorjs/quote@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/@editorjs/code@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/@editorjs/table@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/@editorjs/delimiter@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/@editorjs/inline-code@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/@editorjs/embed@latest"></script>
+@endpush
+
 @push('styles')
 <style>
     /* Editor.js - Style Nomadie */
@@ -745,19 +759,6 @@
     </form>
 </div>
 
-<!-- Editor.js Scripts -->
-<script src="https://cdn.jsdelivr.net/npm/@editorjs/editorjs@latest"></script>
-<script src="https://cdn.jsdelivr.net/npm/@editorjs/header@latest"></script>
-<script src="https://cdn.jsdelivr.net/npm/@editorjs/paragraph@latest"></script>
-<script src="https://cdn.jsdelivr.net/npm/@editorjs/list@latest"></script>
-<script src="https://cdn.jsdelivr.net/npm/@editorjs/image@latest"></script>
-<script src="https://cdn.jsdelivr.net/npm/@editorjs/quote@latest"></script>
-<script src="https://cdn.jsdelivr.net/npm/@editorjs/code@latest"></script>
-<script src="https://cdn.jsdelivr.net/npm/@editorjs/table@latest"></script>
-<script src="https://cdn.jsdelivr.net/npm/@editorjs/delimiter@latest"></script>
-<script src="https://cdn.jsdelivr.net/npm/@editorjs/inline-code@latest"></script>
-<script src="https://cdn.jsdelivr.net/npm/@editorjs/embed@latest"></script>
-
 <script>
 function articleEditor() {
     return {
@@ -814,14 +815,6 @@ function articleEditor() {
                         inlineToolbar: true
                     },
 
-                    paragraph: {
-                        class: Paragraph,
-                        inlineToolbar: true,
-                        config: {
-                            placeholder: 'Écrivez votre paragraphe...'
-                        }
-                    },
-
                     list: {
                         class: List,
                         inlineToolbar: true,
@@ -831,7 +824,7 @@ function articleEditor() {
                     },
 
                     image: {
-                        class: Image,
+                        class: ImageTool,
                         config: {
                             endpoints: {
                                 byFile: '/writer/articles/upload-image',
@@ -884,7 +877,7 @@ function articleEditor() {
                     },
 
                     code: {
-                        class: CodeTool,
+                        class: Code,
                         config: {
                             placeholder: 'Entrez votre code...'
                         }
