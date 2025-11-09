@@ -21,6 +21,8 @@ document.addEventListener('alpine:init', () => {
     Alpine.store('article', {
         settingsSidebarOpen: false,
         showScheduleModal: false,
+        showPreview: false,
+        previewDevice: 'desktop', // desktop, tablet, mobile
         status: 'draft',
         seoScore: 0,
 
@@ -30,6 +32,10 @@ document.addEventListener('alpine:init', () => {
 
         setStatus(status) {
             this.status = status;
+        },
+
+        setPreviewDevice(device) {
+            this.previewDevice = device;
         }
     });
 });
@@ -172,6 +178,17 @@ document.addEventListener('alpine:init', () => {
 @endsection
 
 @section('header-actions')
+    <!-- Bouton Aperçu -->
+    <button type="button"
+            @click="$store.article.showPreview = true"
+            class="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+            title="Aperçu">
+        <svg class="h-5 w-5 text-text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+        </svg>
+    </button>
+
     <!-- Bouton Paramètres -->
     <button type="button"
             @click="$store.article.toggleSidebar()"
@@ -608,6 +625,129 @@ document.addEventListener('alpine:init', () => {
                         Planifier
                     </button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Aperçu Responsive -->
+    <div x-show="$store.article.showPreview"
+         x-cloak
+         @click.self="$store.article.showPreview = false"
+         class="fixed inset-0 bg-black bg-opacity-75 z-50 flex flex-col">
+
+        <!-- Header modal -->
+        <div class="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+                <h3 class="text-lg font-semibold text-text-primary">Aperçu de l'article</h3>
+
+                <!-- Sélecteur de device -->
+                <div class="flex items-center space-x-1 bg-gray-100 rounded-lg p-1">
+                    <!-- Desktop -->
+                    <button @click="$store.article.setPreviewDevice('desktop')"
+                            :class="$store.article.previewDevice === 'desktop' ? 'bg-white shadow-sm' : ''"
+                            class="p-2 rounded hover:bg-white transition-colors"
+                            title="Desktop">
+                        <svg class="h-5 w-5" :class="$store.article.previewDevice === 'desktop' ? 'text-primary' : 'text-text-secondary'" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                        </svg>
+                    </button>
+
+                    <!-- Tablette -->
+                    <button @click="$store.article.setPreviewDevice('tablet')"
+                            :class="$store.article.previewDevice === 'tablet' ? 'bg-white shadow-sm' : ''"
+                            class="p-2 rounded hover:bg-white transition-colors"
+                            title="Tablette">
+                        <svg class="h-5 w-5" :class="$store.article.previewDevice === 'tablet' ? 'text-primary' : 'text-text-secondary'" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                        </svg>
+                    </button>
+
+                    <!-- Mobile -->
+                    <button @click="$store.article.setPreviewDevice('mobile')"
+                            :class="$store.article.previewDevice === 'mobile' ? 'bg-white shadow-sm' : ''"
+                            class="p-2 rounded hover:bg-white transition-colors"
+                            title="Mobile">
+                        <svg class="h-5 w-5" :class="$store.article.previewDevice === 'mobile' ? 'text-primary' : 'text-text-secondary'" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <button @click="$store.article.showPreview = false" class="text-text-secondary hover:text-text-primary transition-colors">
+                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Contenu preview -->
+        <div class="flex-1 overflow-y-auto bg-gray-100 p-8 flex items-start justify-center">
+            <div class="transition-all duration-300 bg-white shadow-xl rounded-lg overflow-hidden"
+                 :class="{
+                     'w-full max-w-6xl': $store.article.previewDevice === 'desktop',
+                     'w-full max-w-3xl': $store.article.previewDevice === 'tablet',
+                     'w-full max-w-sm': $store.article.previewDevice === 'mobile'
+                 }">
+
+                <!-- Article preview -->
+                <article class="prose prose-lg max-w-none p-8">
+                    <!-- Image à la une -->
+                    <template x-if="imagePreview">
+                        <div class="mb-8 -mx-8 -mt-8">
+                            <img :src="imagePreview" alt="Image à la une" class="w-full h-64 object-cover">
+                        </div>
+                    </template>
+
+                    <!-- Catégorie -->
+                    <template x-if="article.category">
+                        <div class="mb-4">
+                            <span class="inline-block px-3 py-1 text-xs font-semibold text-primary bg-primary/10 rounded-full" x-text="article.category"></span>
+                        </div>
+                    </template>
+
+                    <!-- Titre -->
+                    <h1 class="text-4xl font-bold text-text-primary mb-4" x-text="article.title || 'Titre de l\'article'"></h1>
+
+                    <!-- Sous-titre -->
+                    <template x-if="article.subtitle">
+                        <p class="text-xl text-text-secondary mb-6" x-text="article.subtitle"></p>
+                    </template>
+
+                    <!-- Meta info -->
+                    <div class="flex items-center space-x-4 text-sm text-text-secondary mb-8 pb-8 border-b border-gray-200">
+                        <div class="flex items-center space-x-1">
+                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                            </svg>
+                            <span>Aujourd'hui</span>
+                        </div>
+                        <span>•</span>
+                        <div class="flex items-center space-x-1">
+                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            <span x-text="readingTime + ' min de lecture'"></span>
+                        </div>
+                    </div>
+
+                    <!-- Contenu (sera remplacé par rendu Editor.js) -->
+                    <div x-ref="previewContent" class="article-content">
+                        <p class="text-text-secondary italic">Le contenu de votre article apparaîtra ici...</p>
+                    </div>
+
+                    <!-- Tags -->
+                    <template x-if="article.tags">
+                        <div class="mt-12 pt-8 border-t border-gray-200">
+                            <h4 class="text-sm font-semibold text-text-secondary mb-3">Tags</h4>
+                            <div class="flex flex-wrap gap-2">
+                                <template x-for="tag in article.tags.split(',')" :key="tag">
+                                    <span class="inline-block px-3 py-1 text-sm text-text-secondary bg-gray-100 rounded-full hover:bg-gray-200 transition-colors" x-text="tag.trim()"></span>
+                                </template>
+                            </div>
+                        </div>
+                    </template>
+                </article>
             </div>
         </div>
     </div>
