@@ -288,18 +288,22 @@ class ArticleController extends Controller
     }
 
     /**
-     * Upload image for TinyMCE editor
+     * Upload image for Editor.js
      */
     public function uploadImage(Request $request)
     {
         $request->validate([
-            'image' => 'required|image|max:' . config('uploads.max_sizes.image')
+            'image' => 'required|image|max:' . config('uploads.max_sizes.image', 10240)
         ]);
-        
+
         $path = $request->file('image')->store('articles/content', 'public');
-        
+
+        // Editor.js expects this specific format
         return response()->json([
-            'location' => Storage::url($path)
+            'success' => 1,
+            'file' => [
+                'url' => Storage::url($path)
+            ]
         ]);
     }
 
