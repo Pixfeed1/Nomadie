@@ -89,10 +89,12 @@ document.addEventListener('alpine:init', () => {
         width: 100%;
         color: #1F2937;
         background: transparent;
+        text-align: center;
     }
 
     .gutenberg-title::placeholder {
         color: #D1D5DB;
+        text-align: center;
     }
 
     .gutenberg-subtitle {
@@ -106,10 +108,12 @@ document.addEventListener('alpine:init', () => {
         width: 100%;
         color: #6B7280;
         background: transparent;
+        text-align: center;
     }
 
     .gutenberg-subtitle::placeholder {
         color: #D1D5DB;
+        text-align: center;
     }
 
     /* Sidebar settings */
