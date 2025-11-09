@@ -20,6 +20,7 @@
 document.addEventListener('alpine:init', () => {
     Alpine.store('article', {
         settingsSidebarOpen: false,
+        showScheduleModal: false,
         status: 'draft',
         seoScore: 0,
 
@@ -182,7 +183,7 @@ document.addEventListener('alpine:init', () => {
         </svg>
     </button>
 
-    <!-- Bouton Sauvegarder -->
+    <!-- Bouton Sauvegarder brouillon -->
     <button type="submit"
             form="article-form"
             @click="$store.article.setStatus('draft')"
@@ -190,15 +191,52 @@ document.addEventListener('alpine:init', () => {
         Sauvegarder
     </button>
 
-    <!-- Bouton Publier -->
-    <button type="submit"
-            form="article-form"
-            @click="$store.article.setStatus('published')"
-            :disabled="$store.article.seoScore < 78"
-            :class="$store.article.seoScore >= 78 ? 'bg-primary hover:bg-primary-dark text-white' : 'bg-gray-300 text-gray-500 cursor-not-allowed'"
-            class="px-4 py-2 text-sm font-medium rounded-lg transition-colors">
-        Publier
-    </button>
+    <!-- Dropdown Publier avec Alpine.js -->
+    <div x-data="{ publishOpen: false }" @click.away="publishOpen = false" class="relative">
+        <button type="button"
+                @click="publishOpen = !publishOpen"
+                :disabled="$store.article.seoScore < 78"
+                :class="$store.article.seoScore >= 78 ? 'bg-primary hover:bg-primary-dark text-white' : 'bg-gray-300 text-gray-500 cursor-not-allowed'"
+                class="px-4 py-2 text-sm font-medium rounded-lg transition-colors flex items-center space-x-1">
+            <span>Publier</span>
+            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+            </svg>
+        </button>
+
+        <!-- Menu déroulant -->
+        <div x-show="publishOpen"
+             x-cloak
+             x-transition:enter="transition ease-out duration-100"
+             x-transition:enter-start="opacity-0 scale-95"
+             x-transition:enter-end="opacity-100 scale-100"
+             x-transition:leave="transition ease-in duration-75"
+             x-transition:leave-start="opacity-100 scale-100"
+             x-transition:leave-end="opacity-0 scale-95"
+             class="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50">
+
+            <!-- Publier maintenant -->
+            <button type="submit"
+                    form="article-form"
+                    @click="$store.article.setStatus('published'); publishOpen = false"
+                    class="w-full text-left px-4 py-2 text-sm text-text-primary hover:bg-gray-50 flex items-center space-x-2">
+                <svg class="h-4 w-4 text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                </svg>
+                <span>Publier maintenant</span>
+            </button>
+
+            <!-- Planifier -->
+            <button type="button"
+                    @click="$store.article.setStatus('scheduled'); $store.article.showScheduleModal = true; publishOpen = false"
+                    class="w-full text-left px-4 py-2 text-sm text-text-primary hover:bg-gray-50 flex items-center space-x-2">
+                <svg class="h-4 w-4 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                </svg>
+                <span>Planifier pour plus tard</span>
+            </button>
+        </div>
+    </div>
 @endsection
 
 @section('content')
@@ -452,6 +490,127 @@ document.addEventListener('alpine:init', () => {
              class="fixed inset-0 bg-black bg-opacity-25 z-40 lg:hidden"
              x-cloak></div>
     </form>
+
+    <!-- Barre fixe indicateurs SEO en bas -->
+    <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-30 transition-all"
+         :class="$store.article.settingsSidebarOpen ? 'lg:mr-[380px]' : ''"
+         x-cloak>
+        <div class="max-w-[740px] mx-auto px-8 py-3">
+            <div class="flex items-center justify-between">
+                <!-- Score SEO -->
+                <div class="flex items-center space-x-4">
+                    <div class="flex items-center space-x-2">
+                        <span class="text-xs font-medium text-text-secondary">Score Nomad SEO:</span>
+                        <div class="flex items-center space-x-1">
+                            <span class="text-lg font-bold" :class="{
+                                'text-success': seoScore >= 78,
+                                'text-accent': seoScore >= 50 && seoScore < 78,
+                                'text-error': seoScore < 50
+                            }" x-text="seoScore"></span>
+                            <span class="text-xs text-text-secondary">/100</span>
+                        </div>
+                    </div>
+
+                    <!-- Barre de progression mini -->
+                    <div class="w-32 h-2 bg-gray-200 rounded-full overflow-hidden">
+                        <div class="h-full transition-all duration-500"
+                             :style="`width: ${seoScore}%`"
+                             :class="{
+                                 'bg-success': seoScore >= 78,
+                                 'bg-accent': seoScore >= 50 && seoScore < 78,
+                                 'bg-error': seoScore < 50
+                             }"></div>
+                    </div>
+
+                    <!-- Statistiques -->
+                    <div class="hidden md:flex items-center space-x-3 text-xs text-text-secondary">
+                        <span><span x-text="wordCount"></span> mots</span>
+                        <span>•</span>
+                        <span><span x-text="readingTime"></span> min de lecture</span>
+                    </div>
+                </div>
+
+                <!-- Points à améliorer -->
+                <div class="flex items-center space-x-2">
+                    <template x-if="seoScore < 78">
+                        <div class="flex items-center space-x-2 text-xs">
+                            <svg class="h-4 w-4 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                            </svg>
+                            <span class="text-text-secondary">
+                                <template x-if="scores.title < 20"><span>Titre trop court</span></template>
+                                <template x-if="scores.meta < 20 && scores.title >= 20"><span>Meta description manquante</span></template>
+                                <template x-if="scores.content < 10 && scores.meta >= 20 && scores.title >= 20"><span>Contenu insuffisant</span></template>
+                            </span>
+                            <button @click="$store.article.toggleSidebar()" class="ml-2 text-primary hover:underline text-xs font-medium">
+                                Voir les détails
+                            </button>
+                        </div>
+                    </template>
+                    <template x-if="seoScore >= 78">
+                        <div class="flex items-center space-x-1 text-xs text-success">
+                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            <span>Éligible DoFollow</span>
+                        </div>
+                    </template>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Planification -->
+    <div x-show="$store.article.showScheduleModal"
+         x-cloak
+         @click.self="$store.article.showScheduleModal = false"
+         class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div @click.away="$store.article.showScheduleModal = false"
+             x-transition:enter="transition ease-out duration-300"
+             x-transition:enter-start="opacity-0 scale-95"
+             x-transition:enter-end="opacity-100 scale-100"
+             x-transition:leave="transition ease-in duration-200"
+             x-transition:leave-start="opacity-100 scale-100"
+             x-transition:leave-end="opacity-0 scale-95"
+             class="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-semibold text-text-primary">Planifier la publication</h3>
+                <button @click="$store.article.showScheduleModal = false" class="text-text-secondary hover:text-text-primary">
+                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="space-y-4">
+                <div>
+                    <label for="schedule_date" class="block text-sm font-medium text-text-primary mb-2">
+                        Date et heure de publication
+                    </label>
+                    <input type="datetime-local"
+                           id="schedule_date"
+                           x-model="article.scheduled_at"
+                           :min="minDateTime"
+                           class="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
+                </div>
+
+                <div class="flex items-center space-x-3">
+                    <button type="button"
+                            @click="$store.article.showScheduleModal = false"
+                            class="flex-1 px-4 py-2 border border-gray-300 text-text-secondary rounded-lg hover:bg-gray-50 transition-colors">
+                        Annuler
+                    </button>
+                    <button type="submit"
+                            form="article-form"
+                            @click="$store.article.showScheduleModal = false"
+                            class="flex-1 px-4 py-2 bg-primary hover:bg-primary-dark text-white font-medium rounded-lg transition-colors">
+                        Planifier
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
