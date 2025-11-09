@@ -285,6 +285,8 @@ document.addEventListener('alpine:init', () => {
         <!-- Hidden inputs -->
         <input type="hidden" name="content" x-ref="contentInput">
         <input type="hidden" name="status" x-model="$store.article.status">
+        <input type="hidden" name="subtitle" x-model="article.subtitle">
+        <input type="hidden" name="focus_keyphrase" x-model="focusKeyphrase">
 
         <!-- Contenu principal centré (style Gutenberg) -->
         <div class="flex-1 overflow-y-auto content-area bg-white" :class="$store.article.settingsSidebarOpen ? 'sidebar-open' : ''">
