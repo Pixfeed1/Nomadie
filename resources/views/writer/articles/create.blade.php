@@ -921,6 +921,7 @@ function articleEditor() {
                             "blockTunes": {
                                 "toggler": {
                                     "Click to tune": "Cliquer pour configurer",
+                                    "Click to delete": "Cliquer pour supprimer"
                                 }
                             },
                             "inlineToolbar": {
@@ -930,8 +931,13 @@ function articleEditor() {
                             },
                             "toolbar": {
                                 "toolbox": {
-                                    "Add": "Ajouter"
+                                    "Add": "Ajouter",
+                                    "Filter": "Filtrer"
                                 }
+                            },
+                            "popover": {
+                                "Filter": "Filtrer",
+                                "Nothing found": "Rien trouvé"
                             }
                         },
                         toolNames: {
@@ -943,20 +949,59 @@ function articleEditor() {
                             "Delimiter": "Séparateur",
                             "Table": "Tableau",
                             "Image": "Image",
-                            "Embed": "Intégration"
+                            "Embed": "Intégration",
+                            "Bold": "Gras",
+                            "Italic": "Italique",
+                            "Link": "Lien",
+                            "Inline Code": "Code en ligne"
                         },
                         tools: {
                             "header": {
-                                "Header": "Titre"
+                                "Header": "Titre",
+                                "Heading 1": "Titre 1",
+                                "Heading 2": "Titre 2",
+                                "Heading 3": "Titre 3",
+                                "Heading 4": "Titre 4"
                             },
                             "list": {
                                 "Ordered": "Numérotée",
                                 "Unordered": "À puces"
+                            },
+                            "link": {
+                                "Add a link": "Ajouter un lien"
+                            },
+                            "stub": {
+                                "The block can not be displayed correctly.": "Le bloc ne peut pas être affiché correctement."
+                            },
+                            "image": {
+                                "Caption": "Légende",
+                                "Select an Image": "Sélectionner une image",
+                                "With border": "Avec bordure",
+                                "Stretch image": "Étirer l'image",
+                                "With background": "Avec arrière-plan"
+                            },
+                            "code": {
+                                "Code": "Code"
+                            },
+                            "table": {
+                                "Table": "Tableau",
+                                "With headings": "Avec en-têtes",
+                                "Without headings": "Sans en-têtes",
+                                "Add row above": "Ajouter une ligne au-dessus",
+                                "Add row below": "Ajouter une ligne en-dessous",
+                                "Add column to left": "Ajouter une colonne à gauche",
+                                "Add column to right": "Ajouter une colonne à droite",
+                                "Delete row": "Supprimer la ligne",
+                                "Delete column": "Supprimer la colonne"
+                            },
+                            "quote": {
+                                "Quote": "Citation"
                             }
                         },
                         blockTunes: {
                             "delete": {
-                                "Delete": "Supprimer"
+                                "Delete": "Supprimer",
+                                "Click to delete": "Cliquer pour supprimer"
                             },
                             "moveUp": {
                                 "Move up": "Monter"
