@@ -249,7 +249,7 @@ class SeoDataSeeder extends Seeder
         $configurations = [
             // COMMUNAUTE - MODE LIBRE
             'communaute_libre' => [
-                'writer_type' => 'communaute',
+                'writer_type' => 'community',
                 'mode' => 'libre',
                 'configs' => [
                     'title_length' => ['weight' => 1.0, 'threshold' => 7.8, 'is_required' => true],
@@ -283,7 +283,7 @@ class SeoDataSeeder extends Seeder
 
             // CLIENT - MODE LIBRE
             'client_libre' => [
-                'writer_type' => 'client',
+                'writer_type' => 'client_contributor',
                 'mode' => 'libre',
                 'configs' => [
                     'title_length' => ['weight' => 1.0, 'threshold' => 7.0, 'is_required' => true],
@@ -317,7 +317,7 @@ class SeoDataSeeder extends Seeder
 
             // PARTENAIRE - MODE LIBRE (avec contrôle renforcé)
             'partenaire_libre' => [
-                'writer_type' => 'partenaire',
+                'writer_type' => 'partner',
                 'mode' => 'libre',
                 'configs' => [
                     'title_length' => ['weight' => 1.0, 'threshold' => 8.0, 'is_required' => true],
@@ -351,7 +351,7 @@ class SeoDataSeeder extends Seeder
 
             // EQUIPE - MODE LIBRE
             'equipe_libre' => [
-                'writer_type' => 'equipe',
+                'writer_type' => 'team',
                 'mode' => 'libre',
                 'configs' => [
                     // L'équipe a plus de liberté, pondérations égales et seuils plus bas
@@ -386,7 +386,7 @@ class SeoDataSeeder extends Seeder
 
             // EQUIPE - MODE COMMANDE INTERNE
             'equipe_commande' => [
-                'writer_type' => 'equipe',
+                'writer_type' => 'team',
                 'mode' => 'commande_interne',
                 'configs' => [
                     // Configuration stricte pour les commandes internes
@@ -456,7 +456,7 @@ class SeoDataSeeder extends Seeder
 
         SeoConfiguration::updateOrCreate(
             [
-                'writer_type' => 'partenaire',
+                'writer_type' => 'partner',
                 'mode' => 'libre',
                 'criterion_id' => $autoPromoCriterion->id,
             ],

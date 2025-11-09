@@ -1,9 +1,154 @@
-@extends('vendor.layouts.app')
+@extends('layouts.writer')
 
 @section('title', 'Modifier l\'article')
 
-@section('page-title', 'Modifier l\'article')
-@section('page-description', 'Optimisez votre contenu avec NomadSEO')
+@push('head')
+<!-- Editor.js Scripts - Bundles UMD -->
+<script src="https://cdn.jsdelivr.net/npm/@editorjs/editorjs@latest/dist/editorjs.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@editorjs/header@latest/dist/header.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@editorjs/list@latest/dist/list.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@editorjs/image@latest/dist/image.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@editorjs/quote@latest/dist/quote.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@editorjs/code@latest/dist/code.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@editorjs/table@latest/dist/table.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@editorjs/delimiter@latest/dist/delimiter.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@editorjs/inline-code@latest/dist/inline-code.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@editorjs/embed@latest/dist/embed.umd.min.js"></script>
+@endpush
+
+@push('styles')
+<style>
+    /* Editor.js - Style Nomadie */
+    #editorjs {
+        background: white;
+        border: 1px solid #E5E7EB;
+        border-radius: 8px;
+        padding: 1.5rem;
+        min-height: 500px;
+    }
+
+    .ce-block__content,
+    .ce-toolbar__content {
+        max-width: 800px;
+    }
+
+    .codex-editor__redactor {
+        padding-bottom: 200px !important;
+    }
+
+    /* Personnalisation des blocs */
+    .ce-paragraph {
+        font-size: 16px;
+        line-height: 1.6;
+        color: #374151;
+    }
+
+    .ce-header {
+        font-weight: 600;
+        color: #1F2937;
+    }
+
+    .ce-header[contentEditable=true][data-placeholder]:empty::before {
+        color: #9CA3AF;
+    }
+
+    /* H2 style Nomadie */
+    .ce-header h2 {
+        color: #38B2AC;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid rgba(56, 178, 172, 0.2);
+    }
+
+    .ce-header h3 {
+        color: #2C9A94;
+    }
+
+    /* Images */
+    .image-tool__image {
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Citations */
+    .cdx-quote {
+        border-left: 4px solid #38B2AC;
+        background: #F3F4F6;
+        border-radius: 6px;
+    }
+
+    .cdx-quote__text {
+        color: #6B7280;
+        font-style: italic;
+    }
+
+    /* Listes */
+    .cdx-list__item {
+        color: #374151;
+    }
+
+    .cdx-list--unordered .cdx-list__item::before {
+        background-color: #38B2AC;
+    }
+
+    /* Code */
+    .ce-code__textarea {
+        background: #F3F4F6;
+        border-radius: 4px;
+        font-family: 'Courier New', monospace;
+        color: #EF4444;
+    }
+
+    /* Tables */
+    .tc-table {
+        border-collapse: collapse;
+    }
+
+    .tc-table th {
+        background: #38B2AC;
+        color: white;
+        font-weight: 600;
+    }
+
+    .tc-table td,
+    .tc-table th {
+        border: 1px solid #E5E7EB;
+        padding: 0.75rem;
+    }
+
+    .tc-table tr:hover {
+        background: #F9FAFB;
+    }
+
+    /* Delimiter */
+    .ce-delimiter {
+        border-top: 2px solid #E5E7EB;
+    }
+
+    /* Toolbar */
+    .ce-toolbar__plus,
+    .ce-toolbar__settings-btn {
+        color: #38B2AC;
+    }
+
+    .ce-toolbar__plus:hover,
+    .ce-toolbar__settings-btn:hover {
+        background: #38B2AC;
+        color: white;
+    }
+
+    .ce-inline-toolbar {
+        background: #38B2AC;
+    }
+
+    .ce-inline-tool {
+        color: white;
+    }
+
+    .ce-inline-tool:hover {
+        background: rgba(255, 255, 255, 0.2);
+    }
+</style>
+@endpush
 
 @section('content')
 <div x-data="articleEditor" class="max-w-7xl mx-auto">
@@ -150,54 +295,13 @@
 
                         <!-- Contenu -->
                         <div>
-                            <label for="content" class="block text-sm font-medium text-text-primary mb-2">
+                            <label for="editorjs" class="block text-sm font-medium text-text-primary mb-2">
                                 Contenu
                             </label>
-                            <div class="border border-border rounded-lg overflow-hidden">
-                                <!-- Toolbar simple -->
-                                <div class="bg-bg-alt border-b border-border p-2 flex flex-wrap gap-1">
-                                    <button type="button" @click="formatText('bold')" class="p-2 hover:bg-white rounded transition-colors" title="Gras">
-                                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 4h8a4 4 0 014 4 4 4 0 01-4 4H6z" />
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 12h9a4 4 0 014 4 4 4 0 01-4 4H6z" />
-                                        </svg>
-                                    </button>
-                                    <button type="button" @click="formatText('italic')" class="p-2 hover:bg-white rounded transition-colors" title="Italique">
-                                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 4h4M8 20h4m-2-16l-2 16" />
-                                        </svg>
-                                    </button>
-                                    <div class="w-px bg-border mx-1"></div>
-                                    <button type="button" @click="formatText('h2')" class="px-2 py-1 hover:bg-white rounded transition-colors text-sm font-medium">
-                                        H2
-                                    </button>
-                                    <button type="button" @click="formatText('h3')" class="px-2 py-1 hover:bg-white rounded transition-colors text-sm font-medium">
-                                        H3
-                                    </button>
-                                    <div class="w-px bg-border mx-1"></div>
-                                    <button type="button" @click="formatText('ul')" class="p-2 hover:bg-white rounded transition-colors" title="Liste">
-                                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                                        </svg>
-                                    </button>
-                                    <button type="button" @click="formatText('link')" class="p-2 hover:bg-white rounded transition-colors" title="Lien">
-                                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
-                                        </svg>
-                                    </button>
-                                </div>
-                                
-                                <!-- Editeur -->
-                                <div contenteditable="true"
-                                     @input="updateContent($event)"
-                                     @paste="handlePaste($event)"
-                                     x-ref="editor"
-                                     class="min-h-[400px] p-4 focus:outline-none">
-                                    {!! old('content', $article->content) !!}
-                                </div>
-                            </div>
+                            <div id="editorjs"></div>
+                            <input type="hidden" name="content" x-model="article.content" required>
                             <p class="mt-1 text-xs text-text-secondary">
-                                <span x-text="wordCount"></span> mots • 
+                                <span x-text="wordCount"></span> mots •
                                 Temps de lecture : <span x-text="readingTime"></span> min
                             </p>
                         </div>
@@ -265,15 +369,29 @@
                         <div class="text-sm text-text-secondary">
                             Dernière modification : {{ $article->updated_at->diffForHumans() }}
                         </div>
-                        <div class="flex space-x-2">
-                            <a href="{{ route('writer.articles.index') }}" 
-                               class="px-4 py-2 text-text-secondary hover:text-text-primary transition-colors">
-                                Annuler
-                            </a>
-                            <button type="submit" 
-                                    class="px-4 py-2 bg-primary hover:bg-primary-dark text-white font-medium rounded-lg transition-colors">
-                                Mettre à jour
-                            </button>
+                        <div class="flex justify-between items-center w-full">
+                            <form action="{{ route('writer.articles.destroy', $article) }}" method="POST"
+                                  onsubmit="return confirm('Êtes-vous sûr de vouloir mettre cet article à la corbeille ?');">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit"
+                                        class="px-4 py-2 text-error hover:bg-error/10 rounded-lg transition-colors flex items-center">
+                                    <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                    </svg>
+                                    Mettre à la corbeille
+                                </button>
+                            </form>
+                            <div class="flex space-x-2">
+                                <a href="{{ route('writer.articles.index') }}"
+                                   class="px-4 py-2 text-text-secondary hover:text-text-primary transition-colors">
+                                    Annuler
+                                </a>
+                                <button type="submit"
+                                        class="px-4 py-2 bg-primary hover:bg-primary-dark text-white font-medium rounded-lg transition-colors">
+                                    Mettre à jour
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -486,62 +604,439 @@ function articleEditor() {
         wordCount: 0,
         readingTime: 0,
         analyzeTimer: null,
+        editor: null,
 
         init() {
+            // Convertir le HTML existant en blocks Editor.js
+            const initialBlocks = this.convertHTMLToBlocks(this.article.content);
+
+            // Initialiser Editor.js avec le contenu existant
+            this.editor = new EditorJS({
+                holder: 'editorjs',
+                autofocus: true,
+                placeholder: 'Commencez à écrire votre article...',
+                data: {
+                    blocks: initialBlocks
+                },
+
+                tools: {
+                    header: {
+                        class: Header,
+                        config: {
+                            placeholder: 'Titre de section',
+                            levels: [2, 3, 4],
+                            defaultLevel: 2
+                        },
+                        inlineToolbar: true
+                    },
+
+                    list: {
+                        class: List,
+                        inlineToolbar: true,
+                        config: {
+                            defaultStyle: 'unordered'
+                        }
+                    },
+
+                    image: {
+                        class: ImageTool,
+                        config: {
+                            endpoints: {
+                                byFile: '/writer/articles/upload-image',
+                            },
+                            additionalRequestHeaders: {
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                            },
+                            field: 'image',
+                            types: 'image/*',
+                            captionPlaceholder: 'Légende de l\'image',
+                            buttonContent: 'Sélectionner une image',
+                            uploader: {
+                                uploadByFile(file) {
+                                    return new Promise((resolve, reject) => {
+                                        const formData = new FormData();
+                                        formData.append('image', file);
+
+                                        fetch('/writer/articles/upload-image', {
+                                            method: 'POST',
+                                            body: formData,
+                                            headers: {
+                                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                                            }
+                                        })
+                                        .then(response => response.json())
+                                        .then(data => {
+                                            resolve({
+                                                success: 1,
+                                                file: {
+                                                    url: data.location
+                                                }
+                                            });
+                                        })
+                                        .catch(error => {
+                                            reject(error);
+                                        });
+                                    });
+                                }
+                            }
+                        }
+                    },
+
+                    quote: {
+                        class: Quote,
+                        inlineToolbar: true,
+                        config: {
+                            quotePlaceholder: 'Citation',
+                            captionPlaceholder: 'Auteur'
+                        }
+                    },
+
+                    code: {
+                        class: CodeTool,
+                        config: {
+                            placeholder: 'Entrez votre code...'
+                        }
+                    },
+
+                    table: {
+                        class: Table,
+                        inlineToolbar: true,
+                        config: {
+                            rows: 2,
+                            cols: 3,
+                        }
+                    },
+
+                    delimiter: Delimiter,
+
+                    embed: {
+                        class: Embed,
+                        config: {
+                            services: {
+                                youtube: true,
+                                vimeo: true,
+                                instagram: true,
+                                twitter: true,
+                            }
+                        }
+                    },
+
+                    inlineCode: {
+                        class: InlineCode
+                    }
+                },
+
+                onChange: async () => {
+                    await this.saveEditorContent();
+                },
+
+                i18n: {
+                    messages: {
+                        ui: {
+                            "blockTunes": {
+                                "toggler": {
+                                    "Click to tune": "Cliquer pour configurer",
+                                    "Click to delete": "Cliquer pour supprimer"
+                                }
+                            },
+                            "inlineToolbar": {
+                                "converter": {
+                                    "Convert to": "Convertir en"
+                                }
+                            },
+                            "toolbar": {
+                                "toolbox": {
+                                    "Add": "Ajouter",
+                                    "Filter": "Filtrer"
+                                }
+                            },
+                            "popover": {
+                                "Filter": "Filtrer",
+                                "Nothing found": "Rien trouvé"
+                            }
+                        },
+                        toolNames: {
+                            "Text": "Paragraphe",
+                            "Heading": "Titre",
+                            "List": "Liste",
+                            "Quote": "Citation",
+                            "Code": "Code",
+                            "Delimiter": "Séparateur",
+                            "Table": "Tableau",
+                            "Image": "Image",
+                            "Embed": "Intégration",
+                            "Bold": "Gras",
+                            "Italic": "Italique",
+                            "Link": "Lien",
+                            "Inline Code": "Code en ligne"
+                        },
+                        tools: {
+                            "header": {
+                                "Header": "Titre",
+                                "Heading 1": "Titre 1",
+                                "Heading 2": "Titre 2",
+                                "Heading 3": "Titre 3",
+                                "Heading 4": "Titre 4"
+                            },
+                            "list": {
+                                "Ordered": "Numérotée",
+                                "Unordered": "À puces"
+                            },
+                            "link": {
+                                "Add a link": "Ajouter un lien"
+                            },
+                            "stub": {
+                                "The block can not be displayed correctly.": "Le bloc ne peut pas être affiché correctement."
+                            },
+                            "image": {
+                                "Caption": "Légende",
+                                "Select an Image": "Sélectionner une image",
+                                "With border": "Avec bordure",
+                                "Stretch image": "Étirer l'image",
+                                "With background": "Avec arrière-plan"
+                            },
+                            "code": {
+                                "Code": "Code"
+                            },
+                            "table": {
+                                "Table": "Tableau",
+                                "With headings": "Avec en-têtes",
+                                "Without headings": "Sans en-têtes",
+                                "Add row above": "Ajouter une ligne au-dessus",
+                                "Add row below": "Ajouter une ligne en-dessous",
+                                "Add column to left": "Ajouter une colonne à gauche",
+                                "Add column to right": "Ajouter une colonne à droite",
+                                "Delete row": "Supprimer la ligne",
+                                "Delete column": "Supprimer la colonne"
+                            },
+                            "quote": {
+                                "Quote": "Citation"
+                            }
+                        },
+                        blockTunes: {
+                            "delete": {
+                                "Delete": "Supprimer",
+                                "Click to delete": "Cliquer pour supprimer"
+                            },
+                            "moveUp": {
+                                "Move up": "Monter"
+                            },
+                            "moveDown": {
+                                "Move down": "Descendre"
+                            }
+                        }
+                    }
+                }
+            });
+
             // Calculer les stats initiales
             this.updateWordCount();
-            
+
             // Analyse initiale après chargement
             this.$nextTick(() => {
                 this.analyzeContent();
             });
         },
 
-        formatText(command) {
-            const editor = this.$refs.editor;
-            
-            if (command === 'bold') {
-                document.execCommand('bold', false, null);
-            } else if (command === 'italic') {
-                document.execCommand('italic', false, null);
-            } else if (command === 'h2') {
-                document.execCommand('formatBlock', false, '<h2>');
-            } else if (command === 'h3') {
-                document.execCommand('formatBlock', false, '<h3>');
-            } else if (command === 'ul') {
-                document.execCommand('insertUnorderedList', false, null);
-            } else if (command === 'link') {
-                const url = prompt('URL du lien :');
-                if (url) {
-                    document.execCommand('createLink', false, url);
+        convertHTMLToBlocks(html) {
+            if (!html || html.trim() === '') {
+                return [];
+            }
+
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            const blocks = [];
+
+            // Parcourir les éléments et les convertir en blocks
+            const elements = doc.body.children;
+
+            for (let element of elements) {
+                const tagName = element.tagName.toLowerCase();
+
+                if (tagName === 'h2' || tagName === 'h3' || tagName === 'h4') {
+                    blocks.push({
+                        type: 'header',
+                        data: {
+                            text: element.textContent,
+                            level: parseInt(tagName[1])
+                        }
+                    });
+                } else if (tagName === 'p') {
+                    // Garder même les paragraphes vides pour préserver les sauts de ligne
+                    const innerHTML = element.innerHTML;
+
+                    // Diviser par <br> pour créer plusieurs blocs si nécessaire
+                    const parts = innerHTML.split(/<br\s*\/?>/i);
+
+                    if (parts.length > 1) {
+                        // Si plusieurs parties séparées par <br>, créer un bloc pour chaque
+                        parts.forEach(part => {
+                            blocks.push({
+                                type: 'paragraph',
+                                data: {
+                                    text: part.trim()
+                                }
+                            });
+                        });
+                    } else {
+                        // Un seul bloc paragraphe (même vide)
+                        blocks.push({
+                            type: 'paragraph',
+                            data: {
+                                text: innerHTML
+                            }
+                        });
+                    }
+                } else if (tagName === 'ul' || tagName === 'ol') {
+                    const items = Array.from(element.children).map(li => li.innerHTML);
+                    blocks.push({
+                        type: 'list',
+                        data: {
+                            style: tagName === 'ul' ? 'unordered' : 'ordered',
+                            items: items
+                        }
+                    });
+                } else if (tagName === 'figure') {
+                    const img = element.querySelector('img');
+                    const caption = element.querySelector('figcaption');
+                    if (img) {
+                        blocks.push({
+                            type: 'image',
+                            data: {
+                                file: {
+                                    url: img.src
+                                },
+                                caption: caption ? caption.textContent : '',
+                                withBorder: false,
+                                withBackground: false,
+                                stretched: false
+                            }
+                        });
+                    }
+                } else if (tagName === 'blockquote') {
+                    const cite = element.querySelector('cite');
+                    blocks.push({
+                        type: 'quote',
+                        data: {
+                            text: element.textContent.replace(cite ? cite.textContent : '', '').trim(),
+                            caption: cite ? cite.textContent : '',
+                            alignment: 'left'
+                        }
+                    });
+                } else if (tagName === 'pre') {
+                    const code = element.querySelector('code');
+                    blocks.push({
+                        type: 'code',
+                        data: {
+                            code: code ? code.textContent : element.textContent
+                        }
+                    });
+                } else if (tagName === 'table') {
+                    const rows = Array.from(element.querySelectorAll('tr')).map(tr => {
+                        return Array.from(tr.children).map(cell => cell.textContent);
+                    });
+                    blocks.push({
+                        type: 'table',
+                        data: {
+                            withHeadings: element.querySelector('th') !== null,
+                            content: rows
+                        }
+                    });
+                } else if (tagName === 'hr') {
+                    blocks.push({
+                        type: 'delimiter',
+                        data: {}
+                    });
                 }
             }
-            
-            editor.focus();
-            this.updateContent({ target: editor });
+
+            // Si pas de blocs, ajouter un paragraphe vide
+            if (blocks.length === 0) {
+                blocks.push({
+                    type: 'paragraph',
+                    data: {
+                        text: html || ''
+                    }
+                });
+            }
+
+            return blocks;
         },
 
-        updateContent(event) {
-            this.article.content = event.target.innerHTML;
-            this.updateWordCount();
-            
-            // Déclencher l'analyse après 1 seconde d'inactivité
-            clearTimeout(this.analyzeTimer);
-            this.analyzeTimer = setTimeout(() => {
-                this.analyzeContent();
-            }, 1000);
+        async saveEditorContent() {
+            if (!this.editor) return;
+
+            try {
+                const outputData = await this.editor.save();
+
+                // Convertir JSON en HTML
+                const html = this.convertEditorDataToHTML(outputData);
+                this.article.content = html;
+
+                // Mettre à jour compteur et analyser
+                this.updateWordCount();
+
+                // Déclencher l'analyse après 1 seconde d'inactivité
+                clearTimeout(this.analyzeTimer);
+                this.analyzeTimer = setTimeout(() => {
+                    this.analyzeContent();
+                }, 1000);
+            } catch (error) {
+                console.error('Erreur lors de la sauvegarde:', error);
+            }
+        },
+
+        convertEditorDataToHTML(data) {
+            if (!data || !data.blocks) return '';
+
+            return data.blocks.map(block => {
+                switch(block.type) {
+                    case 'header':
+                        return `<h${block.data.level}>${block.data.text}</h${block.data.level}>`;
+
+                    case 'paragraph':
+                        return `<p>${block.data.text}</p>`;
+
+                    case 'list':
+                        const tag = block.data.style === 'ordered' ? 'ol' : 'ul';
+                        const items = block.data.items.map(item => `<li>${item}</li>`).join('');
+                        return `<${tag}>${items}</${tag}>`;
+
+                    case 'image':
+                        const caption = block.data.caption ? `<figcaption>${block.data.caption}</figcaption>` : '';
+                        return `<figure><img src="${block.data.file.url}" alt="${block.data.caption || ''}" />${caption}</figure>`;
+
+                    case 'quote':
+                        const cite = block.data.caption ? `<cite>${block.data.caption}</cite>` : '';
+                        return `<blockquote>${block.data.text}${cite}</blockquote>`;
+
+                    case 'code':
+                        return `<pre><code>${block.data.code}</code></pre>`;
+
+                    case 'table':
+                        const rows = block.data.content.map((row, idx) => {
+                            const tag = idx === 0 && block.data.withHeadings ? 'th' : 'td';
+                            const cells = row.map(cell => `<${tag}>${cell}</${tag}>`).join('');
+                            return `<tr>${cells}</tr>`;
+                        }).join('');
+                        return `<table>${rows}</table>`;
+
+                    case 'delimiter':
+                        return '<hr />';
+
+                    case 'embed':
+                        return block.data.embed || '';
+
+                    default:
+                        return '';
+                }
+            }).join('\n');
         },
 
         updateWordCount() {
-            const text = this.$refs.editor ? this.$refs.editor.innerText : '';
-            this.wordCount = text.split(/\s+/).filter(word => word.length > 0).length;
+            const plainText = this.article.content.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+            this.wordCount = plainText.split(/\s+/).filter(word => word.length > 0).length;
             this.readingTime = Math.ceil(this.wordCount / 200);
-        },
-
-        handlePaste(event) {
-            event.preventDefault();
-            const text = event.clipboardData.getData('text/plain');
-            document.execCommand('insertText', false, text);
         },
 
         addKeyword(event) {
@@ -617,14 +1112,25 @@ function articleEditor() {
             }
         },
 
-        submitForm(event) {
+        async submitForm(event) {
+            // Sauvegarder le contenu Editor.js avant soumission
+            if (this.editor) {
+                await this.saveEditorContent();
+            }
+
+            // Vérifier qu'il y a du contenu
+            if (!this.article.content || this.article.content.trim() === '') {
+                alert('Veuillez ajouter du contenu à votre article');
+                return false;
+            }
+
             // Ajouter les mots-clés au formulaire
             const keywordsInput = document.createElement('input');
             keywordsInput.type = 'hidden';
             keywordsInput.name = 'keywords';
             keywordsInput.value = JSON.stringify(this.keywords);
             event.target.appendChild(keywordsInput);
-            
+
             // Soumettre le formulaire
             event.target.submit();
         }

@@ -13,24 +13,28 @@ class Article extends Model
     protected $fillable = [
         'user_id',
         'title',
+        'subtitle',
         'slug',
         'content',
         'excerpt',
         'featured_image',
         'category',
         'tags',
+        'focus_keyphrase',
         'status',
         'views_count',
         'shares_count',
         'comments_count',
         'meta_data',
-        'published_at'
+        'published_at',
+        'scheduled_at'
     ];
 
     protected $casts = [
         'meta_data' => 'array',
         'tags' => 'array',
         'published_at' => 'datetime',
+        'scheduled_at' => 'datetime',
         'created_at' => 'datetime',
         'updated_at' => 'datetime'
     ];

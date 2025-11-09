@@ -141,12 +141,12 @@ class DashboardController extends Controller
 
         // Nombre total de réservations
         $totalBookings = $vendor->bookings()
-            ->whereIn('status', ['confirmed', 'completed'])
+            ->whereIn('bookings.status', ['confirmed', 'completed'])
             ->count();
 
         // Revenus totaux
         $totalRevenue = $vendor->bookings()
-            ->whereIn('status', ['confirmed', 'completed'])
+            ->whereIn('bookings.status', ['confirmed', 'completed'])
             ->where('payment_status', 'paid')
             ->sum('total_amount');
 
@@ -282,13 +282,13 @@ class DashboardController extends Controller
 
             // Compter les réservations ce mois-ci
             $bookingsCount = $vendor->bookings()
-                ->whereBetween('created_at', [$monthStart, $monthEnd])
-                ->whereIn('status', ['confirmed', 'completed'])
+                ->whereBetween('bookings.created_at', [$monthStart, $monthEnd])
+                ->whereIn('bookings.status', ['confirmed', 'completed'])
                 ->count();
 
             // Revenus du mois
             $revenue = $vendor->bookings()
-                ->whereBetween('created_at', [$monthStart, $monthEnd])
+                ->whereBetween('bookings.created_at', [$monthStart, $monthEnd])
                 ->where('payment_status', 'paid')
                 ->sum('total_amount');
 
@@ -504,13 +504,13 @@ class DashboardController extends Controller
 
             // Réservations du mois
             $bookings = $vendor->bookings()
-                ->whereBetween('created_at', [$monthStart, $monthEnd])
-                ->whereIn('status', ['confirmed', 'completed'])
+                ->whereBetween('bookings.created_at', [$monthStart, $monthEnd])
+                ->whereIn('bookings.status', ['confirmed', 'completed'])
                 ->count();
 
             // Revenus du mois
             $revenue = $vendor->bookings()
-                ->whereBetween('created_at', [$monthStart, $monthEnd])
+                ->whereBetween('bookings.created_at', [$monthStart, $monthEnd])
                 ->where('payment_status', 'paid')
                 ->sum('total_amount');
 
@@ -551,29 +551,29 @@ class DashboardController extends Controller
         // Réservations de la période
         $bookings = $vendor->bookings()
             ->with(['trip', 'user', 'availability'])
-            ->whereBetween('created_at', [$startDate, $endDate])
-            ->orderBy('created_at', 'desc')
+            ->whereBetween('bookings.created_at', [$startDate, $endDate])
+            ->orderBy('bookings.created_at', 'desc')
             ->paginate(20);
 
         // Statistiques de la période
         $stats = [
             'total_bookings' => $vendor->bookings()
-                ->whereBetween('created_at', [$startDate, $endDate])
+                ->whereBetween('bookings.created_at', [$startDate, $endDate])
                 ->count(),
             'confirmed_bookings' => $vendor->bookings()
-                ->whereBetween('created_at', [$startDate, $endDate])
-                ->whereIn('status', ['confirmed', 'completed'])
+                ->whereBetween('bookings.created_at', [$startDate, $endDate])
+                ->whereIn('bookings.status', ['confirmed', 'completed'])
                 ->count(),
             'cancelled_bookings' => $vendor->bookings()
-                ->whereBetween('created_at', [$startDate, $endDate])
-                ->where('status', 'cancelled')
+                ->whereBetween('bookings.created_at', [$startDate, $endDate])
+                ->where('bookings.status', 'cancelled')
                 ->count(),
             'total_revenue' => $vendor->bookings()
-                ->whereBetween('created_at', [$startDate, $endDate])
+                ->whereBetween('bookings.created_at', [$startDate, $endDate])
                 ->where('payment_status', 'paid')
                 ->sum('total_amount'),
             'pending_revenue' => $vendor->bookings()
-                ->whereBetween('created_at', [$startDate, $endDate])
+                ->whereBetween('bookings.created_at', [$startDate, $endDate])
                 ->where('payment_status', 'pending')
                 ->sum('total_amount'),
         ];
@@ -610,7 +610,7 @@ class DashboardController extends Controller
                 $q->upcoming();
             },
             'bookings as total_bookings' => function($q) {
-                $q->whereIn('status', ['confirmed', 'completed']);
+                $q->whereIn('bookings.status', ['confirmed', 'completed']);
             }
         ])->paginate(15);
 
@@ -646,8 +646,8 @@ class DashboardController extends Controller
 
         $bookings = $vendor->bookings()
             ->with(['trip', 'user', 'availability'])
-            ->whereBetween('created_at', [$startDate, $endDate])
-            ->orderBy('created_at', 'desc')
+            ->whereBetween('bookings.created_at', [$startDate, $endDate])
+            ->orderBy('bookings.created_at', 'desc')
             ->get();
 
         $filename = 'ventes_' . $vendor->company_name . '_' . date('Y-m-d') . '.csv';
@@ -709,7 +709,7 @@ class DashboardController extends Controller
                     $q->upcoming();
                 },
                 'bookings as total_bookings' => function($q) {
-                    $q->whereIn('status', ['confirmed', 'completed']);
+                    $q->whereIn('bookings.status', ['confirmed', 'completed']);
                 }
             ])
             ->get();

@@ -24,7 +24,7 @@ class AdminWriterController extends Controller
             // Tous les rédacteurs
             $writers = $query->with(['articles' => function($q) {
                 $q->latest()->limit(1);
-            }])->orderBy('created_at', 'desc')->paginate(20);
+            }])->orderBy('created_at', 'desc')->paginate(20)->withQueryString();
         } else {
             // Filtrer par statut
             $writers = $query->where('writer_status', $status === 'pending' ? User::WRITER_STATUS_PENDING : $status)
@@ -32,7 +32,7 @@ class AdminWriterController extends Controller
                     $q->latest()->limit(1);
                 }])
                 ->orderBy('created_at', 'desc')
-                ->paginate(20);
+                ->paginate(20)->withQueryString();
         }
 
         $stats = [

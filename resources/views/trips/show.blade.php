@@ -599,13 +599,13 @@
                     <!-- Organisateur -->
                     <div class="bg-white rounded-lg shadow-sm p-6">
                         <h2 class="text-xl font-bold text-text-primary mb-4">À propos de l'organisateur</h2>
-                        
-                        <div class="flex items-center mb-4">
+
+                        <div class="flex items-center justify-center mb-4">
                             <div class="h-14 w-14 rounded-full overflow-hidden flex-shrink-0 bg-gray-100">
                                 @if($trip->vendor->logo)
-                                <img 
-                                    src="{{ Storage::url($trip->vendor->logo) }}" 
-                                    alt="{{ $trip->vendor->company_name }}" 
+                                <img
+                                    src="{{ Storage::url($trip->vendor->logo) }}"
+                                    alt="{{ $trip->vendor->company_name }}"
                                     class="h-full w-full object-cover"
                                 />
                                 @else
@@ -614,23 +614,12 @@
                                 </div>
                                 @endif
                             </div>
-                            <div class="ml-4">
-                                <h3 class="font-medium text-text-primary">{{ $trip->vendor->company_name }}</h3>
-                                @if($trip->vendor->rating)
-                                <x-rating-stars
-                                    :rating="$trip->vendor->rating"
-                                    size="sm"
-                                    :count="$trip->vendor->reviews_count ?? 0"
-                                    :showValue="false"
-                                />
-                                @endif
-                            </div>
                         </div>
-                        
+
                         @if($trip->vendor->description)
                         <p class="text-text-secondary text-sm mb-4">{{ $trip->vendor->description }}</p>
                         @endif
-                        
+
                         <a href="{{ route('vendors.show', $trip->vendor->id) }}" class="w-full inline-flex items-center justify-center px-4 py-2 border border-primary text-sm font-medium rounded-md text-primary hover:bg-primary/5 focus:outline-none transition-colors">
                             @if($trip->isActivity())
                                 Voir toutes les activités de cet organisateur
@@ -750,7 +739,7 @@
 <!-- Modal premier message -->
 @auth
 @if(Auth::user()->role === 'customer')
-<div id="messageModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+<div id="messageModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-[9999]">
     <div class="bg-white rounded-lg max-w-md w-full p-6 m-4">
         <div class="flex justify-between items-center mb-4">
             <h3 class="text-lg font-semibold text-text-primary">Contacter {{ $trip->vendor->company_name }}</h3>

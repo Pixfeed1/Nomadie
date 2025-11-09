@@ -1,4 +1,4 @@
-@extends('vendor.layouts.app')
+@extends('layouts.writer')
 
 @section('title', 'Mes badges')
 
@@ -137,7 +137,7 @@
                     @if($item['is_unlocked'])
                         <div class="flex items-center justify-between text-xs">
                             <span class="text-green-600 font-medium">✓ Débloqué</span>
-                            <span class="text-text-secondary">{{ $item['unlocked_at']->format('d/m/Y') }}</span>
+                            <span class="text-text-secondary">{{ \Carbon\Carbon::parse($item['unlocked_at'])->format('d/m/Y') }}</span>
                         </div>
                         
                         @if($stats['featured_badge'] && $stats['featured_badge']->id === $item['badge']->id)
@@ -225,7 +225,7 @@
                         
                         @if($item['is_unlocked'])
                             <p class="mt-1 text-sm text-green-600">
-                                ✓ Débloqué le {{ $item['unlocked_at']->format('d F Y') }}
+                                ✓ Débloqué le {{ \Carbon\Carbon::parse($item['unlocked_at'])->format('d F Y') }}
                             </p>
                         @endif
                         

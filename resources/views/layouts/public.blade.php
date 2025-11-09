@@ -82,7 +82,7 @@
                                 Accueil
                             </a>
                             <a href="{{ route('destinations.index') }}" class="border-transparent text-text-primary hover:text-primary hover:border-primary px-3 py-2 inline-flex items-center text-sm font-medium border-b-2 transition-colors">
-                                Destinations
+                                Expériences
                             </a>
                             <a href="{{ route('blog') }}" class="border-transparent text-text-primary hover:text-primary hover:border-primary px-3 py-2 inline-flex items-center text-sm font-medium border-b-2 transition-colors">
                                 Blog
@@ -251,7 +251,7 @@
                         Accueil
                     </a>
                     <a href="{{ route('destinations.index') }}" class="block pl-3 pr-4 py-2 text-text-primary hover:text-primary hover:bg-bg-alt font-medium transition-colors">
-                        Destinations
+                        Expériences
                     </a>
                     <a href="{{ route('blog') }}" class="block pl-3 pr-4 py-2 text-text-primary hover:text-primary hover:bg-bg-alt font-medium transition-colors">
                         Blog
@@ -382,7 +382,7 @@
                         </ul>
                     </div>
                     <div>
-                        <h3 class="text-sm font-semibold text-text-primary tracking-wider uppercase">Destinations</h3>
+                        <h3 class="text-sm font-semibold text-text-primary tracking-wider uppercase">Expériences</h3>
                         <ul class="mt-4 space-y-4">
                             <li>
                                 <a href="#" class="text-base text-text-secondary hover:text-primary transition-colors">Europe</a>
@@ -391,7 +391,7 @@
                                 <a href="#" class="text-base text-text-secondary hover:text-primary transition-colors">Asie</a>
                             </li>
                             <li>
-                                <a href="{{ route('destinations.index') }}" class="text-base text-text-secondary hover:text-primary transition-colors">Toutes les destinations</a>
+                                <a href="{{ route('destinations.index') }}" class="text-base text-text-secondary hover:text-primary transition-colors">Toutes les expériences</a>
                             </li>
                         </ul>
                     </div>

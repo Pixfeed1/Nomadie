@@ -274,7 +274,7 @@ class Vendor extends Model
     public function getTotalBookingsAttribute()
     {
         return $this->bookings()
-            ->where('status', 'confirmed')
+            ->where('bookings.status', 'confirmed')
             ->count();
     }
     

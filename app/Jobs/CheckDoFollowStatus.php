@@ -24,6 +24,23 @@ class CheckDoFollowStatus implements ShouldQueue
 
     public function handle()
     {
+        // Les rédacteurs de l'équipe Nomadie ont automatiquement le dofollow
+        if ($this->user->writer_type === 'team') {
+            if (!$this->user->is_dofollow) {
+                $this->user->update(['is_dofollow' => true]);
+
+                // Mettre à jour toutes les analyses
+                SeoAnalysis::where('user_id', $this->user->id)
+                    ->update(['is_dofollow' => true]);
+
+                \Log::info("DoFollow accordé automatiquement (équipe Nomadie)", [
+                    'user_id' => $this->user->id,
+                    'writer_type' => 'team'
+                ]);
+            }
+            return;
+        }
+
         // Vérifier si déjà en dofollow
         if ($this->user->is_dofollow ?? false) {
             return;

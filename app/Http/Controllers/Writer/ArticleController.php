@@ -51,24 +51,29 @@ class ArticleController extends Controller
     {
         $validated = $request->validate([
             'title' => 'required|string|max:255',
+            'subtitle' => 'nullable|string|max:255',
             'content' => 'required|string|min:500',
             'excerpt' => 'nullable|string|max:500',
             'featured_image' => 'nullable|image|max:' . config('uploads.max_sizes.image'),
             'meta_description' => 'nullable|string|max:160',
             'keywords' => 'nullable|array',
+            'focus_keyphrase' => 'nullable|string|max:100',
             'slug' => 'nullable|string|max:255',
             'category' => 'nullable|string',
             'tags' => 'nullable|string',
-            'status' => 'nullable|in:draft,pending,published', // Ajout des statuts
+            'status' => 'nullable|in:draft,pending,published,scheduled',
+            'scheduled_at' => 'nullable|date|after:now',
             'is_test_article' => 'nullable|boolean' // PHASE 5: Article test pour community writers
         ]);
 
         $article = new Article();
         $article->user_id = Auth::id();
         $article->title = $validated['title'];
+        $article->subtitle = $validated['subtitle'] ?? null;
         $article->slug = $validated['slug'] ?? Str::slug($validated['title']);
         $article->content = $validated['content'];
         $article->excerpt = $validated['excerpt'] ?? Str::limit(strip_tags($validated['content']), 160);
+        $article->focus_keyphrase = $validated['focus_keyphrase'] ?? null;
         $article->status = $request->input('status', 'draft');
 
         // PHASE 5: Marquer comme article test si demandé
@@ -81,9 +86,11 @@ class ArticleController extends Controller
             $article->is_test_article = true;
         }
 
-        // Si publié, définir la date de publication
-        if ($validated['status'] === 'published' && !$article->published_at) {
+        // Gestion de la publication
+        if ($article->status === 'published' && !$article->published_at) {
             $article->published_at = now();
+        } elseif ($article->status === 'scheduled' && isset($validated['scheduled_at'])) {
+            $article->scheduled_at = $validated['scheduled_at'];
         }
         
         // Handle featured image
@@ -102,9 +109,8 @@ class ArticleController extends Controller
 
         $article->save();
 
-        // Run SEO analysis - Utilisation directe au lieu de l'injection
-        $analyzer = new \App\Services\Seo\SeoAnalyzer();
-        $analysis = $analyzer->analyzeArticle($article, Auth::user());
+        // Run SEO analysis
+        $analysis = $this->seoAnalyzer->analyzeArticle($article, Auth::user());
 
         // PHASE 3: Validation stricte pour partenaires (max 20% auto-promo)
         if (Auth::user()->isPartner() && $analysis->auto_promo_percentage > 20) {
@@ -174,15 +180,18 @@ class ArticleController extends Controller
 
         $validated = $request->validate([
             'title' => 'required|string|max:255',
+            'subtitle' => 'nullable|string|max:255',
             'content' => 'required|string|min:500',
             'excerpt' => 'nullable|string|max:500',
             'featured_image' => 'nullable|image|max:' . config('uploads.max_sizes.image'),
             'meta_description' => 'nullable|string|max:160',
             'keywords' => 'nullable|array',
+            'focus_keyphrase' => 'nullable|string|max:100',
             'slug' => 'nullable|string|max:255',
             'category' => 'nullable|string',
             'tags' => 'nullable|string',
-            'status' => 'nullable|in:draft,pending,published'
+            'status' => 'nullable|in:draft,pending,published,scheduled',
+            'scheduled_at' => 'nullable|date|after:now'
         ]);
 
         // Stocker l'ancien score pour comparaison
@@ -190,9 +199,11 @@ class ArticleController extends Controller
         $oldScore = $oldAnalysis ? $oldAnalysis->global_score : 0;
 
         $article->title = $validated['title'];
+        $article->subtitle = $validated['subtitle'] ?? null;
         $article->slug = $validated['slug'] ?? Str::slug($validated['title']);
         $article->content = $validated['content'];
         $article->excerpt = $validated['excerpt'] ?? Str::limit(strip_tags($validated['content']), 160);
+        $article->focus_keyphrase = $validated['focus_keyphrase'] ?? null;
         
         if ($request->hasFile('featured_image')) {
             // Supprimer l'ancienne image si elle existe
@@ -214,6 +225,8 @@ class ArticleController extends Controller
             $article->status = $validated['status'];
             if ($validated['status'] === 'published' && !$article->published_at) {
                 $article->published_at = now();
+            } elseif ($validated['status'] === 'scheduled' && isset($validated['scheduled_at'])) {
+                $article->scheduled_at = $validated['scheduled_at'];
             }
         }
 
@@ -330,8 +343,7 @@ class ArticleController extends Controller
         }
 
         // Ajouter l'appel à analyzeRaw pour des données supplémentaires si nécessaire
-        $analyzer = new \App\Services\Seo\SeoAnalyzer();
-        $rawAnalysis = $analyzer->analyzeRaw(
+        $rawAnalysis = $this->seoAnalyzer->analyzeRaw(
             $request->title,
             $request->content,
             $request->meta_description

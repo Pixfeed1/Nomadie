@@ -36,7 +36,7 @@ class AdminBriefController extends Controller
             $query->where('type', $request->type);
         }
 
-        $briefs = $query->paginate(20);
+        $briefs = $query->paginate(20)->withQueryString();
 
         // Statistiques
         $stats = [

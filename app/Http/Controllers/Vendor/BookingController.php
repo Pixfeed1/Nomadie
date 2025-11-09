@@ -23,7 +23,7 @@ class BookingController extends Controller
             })
             ->with(['trip', 'user'])
             ->latest()
-            ->paginate(20);
+            ->paginate(20)->withQueryString();
         
         return view('vendor.bookings.index', compact('bookings'));
     }
@@ -184,9 +184,9 @@ class BookingController extends Controller
         if ($request->has('date_to')) {
             $query->whereDate('created_at', '<=', $request->date_to);
         }
-        
-        $bookings = $query->with(['trip', 'user'])->paginate(20);
-        
+
+        $bookings = $query->with(['trip', 'user'])->paginate(20)->withQueryString();
+
         return view('vendor.bookings.index', compact('bookings'));
     }
 }

@@ -13,12 +13,59 @@ class OrderController extends Controller
      *
      * @return \Illuminate\View\View
      */
-    public function index()
+    public function index(Request $request)
     {
-        // Récupérer toutes les réservations (orders) avec relations
-        $bookings = Booking::with(['trip', 'user', 'vendor'])
-            ->latest()
-            ->paginate(20);
+        $query = Booking::with(['trip', 'user', 'vendor']);
+
+        // Filtre par statut
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        // Filtre par statut de paiement
+        if ($request->filled('payment_status')) {
+            $query->where('payment_status', $request->payment_status);
+        }
+
+        // Filtre par recherche (nom client, email, référence)
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->whereHas('user', function($userQuery) use ($search) {
+                    $userQuery->where('firstname', 'LIKE', "%{$search}%")
+                        ->orWhere('lastname', 'LIKE', "%{$search}%")
+                        ->orWhere('email', 'LIKE', "%{$search}%");
+                })
+                ->orWhere('reference', 'LIKE', "%{$search}%")
+                ->orWhereHas('trip', function($tripQuery) use ($search) {
+                    $tripQuery->where('title', 'LIKE', "%{$search}%");
+                });
+            });
+        }
+
+        // Filtre par date de début
+        if ($request->filled('date_from')) {
+            $query->whereDate('created_at', '>=', $request->date_from);
+        }
+
+        // Filtre par date de fin
+        if ($request->filled('date_to')) {
+            $query->whereDate('created_at', '<=', $request->date_to);
+        }
+
+        // Filtre par vendeur
+        if ($request->filled('vendor_id')) {
+            $query->whereHas('trip', function($tripQuery) use ($request) {
+                $tripQuery->where('vendor_id', $request->vendor_id);
+            });
+        }
+
+        // Tri
+        $sortBy = $request->get('sort_by', 'created_at');
+        $sortOrder = $request->get('sort_order', 'desc');
+        $query->orderBy($sortBy, $sortOrder);
+
+        $bookings = $query->paginate(20)->withQueryString();
 
         return view('admin.orders.index', compact('bookings'));
     }
