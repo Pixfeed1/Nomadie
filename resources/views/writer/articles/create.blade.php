@@ -1055,6 +1055,11 @@ function articleEditor() {
                             "popover": {
                                 "Filter": "Filtrer",
                                 "Nothing found": "Rien trouvé"
+                            },
+                            "inlineToolbar": {
+                                "converter": {
+                                    "Convert to": "Convertir en"
+                                }
                             }
                         },
                         toolNames: {
@@ -1098,6 +1103,12 @@ function articleEditor() {
                                 "Add column to right": "Ajouter une colonne à droite",
                                 "Delete column": "Supprimer la colonne",
                                 "With headings": "Avec en-têtes"
+                            },
+                            "link": {
+                                "Add a link": "Ajouter un lien"
+                            },
+                            "stub": {
+                                "The block can not be displayed correctly.": "Le bloc ne peut pas être affiché correctement."
                             }
                         },
                         blockTunes: {
