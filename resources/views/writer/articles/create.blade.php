@@ -14,6 +14,25 @@
 <script src="https://cdn.jsdelivr.net/npm/@editorjs/delimiter@latest/dist/delimiter.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@editorjs/inline-code@latest/dist/inline-code.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@editorjs/embed@latest/dist/embed.umd.min.js"></script>
+
+<!-- Alpine.js Store Global -->
+<script>
+document.addEventListener('alpine:init', () => {
+    Alpine.store('article', {
+        settingsSidebarOpen: false,
+        status: 'draft',
+        seoScore: 0,
+
+        toggleSidebar() {
+            this.settingsSidebarOpen = !this.settingsSidebarOpen;
+        },
+
+        setStatus(status) {
+            this.status = status;
+        }
+    });
+});
+</script>
 @endpush
 
 @push('styles')
@@ -147,14 +166,14 @@
         <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
         </svg>
-        <span>Brouillon</span>
+        <span x-text="$store.article.status === 'draft' ? 'Brouillon' : 'Publié'"></span>
     </div>
 @endsection
 
 @section('header-actions')
     <!-- Bouton Paramètres -->
     <button type="button"
-            @click="settingsSidebarOpen = !settingsSidebarOpen"
+            @click="$store.article.toggleSidebar()"
             class="p-2 rounded-lg hover:bg-gray-100 transition-colors"
             title="Paramètres">
         <svg class="h-5 w-5 text-text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -166,7 +185,7 @@
     <!-- Bouton Sauvegarder -->
     <button type="submit"
             form="article-form"
-            @click="article.status = 'draft'"
+            @click="$store.article.setStatus('draft')"
             class="px-4 py-2 text-sm font-medium text-text-secondary hover:text-text-primary hover:bg-gray-100 rounded-lg transition-colors">
         Sauvegarder
     </button>
@@ -174,9 +193,9 @@
     <!-- Bouton Publier -->
     <button type="submit"
             form="article-form"
-            @click="article.status = 'published'"
-            :disabled="seoScore < 78"
-            :class="seoScore >= 78 ? 'bg-primary hover:bg-primary-dark text-white' : 'bg-gray-300 text-gray-500 cursor-not-allowed'"
+            @click="$store.article.setStatus('published')"
+            :disabled="$store.article.seoScore < 78"
+            :class="$store.article.seoScore >= 78 ? 'bg-primary hover:bg-primary-dark text-white' : 'bg-gray-300 text-gray-500 cursor-not-allowed'"
             class="px-4 py-2 text-sm font-medium rounded-lg transition-colors">
         Publier
     </button>
@@ -189,9 +208,10 @@
 
         <!-- Hidden inputs -->
         <input type="hidden" name="content" x-ref="contentInput">
+        <input type="hidden" name="status" x-model="$store.article.status">
 
         <!-- Contenu principal centré (style Gutenberg) -->
-        <div class="flex-1 overflow-y-auto content-area bg-white" :class="settingsSidebarOpen ? 'sidebar-open' : ''">
+        <div class="flex-1 overflow-y-auto content-area bg-white" :class="$store.article.settingsSidebarOpen ? 'sidebar-open' : ''">
             <div class="max-w-[740px] mx-auto px-8 py-16">
                 <!-- Titre -->
                 <div class="mb-2">
@@ -221,12 +241,12 @@
         </div>
 
         <!-- Sidebar Paramètres (slide depuis la droite) -->
-        <div class="settings-sidebar" :class="settingsSidebarOpen ? 'open' : ''" x-cloak>
+        <div class="settings-sidebar" :class="$store.article.settingsSidebarOpen ? 'open' : ''" x-cloak>
             <!-- Header sidebar -->
             <div class="sticky top-0 bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between z-10">
                 <h3 class="text-lg font-semibold text-text-primary">Paramètres</h3>
                 <button type="button"
-                        @click="settingsSidebarOpen = false"
+                        @click="$store.article.toggleSidebar()"
                         class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
                     <svg class="h-5 w-5 text-text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
@@ -404,24 +424,8 @@
                 <div>
                     <h4 class="text-sm font-semibold text-text-primary mb-3">Publication</h4>
 
-                    <!-- Statut -->
-                    <div class="mb-4">
-                        <label for="status" class="block text-xs font-medium text-text-secondary mb-1">
-                            Statut
-                        </label>
-                        <select id="status"
-                                name="status"
-                                x-model="article.status"
-                                class="w-full px-3 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-sm">
-                            <option value="draft">📝 Brouillon</option>
-                            <option value="pending">⏳ En attente</option>
-                            <option value="scheduled">📅 Planifié</option>
-                            <option value="published" :disabled="seoScore < 78">✅ Publié</option>
-                        </select>
-                    </div>
-
                     <!-- Date de publication (si planifié) -->
-                    <div x-show="article.status === 'scheduled'" class="mb-4">
+                    <div x-show="$store.article.status === 'scheduled'" class="mb-4">
                         <label for="scheduled_at" class="block text-xs font-medium text-text-secondary mb-1">
                             Date de publication
                         </label>
@@ -437,8 +441,8 @@
         </div>
 
         <!-- Overlay quand sidebar est ouverte (mobile uniquement) -->
-        <div x-show="settingsSidebarOpen"
-             @click="settingsSidebarOpen = false"
+        <div x-show="$store.article.settingsSidebarOpen"
+             @click="$store.article.toggleSidebar()"
              x-transition:enter="transition-opacity ease-out duration-300"
              x-transition:enter-start="opacity-0"
              x-transition:enter-end="opacity-100"
@@ -453,7 +457,6 @@
 <script>
 function articleEditor() {
     return {
-        settingsSidebarOpen: false,
         article: {
             title: '',
             subtitle: '',
@@ -462,7 +465,6 @@ function articleEditor() {
             slug: '',
             category: '',
             tags: '',
-            status: 'draft',
             scheduled_at: ''
         },
         imagePreview: null,
@@ -652,6 +654,11 @@ function articleEditor() {
                 if (!this.article.slug || this.article.slug === '') {
                     this.article.slug = this.generateSlug(title);
                 }
+            });
+
+            // Synchroniser seoScore avec le store
+            this.$watch('seoScore', (value) => {
+                Alpine.store('article').seoScore = value;
             });
         },
 
