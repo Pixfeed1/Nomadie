@@ -4,11 +4,134 @@
 
 @push('styles')
 <style>
-    /* Masquer la pub TinyMCE "Get all features" */
-    .tox-promotion,
-    .tox-statusbar__text-container,
-    .tox-statusbar a[href*="tiny.cloud"] {
-        display: none !important;
+    /* Editor.js - Style Nomadie */
+    #editorjs {
+        background: white;
+        border: 1px solid #E5E7EB;
+        border-radius: 8px;
+        padding: 1.5rem;
+        min-height: 500px;
+    }
+
+    .ce-block__content,
+    .ce-toolbar__content {
+        max-width: 800px;
+    }
+
+    .codex-editor__redactor {
+        padding-bottom: 200px !important;
+    }
+
+    /* Personnalisation des blocs */
+    .ce-paragraph {
+        font-size: 16px;
+        line-height: 1.6;
+        color: #374151;
+    }
+
+    .ce-header {
+        font-weight: 600;
+        color: #1F2937;
+    }
+
+    .ce-header[contentEditable=true][data-placeholder]:empty::before {
+        color: #9CA3AF;
+    }
+
+    /* H2 style Nomadie */
+    .ce-header h2 {
+        color: #38B2AC;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid rgba(56, 178, 172, 0.2);
+    }
+
+    .ce-header h3 {
+        color: #2C9A94;
+    }
+
+    /* Images */
+    .image-tool__image {
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Citations */
+    .cdx-quote {
+        border-left: 4px solid #38B2AC;
+        background: #F3F4F6;
+        border-radius: 6px;
+    }
+
+    .cdx-quote__text {
+        color: #6B7280;
+        font-style: italic;
+    }
+
+    /* Listes */
+    .cdx-list__item {
+        color: #374151;
+    }
+
+    .cdx-list--unordered .cdx-list__item::before {
+        background-color: #38B2AC;
+    }
+
+    /* Code */
+    .ce-code__textarea {
+        background: #F3F4F6;
+        border-radius: 4px;
+        font-family: 'Courier New', monospace;
+        color: #EF4444;
+    }
+
+    /* Tables */
+    .tc-table {
+        border-collapse: collapse;
+    }
+
+    .tc-table th {
+        background: #38B2AC;
+        color: white;
+        font-weight: 600;
+    }
+
+    .tc-table td,
+    .tc-table th {
+        border: 1px solid #E5E7EB;
+        padding: 0.75rem;
+    }
+
+    .tc-table tr:hover {
+        background: #F9FAFB;
+    }
+
+    /* Delimiter */
+    .ce-delimiter {
+        border-top: 2px solid #E5E7EB;
+    }
+
+    /* Toolbar */
+    .ce-toolbar__plus,
+    .ce-toolbar__settings-btn {
+        color: #38B2AC;
+    }
+
+    .ce-toolbar__plus:hover,
+    .ce-toolbar__settings-btn:hover {
+        background: #38B2AC;
+        color: white;
+    }
+
+    .ce-inline-toolbar {
+        background: #38B2AC;
+    }
+
+    .ce-inline-tool {
+        color: white;
+    }
+
+    .ce-inline-tool:hover {
+        background: rgba(255, 255, 255, 0.2);
     }
 </style>
 @endpush
@@ -133,14 +256,11 @@
 
                             <!-- Éditeur de contenu -->
                             <div>
-                                <label for="content" class="block text-sm font-medium text-text-primary mb-2">
+                                <label for="editorjs" class="block text-sm font-medium text-text-primary mb-2">
                                     Contenu de l'article <span class="text-error">*</span>
                                 </label>
-                                <textarea id="content"
-                                          name="content"
-                                          x-model="article.content"
-                                          class="w-full"
-                                          style="height: 500px;"></textarea>
+                                <div id="editorjs"></div>
+                                <input type="hidden" name="content" x-model="article.content" required>
                                 <div class="mt-2 flex items-center justify-between text-xs text-text-secondary">
                                     <span>
                                         <span x-text="wordCount" class="font-medium"></span> mots
@@ -625,8 +745,19 @@
     </form>
 </div>
 
-<!-- TinyMCE et JavaScript -->
-<script src="{{ asset('vendor/tinymce/tinymce.min.js') }}"></script>
+<!-- Editor.js Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/@editorjs/editorjs@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/@editorjs/header@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/@editorjs/paragraph@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/@editorjs/list@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/@editorjs/image@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/@editorjs/quote@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/@editorjs/code@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/@editorjs/table@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/@editorjs/delimiter@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/@editorjs/inline-code@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/@editorjs/embed@latest"></script>
+
 <script>
 function articleEditor() {
     return {
@@ -663,253 +794,185 @@ function articleEditor() {
         analyzeTimeout: null,
         minDateTime: '',
 
+        editor: null,
+
         init() {
-            // Initialiser TinyMCE en mode visuel WordPress
-            tinymce.init({
-                selector: '#content',
-                license_key: 'gpl',
-                base_url: '/vendor/tinymce',
-                suffix: '.min',
-                height: 500,
-                menubar: 'edit view insert format tools table',
-                menu: {
-                    edit: { title: 'Édition', items: 'undo redo | cut copy paste | selectall | searchreplace' },
-                    view: { title: 'Affichage', items: 'code | visualaid visualchars visualblocks | preview fullscreen' },
-                    insert: { title: 'Insérer', items: 'image link media template codesample inserttable | charmap emoticons hr | pagebreak nonbreaking anchor | insertdatetime' },
-                    format: { title: 'Format', items: 'bold italic underline strikethrough superscript subscript codeformat | styles blocks fontfamily fontsize align lineheight | forecolor backcolor | language | removeformat' },
-                    tools: { title: 'Outils', items: 'spellchecker spellcheckerlanguage | a11ycheck code wordcount' },
-                    table: { title: 'Tableau', items: 'inserttable | cell row column | advtablesort | tableprops deletetable' }
-                },
-                plugins: [
-                    'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
-                    'anchor', 'searchreplace', 'visualblocks', 'visualchars', 'code', 'fullscreen',
-                    'insertdatetime', 'media', 'table', 'help', 'wordcount', 'emoticons',
-                    'codesample', 'quickbars', 'autoresize'
-                ],
-                toolbar: 'undo redo | styles | bold italic underline strikethrough | forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image media table | emoticons charmap | removeformat code fullscreen',
-                toolbar_mode: 'sliding',
-                quickbars_selection_toolbar: 'bold italic | quicklink h2 h3 blockquote',
-                quickbars_insert_toolbar: 'quickimage quicktable',
-                contextmenu: 'link image table',
+            // Initialiser Editor.js
+            this.editor = new EditorJS({
+                holder: 'editorjs',
+                autofocus: true,
+                placeholder: 'Commencez à écrire votre article...',
 
-                // Styles personnalisés pour WYSIWYG Nomadie
-                content_style: `
-                    /* Fond et conteneur comme sur le site */
-                    body {
-                        max-width: 800px;
-                        margin: 0;
-                        padding: 1rem;
-                        background: #ffffff;
-                        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-                        font-size: 16px;
-                        line-height: 1.6;
-                        color: #1F2937;
-                    }
+                tools: {
+                    header: {
+                        class: Header,
+                        config: {
+                            placeholder: 'Titre de section',
+                            levels: [2, 3, 4],
+                            defaultLevel: 2
+                        },
+                        inlineToolbar: true
+                    },
 
-                    /* Titres style Nomadie */
-                    h1 {
-                        font-size: 2rem;
-                        font-weight: 700;
-                        color: #1F2937;
-                        margin: 1.5rem 0 0.75rem 0;
-                        line-height: 1.2;
-                    }
-                    h2 {
-                        font-size: 1.75rem;
-                        font-weight: 600;
-                        color: #38B2AC;
-                        margin: 1.5rem 0 0.5rem 0;
-                        padding-bottom: 0.5rem;
-                        border-bottom: 2px solid #38B2AC20;
-                    }
-                    h3 {
-                        font-size: 1.5rem;
-                        font-weight: 600;
-                        color: #2C9A94;
-                        margin: 1.25rem 0 0.5rem 0;
-                    }
-                    h4, h5, h6 {
-                        font-weight: 600;
-                        color: #1F2937;
-                        margin: 1rem 0 0.5rem 0;
-                    }
-
-                    /* Paragraphes */
-                    p {
-                        margin: 0 0 1rem 0;
-                        color: #374151;
-                    }
-
-                    /* Liens */
-                    a {
-                        color: #38B2AC;
-                        text-decoration: underline;
-                        transition: color 0.2s;
-                    }
-                    a:hover {
-                        color: #2C9A94;
-                    }
-
-                    /* Images */
-                    img {
-                        max-width: 100%;
-                        height: auto;
-                        border-radius: 8px;
-                        margin: 1rem auto;
-                        display: block;
-                        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-                    }
-
-                    /* Citations */
-                    blockquote {
-                        border-left: 4px solid #38B2AC;
-                        padding-left: 1rem;
-                        margin: 1rem 0;
-                        font-style: italic;
-                        color: #6B7280;
-                        background: #F3F4F6;
-                        padding: 1rem;
-                        border-radius: 6px;
-                    }
-
-                    /* Listes */
-                    ul, ol {
-                        margin: 1rem 0;
-                        padding-left: 1.5rem;
-                    }
-                    li {
-                        margin-bottom: 0.5rem;
-                        color: #374151;
-                    }
-                    ul li::marker {
-                        color: #38B2AC;
-                    }
-
-                    /* Code */
-                    code {
-                        background: #F3F4F6;
-                        padding: 0.2rem 0.5rem;
-                        border-radius: 4px;
-                        font-family: 'Courier New', monospace;
-                        font-size: 0.9em;
-                        color: #EF4444;
-                    }
-
-                    /* Tableaux */
-                    table {
-                        width: 100%;
-                        border-collapse: collapse;
-                        margin: 1rem 0;
-                    }
-                    th {
-                        background: #38B2AC;
-                        color: white;
-                        padding: 0.75rem;
-                        text-align: left;
-                        font-weight: 600;
-                    }
-                    td {
-                        padding: 0.75rem;
-                        border-bottom: 1px solid #E5E7EB;
-                    }
-                    tr:hover {
-                        background: #F9FAFB;
-                    }
-
-                    /* Séparateur */
-                    hr {
-                        border: none;
-                        border-top: 2px solid #E5E7EB;
-                        margin: 1.5rem 0;
-                    }
-
-                    /* Strong et emphasis */
-                    strong {
-                        font-weight: 600;
-                        color: #1F2937;
-                    }
-                    em {
-                        font-style: italic;
-                        color: #6B7280;
-                    }
-                `,
-                language: 'fr_FR',
-
-                // Options images améliorées
-                images_upload_url: '/writer/articles/upload-image',
-                automatic_uploads: true,
-                image_caption: true,
-                image_title: true,
-                image_description: true,
-                image_advtab: true,
-                file_picker_types: 'image',
-
-                // Palette de couleurs personnalisée Nomadie
-                color_map: [
-                    '#38B2AC', 'Primary (Teal)',
-                    '#2C9A94', 'Primary Dark',
-                    '#F59E0B', 'Accent (Amber)',
-                    '#10B981', 'Success (Green)',
-                    '#EF4444', 'Error (Red)',
-                    '#1F2937', 'Text Primary',
-                    '#6B7280', 'Text Secondary',
-                    '#FFFFFF', 'White',
-                    '#000000', 'Black',
-                    '#F3F4F6', 'Background',
-                    '#3B82F6', 'Blue',
-                    '#8B5CF6', 'Purple',
-                    '#EC4899', 'Pink',
-                    '#F59E0B', 'Orange',
-                ],
-                color_cols: 7,
-                // Upload d'images amélioré
-                images_upload_handler: function (blobInfo, success, failure, progress) {
-                    const xhr = new XMLHttpRequest();
-                    xhr.open('POST', '/writer/articles/upload-image');
-                    xhr.setRequestHeader('X-CSRF-TOKEN', document.querySelector('meta[name="csrf-token"]').content);
-
-                    xhr.upload.onprogress = function(e) {
-                        progress(e.loaded / e.total * 100);
-                    };
-
-                    xhr.onload = function() {
-                        if (xhr.status === 403) {
-                            failure('HTTP Error: ' + xhr.status, { remove: true });
-                            return;
+                    paragraph: {
+                        class: Paragraph,
+                        inlineToolbar: true,
+                        config: {
+                            placeholder: 'Écrivez votre paragraphe...'
                         }
-                        if (xhr.status < 200 || xhr.status >= 300) {
-                            failure('HTTP Error: ' + xhr.status);
-                            return;
-                        }
-                        const json = JSON.parse(xhr.responseText);
-                        if (!json || typeof json.location != 'string') {
-                            failure('Invalid JSON: ' + xhr.responseText);
-                            return;
-                        }
-                        success(json.location);
-                    };
+                    },
 
-                    xhr.onerror = function () {
-                        failure('Erreur lors du téléchargement de l\'image. Code: ' + xhr.status);
-                    };
+                    list: {
+                        class: List,
+                        inlineToolbar: true,
+                        config: {
+                            defaultStyle: 'unordered'
+                        }
+                    },
 
-                    const formData = new FormData();
-                    formData.append('image', blobInfo.blob(), blobInfo.filename());
-                    xhr.send(formData);
+                    image: {
+                        class: Image,
+                        config: {
+                            endpoints: {
+                                byFile: '/writer/articles/upload-image',
+                            },
+                            additionalRequestHeaders: {
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                            },
+                            field: 'image',
+                            types: 'image/*',
+                            captionPlaceholder: 'Légende de l\'image',
+                            buttonContent: 'Sélectionner une image',
+                            uploader: {
+                                uploadByFile(file) {
+                                    return new Promise((resolve, reject) => {
+                                        const formData = new FormData();
+                                        formData.append('image', file);
+
+                                        fetch('/writer/articles/upload-image', {
+                                            method: 'POST',
+                                            body: formData,
+                                            headers: {
+                                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                                            }
+                                        })
+                                        .then(response => response.json())
+                                        .then(data => {
+                                            resolve({
+                                                success: 1,
+                                                file: {
+                                                    url: data.location
+                                                }
+                                            });
+                                        })
+                                        .catch(error => {
+                                            reject(error);
+                                        });
+                                    });
+                                }
+                            }
+                        }
+                    },
+
+                    quote: {
+                        class: Quote,
+                        inlineToolbar: true,
+                        config: {
+                            quotePlaceholder: 'Citation',
+                            captionPlaceholder: 'Auteur'
+                        }
+                    },
+
+                    code: {
+                        class: CodeTool,
+                        config: {
+                            placeholder: 'Entrez votre code...'
+                        }
+                    },
+
+                    table: {
+                        class: Table,
+                        inlineToolbar: true,
+                        config: {
+                            rows: 2,
+                            cols: 3,
+                        }
+                    },
+
+                    delimiter: Delimiter,
+
+                    embed: {
+                        class: Embed,
+                        config: {
+                            services: {
+                                youtube: true,
+                                vimeo: true,
+                                instagram: true,
+                                twitter: true,
+                            }
+                        }
+                    },
+
+                    inlineCode: {
+                        class: InlineCode
+                    }
                 },
 
-                // Style du dialogue d'insertion d'image
-                image_class_list: [
-                    {title: 'Responsive', value: 'img-responsive'},
-                    {title: 'Arrondie', value: 'rounded-lg'},
-                    {title: 'Ombre', value: 'shadow-lg'},
-                    {title: 'Centrée', value: 'mx-auto block'}
-                ],
-                setup: (editor) => {
-                    editor.on('change keyup', () => {
-                        this.article.content = editor.getContent();
-                        this.debounceAnalyze();
-                    });
+                onChange: async () => {
+                    await this.saveEditorContent();
+                },
+
+                i18n: {
+                    messages: {
+                        ui: {
+                            "blockTunes": {
+                                "toggler": {
+                                    "Click to tune": "Cliquer pour configurer",
+                                }
+                            },
+                            "inlineToolbar": {
+                                "converter": {
+                                    "Convert to": "Convertir en"
+                                }
+                            },
+                            "toolbar": {
+                                "toolbox": {
+                                    "Add": "Ajouter"
+                                }
+                            }
+                        },
+                        toolNames: {
+                            "Text": "Paragraphe",
+                            "Heading": "Titre",
+                            "List": "Liste",
+                            "Quote": "Citation",
+                            "Code": "Code",
+                            "Delimiter": "Séparateur",
+                            "Table": "Tableau",
+                            "Image": "Image",
+                            "Embed": "Intégration"
+                        },
+                        tools: {
+                            "header": {
+                                "Header": "Titre"
+                            },
+                            "list": {
+                                "Ordered": "Numérotée",
+                                "Unordered": "À puces"
+                            }
+                        },
+                        blockTunes: {
+                            "delete": {
+                                "Delete": "Supprimer"
+                            },
+                            "moveUp": {
+                                "Move up": "Monter"
+                            },
+                            "moveDown": {
+                                "Move down": "Descendre"
+                            }
+                        }
+                    }
                 }
             });
 
@@ -917,6 +980,70 @@ function articleEditor() {
             const now = new Date();
             now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
             this.minDateTime = now.toISOString().slice(0, 16);
+        },
+
+        async saveEditorContent() {
+            if (!this.editor) return;
+
+            try {
+                const outputData = await this.editor.save();
+
+                // Convertir JSON en HTML
+                const html = this.convertEditorDataToHTML(outputData);
+                this.article.content = html;
+
+                // Analyser SEO
+                this.debounceAnalyze();
+            } catch (error) {
+                console.error('Erreur lors de la sauvegarde:', error);
+            }
+        },
+
+        convertEditorDataToHTML(data) {
+            if (!data || !data.blocks) return '';
+
+            return data.blocks.map(block => {
+                switch(block.type) {
+                    case 'header':
+                        return `<h${block.data.level}>${block.data.text}</h${block.data.level}>`;
+
+                    case 'paragraph':
+                        return `<p>${block.data.text}</p>`;
+
+                    case 'list':
+                        const tag = block.data.style === 'ordered' ? 'ol' : 'ul';
+                        const items = block.data.items.map(item => `<li>${item}</li>`).join('');
+                        return `<${tag}>${items}</${tag}>`;
+
+                    case 'image':
+                        const caption = block.data.caption ? `<figcaption>${block.data.caption}</figcaption>` : '';
+                        return `<figure><img src="${block.data.file.url}" alt="${block.data.caption || ''}" />${caption}</figure>`;
+
+                    case 'quote':
+                        const cite = block.data.caption ? `<cite>${block.data.caption}</cite>` : '';
+                        return `<blockquote>${block.data.text}${cite}</blockquote>`;
+
+                    case 'code':
+                        return `<pre><code>${block.data.code}</code></pre>`;
+
+                    case 'table':
+                        const rows = block.data.content.map((row, idx) => {
+                            const tag = idx === 0 && block.data.withHeadings ? 'th' : 'td';
+                            const cells = row.map(cell => `<${tag}>${cell}</${tag}>`).join('');
+                            return `<tr>${cells}</tr>`;
+                        }).join('');
+                        return `<table>${rows}</table>`;
+
+                    case 'delimiter':
+                        return '<hr />';
+
+                    case 'embed':
+                        return block.data.embed || '';
+
+                    default:
+                        return '';
+                }
+            }).join('\n');
         },
 
         debounceAnalyze() {
@@ -1065,10 +1192,17 @@ function articleEditor() {
             reader.readAsDataURL(file);
         },
 
-        handleSubmit(e) {
-            // Sync TinyMCE avant soumission
-            if (tinymce.get('content')) {
-                this.article.content = tinymce.get('content').getContent();
+        async handleSubmit(e) {
+            // Sauvegarder le contenu Editor.js avant soumission
+            if (this.editor) {
+                await this.saveEditorContent();
+            }
+
+            // Vérifier qu'il y a du contenu
+            if (!this.article.content || this.article.content.trim() === '') {
+                e.preventDefault();
+                alert('Veuillez ajouter du contenu à votre article');
+                return false;
             }
         }
     };
