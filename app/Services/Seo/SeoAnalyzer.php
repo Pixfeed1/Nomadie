@@ -168,6 +168,11 @@ class SeoAnalyzer
         $this->analyzeImages();
         $this->analyzeEngagement();
         $this->analyzeAuthenticity();
+
+        // Nouvelles analyses Nomad SEO (synchronisation frontend)
+        $this->analyzeFocusKeyphrase();
+        $this->analyzeTransitionWords();
+        $this->analyzeLinks();
     }
     
     /**
@@ -2450,5 +2455,150 @@ class SeoAnalyzer
         }
         
         return $schemas;
+    }
+
+    /**
+     * Analyser le mot-clé principal (Focus Keyphrase)
+     * Synchronisation avec le frontend Nomad SEO
+     */
+    protected function analyzeFocusKeyphrase()
+    {
+        $focusKeyphrase = $this->article->focus_keyphrase;
+
+        if (empty($focusKeyphrase)) {
+            // Pas de mot-clé défini, skip
+            $this->analysis->keyword_data = [
+                'focus_keyphrase' => null,
+                'in_title' => false,
+                'in_meta' => false,
+                'in_headings' => false,
+                'density' => 0,
+                'occurrences' => 0
+            ];
+            return;
+        }
+
+        $keyphrase = strtolower($focusKeyphrase);
+        $content = strip_tags($this->article->content);
+        $contentLower = strtolower($content);
+        $titleLower = strtolower($this->article->title);
+        $metaDescription = $this->article->meta_data['description'] ?? '';
+        $metaLower = strtolower($metaDescription);
+
+        // Vérifier présence dans titre
+        $inTitle = strpos($titleLower, $keyphrase) !== false;
+
+        // Vérifier présence dans meta description
+        $inMeta = strpos($metaLower, $keyphrase) !== false;
+
+        // Vérifier présence dans les sous-titres (H2, H3, H4)
+        $inHeadings = false;
+        if (preg_match_all('/<h[2-4][^>]*>(.*?)<\/h[2-4]>/si', $this->article->content, $matches)) {
+            foreach ($matches[1] as $heading) {
+                if (strpos(strtolower(strip_tags($heading)), $keyphrase) !== false) {
+                    $inHeadings = true;
+                    break;
+                }
+            }
+        }
+
+        // Compter occurrences (en utilisant word boundaries pour plus de précision)
+        $pattern = '/\b' . preg_quote($keyphrase, '/') . '\b/i';
+        preg_match_all($pattern, $contentLower, $matches);
+        $occurrences = count($matches[0]);
+
+        // Calculer densité (% du contenu)
+        $words = str_word_count($contentLower);
+        $density = $words > 0 ? ($occurrences / $words) * 100 : 0;
+
+        // Stocker les données
+        $this->analysis->keyword_data = [
+            'focus_keyphrase' => $focusKeyphrase,
+            'in_title' => $inTitle,
+            'in_meta' => $inMeta,
+            'in_headings' => $inHeadings,
+            'density' => round($density, 2),
+            'occurrences' => $occurrences
+        ];
+    }
+
+    /**
+     * Analyser les mots de transition (français)
+     * Synchronisation avec le frontend Nomad SEO
+     */
+    protected function analyzeTransitionWords()
+    {
+        $transitionWords = [
+            'mais', 'donc', 'or', 'ni', 'car', 'cependant', 'toutefois', 'néanmoins',
+            'pourtant', 'en effet', 'par conséquent', 'ainsi', 'alors', 'ensuite',
+            'puis', 'd\'abord', 'enfin', 'finalement', 'premièrement', 'deuxièmement',
+            'notamment', 'en outre', 'de plus', 'par ailleurs', 'également', 'aussi',
+            'en revanche', 'au contraire', 'tandis que', 'alors que', 'bien que',
+            'quoique', 'malgré', 'en dépit de', 'grâce à', 'à cause de', 'pour',
+            'afin de', 'en conclusion', 'bref', 'en somme', 'en résumé'
+        ];
+
+        $content = strip_tags($this->article->content);
+        $contentLower = strtolower($content);
+        $transitionCount = 0;
+
+        foreach ($transitionWords as $word) {
+            $pattern = '/\b' . preg_quote($word, '/') . '\b/i';
+            preg_match_all($pattern, $contentLower, $matches);
+            $transitionCount += count($matches[0]);
+        }
+
+        // Compter les phrases
+        $sentences = preg_split('/[.!?]+/', $content);
+        $sentences = array_filter($sentences, function($s) { return trim($s) != ''; });
+        $sentenceCount = count($sentences);
+
+        // Calculer le pourcentage
+        $transitionsPercentage = $sentenceCount > 0 ? ($transitionCount / $sentenceCount) * 100 : 0;
+
+        // Ajouter aux keyword_data
+        $keywordData = $this->analysis->keyword_data ?? [];
+        $keywordData['transitions_count'] = $transitionCount;
+        $keywordData['transitions_percentage'] = round($transitionsPercentage, 2);
+        $this->analysis->keyword_data = $keywordData;
+    }
+
+    /**
+     * Analyser les liens internes et externes
+     * Synchronisation avec le frontend Nomad SEO
+     */
+    protected function analyzeLinks()
+    {
+        $content = $this->article->content;
+        $internalLinks = 0;
+        $externalLinks = 0;
+
+        // Extraire tous les liens <a href="...">
+        if (preg_match_all('/<a[^>]*href=["\'](.*?)["\'][^>]*>/i', $content, $matches)) {
+            foreach ($matches[1] as $url) {
+                // Nettoyer l'URL
+                $url = trim($url);
+
+                // Lien externe si commence par http:// ou https://
+                if (preg_match('/^https?:\/\//i', $url)) {
+                    // Vérifier si c'est un lien interne (même domaine) ou externe
+                    $domain = parse_url(config('app.url'), PHP_URL_HOST);
+                    $linkDomain = parse_url($url, PHP_URL_HOST);
+
+                    if ($linkDomain && $linkDomain !== $domain) {
+                        $externalLinks++;
+                    } else {
+                        $internalLinks++;
+                    }
+                } else {
+                    // Lien relatif = lien interne
+                    $internalLinks++;
+                }
+            }
+        }
+
+        // Stocker les compteurs
+        $this->analysis->internal_links_count = $internalLinks;
+        $this->analysis->external_links_count = $externalLinks;
     }
 }
