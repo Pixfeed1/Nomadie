@@ -420,6 +420,21 @@ document.addEventListener('alpine:init', () => {
                 <div>
                     <h4 class="text-sm font-semibold text-text-primary mb-3">Référencement (SEO)</h4>
 
+                    <!-- Mot-clé principal -->
+                    <div class="mb-4">
+                        <label for="focus_keyphrase" class="block text-xs font-medium text-text-secondary mb-1">
+                            Mot-clé principal
+                            <span class="text-xs text-text-secondary ml-1">(Focus keyphrase)</span>
+                        </label>
+                        <input type="text"
+                               id="focus_keyphrase"
+                               x-model="focusKeyphrase"
+                               @input="debounceAnalyze()"
+                               class="w-full px-3 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-sm"
+                               placeholder="ex: voyage à Bali">
+                        <p class="mt-1 text-xs text-text-secondary">Le mot-clé que vous ciblez pour cet article</p>
+                    </div>
+
                     <!-- Slug -->
                     <div class="mb-4">
                         <label for="slug" class="block text-xs font-medium text-text-secondary mb-1">
@@ -474,6 +489,72 @@ document.addEventListener('alpine:init', () => {
                             <span x-show="seoScore >= 50 && seoScore < 78" class="text-accent">À améliorer pour DoFollow</span>
                             <span x-show="seoScore < 50" class="text-error">Optimisation nécessaire</span>
                         </p>
+                    </div>
+
+                    <!-- Détails SEO (Nomad SEO) -->
+                    <div class="mt-4 space-y-3">
+                        <h5 class="text-xs font-semibold text-text-primary">Analyse Nomad SEO</h5>
+
+                        <!-- Mot-clé principal -->
+                        <template x-if="focusKeyphrase">
+                            <div class="text-xs space-y-1">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-text-secondary">Mot-clé dans le titre</span>
+                                    <span :class="seoDetails.keyphraseInTitle ? 'text-success' : 'text-error'">
+                                        <span x-show="seoDetails.keyphraseInTitle">✓</span>
+                                        <span x-show="!seoDetails.keyphraseInTitle">✗</span>
+                                    </span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-text-secondary">Mot-clé dans meta</span>
+                                    <span :class="seoDetails.keyphraseInMeta ? 'text-success' : 'text-error'">
+                                        <span x-show="seoDetails.keyphraseInMeta">✓</span>
+                                        <span x-show="!seoDetails.keyphraseInMeta">✗</span>
+                                    </span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-text-secondary">Mot-clé dans sous-titres</span>
+                                    <span :class="seoDetails.keyphraseInHeadings ? 'text-success' : 'text-error'">
+                                        <span x-show="seoDetails.keyphraseInHeadings">✓</span>
+                                        <span x-show="!seoDetails.keyphraseInHeadings">✗</span>
+                                    </span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-text-secondary">Densité mot-clé</span>
+                                    <span :class="{
+                                        'text-success': seoDetails.keyphraseDensity >= 0.5 && seoDetails.keyphraseDensity <= 2.5,
+                                        'text-accent': seoDetails.keyphraseDensity > 0 && seoDetails.keyphraseDensity < 3,
+                                        'text-error': seoDetails.keyphraseDensity === 0 || seoDetails.keyphraseDensity >= 3
+                                    }">
+                                        <span x-text="seoDetails.keyphraseDensity.toFixed(2)"></span>%
+                                    </span>
+                                </div>
+                            </div>
+                        </template>
+
+                        <!-- Mots de transition -->
+                        <div class="text-xs flex items-center justify-between">
+                            <span class="text-text-secondary">Mots de transition</span>
+                            <span :class="{
+                                'text-success': seoDetails.transitionsPercentage >= 20,
+                                'text-accent': seoDetails.transitionsPercentage >= 10,
+                                'text-error': seoDetails.transitionsPercentage < 10
+                            }">
+                                <span x-text="Math.round(seoDetails.transitionsPercentage)"></span>%
+                            </span>
+                        </div>
+
+                        <!-- Liens -->
+                        <div class="text-xs space-y-1">
+                            <div class="flex items-center justify-between">
+                                <span class="text-text-secondary">Liens internes</span>
+                                <span :class="seoDetails.internalLinks >= 1 ? 'text-success' : 'text-error'" x-text="seoDetails.internalLinks"></span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-text-secondary">Liens externes</span>
+                                <span :class="seoDetails.externalLinks >= 1 ? 'text-success' : 'text-error'" x-text="seoDetails.externalLinks"></span>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -839,13 +920,26 @@ function articleEditor() {
             scheduled_at: ''
         },
         imagePreview: null,
+        focusKeyphrase: '',
         seoScore: 0,
         scores: {
             title: 0,
             content: 0,
             meta: 0,
             images: 0,
-            readability: 0
+            readability: 0,
+            keyphrase: 0,
+            links: 0,
+            transitions: 0
+        },
+        seoDetails: {
+            keyphraseInTitle: false,
+            keyphraseInMeta: false,
+            keyphraseInHeadings: false,
+            keyphraseDensity: 0,
+            transitionsPercentage: 0,
+            internalLinks: 0,
+            externalLinks: 0
         },
         wordCount: 0,
         readingTime: 0,
@@ -1078,11 +1172,19 @@ function articleEditor() {
             try {
                 const editorData = await this.editor.save();
 
-                // Compter les mots
+                // Compter les mots et extraire le contenu
                 let textContent = '';
+                let headings = [];
+                let sentences = [];
                 editorData.blocks.forEach(block => {
-                    if (block.type === 'paragraph' || block.type === 'header') {
+                    if (block.type === 'paragraph') {
                         textContent += block.data.text + ' ';
+                        // Diviser en phrases
+                        const blockSentences = block.data.text.split(/[.!?]+/).filter(s => s.trim().length > 0);
+                        sentences.push(...blockSentences);
+                    } else if (block.type === 'header') {
+                        textContent += block.data.text + ' ';
+                        headings.push(block.data.text.toLowerCase());
                     } else if (block.type === 'list') {
                         textContent += block.data.items.join(' ') + ' ';
                     }
@@ -1092,20 +1194,37 @@ function articleEditor() {
                 this.wordCount = words.length;
                 this.readingTime = Math.ceil(this.wordCount / 200);
 
+                // Analyser mot-clé principal
+                if (this.focusKeyphrase) {
+                    this.analyzeKeyphrase(textContent, headings);
+                }
+
+                // Analyser mots de transition
+                this.analyzeTransitions(textContent);
+
+                // Analyser liens (approximatif - on compte les balises <a>)
+                this.analyzeLinks(textContent);
+
                 // Calculer scores SEO
                 this.scores.title = this.scoreTitleSEO();
                 this.scores.meta = this.scoreMetaSEO();
                 this.scores.content = this.scoreContentSEO();
-                this.scores.images = editorData.blocks.some(b => b.type === 'image') ? 20 : 0;
-                this.scores.readability = this.wordCount >= 300 ? 20 : Math.floor((this.wordCount / 300) * 20);
+                this.scores.images = editorData.blocks.some(b => b.type === 'image') ? 15 : 0;
+                this.scores.readability = this.wordCount >= 300 ? 10 : Math.floor((this.wordCount / 300) * 10);
+                this.scores.keyphrase = this.scoreKeyphraseSEO();
+                this.scores.links = this.scoreLinksSEO();
+                this.scores.transitions = this.scoreTransitionsSEO();
 
-                // Score total
+                // Score total (sur 100)
                 this.seoScore = Math.round(
                     this.scores.title +
                     this.scores.meta +
                     this.scores.content +
                     this.scores.images +
-                    this.scores.readability
+                    this.scores.readability +
+                    this.scores.keyphrase +
+                    this.scores.links +
+                    this.scores.transitions
                 );
 
             } catch (error) {
@@ -1130,10 +1249,139 @@ function articleEditor() {
         },
 
         scoreContentSEO() {
-            if (this.wordCount >= 800) return 20;
-            if (this.wordCount >= 500) return 15;
-            if (this.wordCount >= 300) return 10;
-            if (this.wordCount > 0) return 5;
+            if (this.wordCount >= 800) return 15;
+            if (this.wordCount >= 500) return 10;
+            if (this.wordCount >= 300) return 5;
+            if (this.wordCount > 0) return 2;
+            return 0;
+        },
+
+        // Analyser mot-clé principal
+        analyzeKeyphrase(textContent, headings) {
+            if (!this.focusKeyphrase) return;
+
+            const keyphrase = this.focusKeyphrase.toLowerCase();
+            const contentLower = textContent.toLowerCase();
+            const titleLower = this.article.title.toLowerCase();
+            const metaLower = this.article.meta_description.toLowerCase();
+
+            // Vérifier présence dans titre
+            this.seoDetails.keyphraseInTitle = titleLower.includes(keyphrase);
+
+            // Vérifier présence dans meta description
+            this.seoDetails.keyphraseInMeta = metaLower.includes(keyphrase);
+
+            // Vérifier présence dans sous-titres
+            this.seoDetails.keyphraseInHeadings = headings.some(h => h.includes(keyphrase));
+
+            // Calculer densité (% du nombre total de mots)
+            const keyphraseWords = keyphrase.split(/\s+/);
+            const keyphraseLength = keyphraseWords.length;
+            let occurrences = 0;
+
+            // Compter occurrences
+            const regex = new RegExp('\\b' + keyphrase.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&') + '\\b', 'gi');
+            const matches = contentLower.match(regex);
+            occurrences = matches ? matches.length : 0;
+
+            // Densité optimale : 0.5% - 2.5%
+            this.seoDetails.keyphraseDensity = this.wordCount > 0 ? (occurrences / this.wordCount) * 100 : 0;
+        },
+
+        // Analyser mots de transition français
+        analyzeTransitions(textContent) {
+            const transitionWords = [
+                'mais', 'donc', 'or', 'ni', 'car', 'cependant', 'toutefois', 'néanmoins',
+                'pourtant', 'en effet', 'par conséquent', 'ainsi', 'alors', 'ensuite',
+                'puis', 'd\'abord', 'enfin', 'finalement', 'premièrement', 'deuxièmement',
+                'notamment', 'en outre', 'de plus', 'par ailleurs', 'également', 'aussi',
+                'en revanche', 'au contraire', 'tandis que', 'alors que', 'bien que',
+                'quoique', 'malgré', 'en dépit de', 'grâce à', 'à cause de', 'pour',
+                'afin de', 'en conclusion', 'bref', 'en somme', 'en résumé'
+            ];
+
+            const contentLower = textContent.toLowerCase();
+            let transitionCount = 0;
+
+            transitionWords.forEach(word => {
+                const regex = new RegExp('\\b' + word + '\\b', 'gi');
+                const matches = contentLower.match(regex);
+                if (matches) transitionCount += matches.length;
+            });
+
+            // % de phrases avec mots de transition (estimation)
+            const sentenceCount = textContent.split(/[.!?]+/).filter(s => s.trim().length > 0).length;
+            this.seoDetails.transitionsPercentage = sentenceCount > 0 ? (transitionCount / sentenceCount) * 100 : 0;
+        },
+
+        // Analyser liens
+        analyzeLinks(textContent) {
+            // Réinitialiser les compteurs
+            this.seoDetails.internalLinks = 0;
+            this.seoDetails.externalLinks = 0;
+
+            // Compter balises <a> dans le contenu
+            const linkMatches = textContent.match(/<a[^>]*href=["']([^"']*)["'][^>]*>/gi);
+
+            if (linkMatches) {
+                linkMatches.forEach(link => {
+                    // Liens externes (http/https)
+                    if (link.match(/https?:\/\//i)) {
+                        this.seoDetails.externalLinks++;
+                    } else {
+                        this.seoDetails.internalLinks++;
+                    }
+                });
+            }
+        },
+
+        // Score mot-clé principal
+        scoreKeyphraseSEO() {
+            if (!this.focusKeyphrase) return 0;
+
+            let score = 0;
+
+            // Présence dans titre (+5)
+            if (this.seoDetails.keyphraseInTitle) score += 5;
+
+            // Présence dans meta (+5)
+            if (this.seoDetails.keyphraseInMeta) score += 5;
+
+            // Présence dans sous-titres (+5)
+            if (this.seoDetails.keyphraseInHeadings) score += 5;
+
+            // Densité optimale 0.5% - 2.5% (+10)
+            const density = this.seoDetails.keyphraseDensity;
+            if (density >= 0.5 && density <= 2.5) {
+                score += 10;
+            } else if (density > 0 && density < 3) {
+                score += 5;
+            }
+
+            return score;
+        },
+
+        // Score liens
+        scoreLinksSEO() {
+            let score = 0;
+
+            // Au moins 1 lien interne (+5)
+            if (this.seoDetails.internalLinks >= 1) score += 5;
+
+            // Au moins 1 lien externe (+5)
+            if (this.seoDetails.externalLinks >= 1) score += 5;
+
+            return score;
+        },
+
+        // Score mots de transition
+        scoreTransitionsSEO() {
+            // Minimum 20% de phrases avec transitions (+5)
+            if (this.seoDetails.transitionsPercentage >= 20) {
+                return 5;
+            } else if (this.seoDetails.transitionsPercentage >= 10) {
+                return 3;
+            }
             return 0;
         },
 
