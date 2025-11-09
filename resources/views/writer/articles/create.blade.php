@@ -163,39 +163,48 @@ document.addEventListener('alpine:init', () => {
 
 {{-- Injection des éléments dans le header du layout --}}
 @section('header-left')
-    <a href="{{ route('writer.articles.index') }}"
-       class="flex items-center space-x-2 text-text-secondary hover:text-text-primary transition-colors">
-        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
-        </svg>
-        <span class="hidden sm:inline text-sm font-medium">Articles</span>
-    </a>
+    <div class="flex items-center space-x-3">
+        <!-- Flèche retour -->
+        <a href="{{ route('writer.articles.index') }}"
+           class="flex items-center space-x-2 text-text-secondary hover:text-text-primary transition-colors">
+            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+            </svg>
+            <span class="hidden sm:inline text-sm font-medium">Articles</span>
+        </a>
+
+        <!-- Séparateur vertical -->
+        <div class="h-6 w-px bg-gray-300"></div>
+
+        <!-- Boutons Undo/Redo -->
+        <div class="flex items-center space-x-1">
+            <!-- Bouton Undo (Annuler) -->
+            <button type="button"
+                    @click="undo()"
+                    x-ref="undoButton"
+                    class="p-2 rounded-lg hover:bg-gray-100 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                    title="Annuler (Ctrl+Z)">
+                <svg class="h-5 w-5 text-text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/>
+                </svg>
+            </button>
+
+            <!-- Bouton Redo (Refaire) -->
+            <button type="button"
+                    @click="redo()"
+                    x-ref="redoButton"
+                    class="p-2 rounded-lg hover:bg-gray-100 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                    title="Refaire (Ctrl+Y)">
+                <svg class="h-5 w-5 text-text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 10h-10a8 8 0 00-8 8v2M21 10l-6 6m6-6l-6-6"/>
+                </svg>
+            </button>
+        </div>
+    </div>
 @endsection
 
 @section('header-center')
-    <div class="flex items-center space-x-1">
-        <!-- Bouton Undo (Annuler) -->
-        <button type="button"
-                @click="undo()"
-                x-ref="undoButton"
-                class="p-2 rounded-lg hover:bg-gray-100 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-                title="Annuler (Ctrl+Z)">
-            <svg class="h-5 w-5 text-text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/>
-            </svg>
-        </button>
-
-        <!-- Bouton Redo (Refaire) -->
-        <button type="button"
-                @click="redo()"
-                x-ref="redoButton"
-                class="p-2 rounded-lg hover:bg-gray-100 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-                title="Refaire (Ctrl+Y)">
-            <svg class="h-5 w-5 text-text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 10h-10a8 8 0 00-8 8v2M21 10l-6 6m6-6l-6-6"/>
-            </svg>
-        </button>
-    </div>
+    {{-- Vide maintenant - boutons déplacés à gauche --}}
 @endsection
 
 @section('header-actions')
