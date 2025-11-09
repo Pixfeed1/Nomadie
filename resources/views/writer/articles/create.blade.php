@@ -53,12 +53,12 @@
 
     /* Inputs style Gutenberg */
     .gutenberg-title {
-        font-size: 40px;
+        font-size: 32px;
         font-weight: 700;
-        line-height: 1.2;
+        line-height: 1.3;
         border: none;
         outline: none;
-        padding: 0;
+        padding: 12px 0;
         margin: 0;
         width: 100%;
         color: #1F2937;
@@ -70,12 +70,12 @@
     }
 
     .gutenberg-subtitle {
-        font-size: 18px;
+        font-size: 16px;
         font-weight: 400;
         line-height: 1.6;
         border: none;
         outline: none;
-        padding: 0;
+        padding: 8px 0;
         margin: 0;
         width: 100%;
         color: #6B7280;
@@ -131,73 +131,70 @@
 </style>
 @endpush
 
+{{-- Injection des éléments dans le header du layout --}}
+@section('header-left')
+    <a href="{{ route('writer.articles.index') }}"
+       class="flex items-center space-x-2 text-text-secondary hover:text-text-primary transition-colors">
+        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+        </svg>
+        <span class="hidden sm:inline text-sm font-medium">Articles</span>
+    </a>
+@endsection
+
+@section('header-center')
+    <div class="flex items-center space-x-2 text-sm text-text-secondary">
+        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+        </svg>
+        <span>Brouillon</span>
+    </div>
+@endsection
+
+@section('header-actions')
+    <!-- Bouton Paramètres -->
+    <button type="button"
+            @click="settingsSidebarOpen = !settingsSidebarOpen"
+            class="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+            title="Paramètres">
+        <svg class="h-5 w-5 text-text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+        </svg>
+    </button>
+
+    <!-- Bouton Sauvegarder -->
+    <button type="submit"
+            form="article-form"
+            @click="article.status = 'draft'"
+            class="px-4 py-2 text-sm font-medium text-text-secondary hover:text-text-primary hover:bg-gray-100 rounded-lg transition-colors">
+        Sauvegarder
+    </button>
+
+    <!-- Bouton Publier -->
+    <button type="submit"
+            form="article-form"
+            @click="article.status = 'published'"
+            :disabled="seoScore < 78"
+            :class="seoScore >= 78 ? 'bg-primary hover:bg-primary-dark text-white' : 'bg-gray-300 text-gray-500 cursor-not-allowed'"
+            class="px-4 py-2 text-sm font-medium rounded-lg transition-colors">
+        Publier
+    </button>
+@endsection
+
 @section('content')
-<div x-data="articleEditor()" x-init="init()" class="h-screen flex flex-col">
-    <form action="{{ route('writer.articles.store') }}" method="POST" enctype="multipart/form-data" @submit="saveEditorContent">
+<div x-data="articleEditor()" x-init="init()" class="flex-1 flex flex-col overflow-hidden">
+    <form id="article-form" action="{{ route('writer.articles.store') }}" method="POST" enctype="multipart/form-data" @submit="saveEditorContent" class="flex-1 flex flex-col overflow-hidden">
         @csrf
 
         <!-- Hidden inputs -->
         <input type="hidden" name="content" x-ref="contentInput">
 
-        <!-- Barre d'outils supérieure (style Gutenberg) -->
-        <div class="sticky top-0 z-40 bg-white border-b border-gray-200">
-            <div class="px-4 py-3 flex items-center justify-between">
-                <!-- Gauche : Logo + Retour -->
-                <div class="flex items-center space-x-4">
-                    <a href="{{ route('writer.articles.index') }}"
-                       class="flex items-center space-x-2 text-text-secondary hover:text-text-primary transition-colors">
-                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
-                        </svg>
-                        <span class="hidden sm:inline text-sm font-medium">Articles</span>
-                    </a>
-                </div>
-
-                <!-- Centre : Brouillon / Statut -->
-                <div class="flex items-center space-x-2 text-sm text-text-secondary">
-                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                    </svg>
-                    <span>Brouillon</span>
-                </div>
-
-                <!-- Droite : Actions -->
-                <div class="flex items-center space-x-2">
-                    <!-- Bouton Paramètres -->
-                    <button type="button"
-                            @click="settingsSidebarOpen = !settingsSidebarOpen"
-                            class="p-2 rounded-lg hover:bg-gray-100 transition-colors"
-                            title="Paramètres">
-                        <svg class="h-5 w-5 text-text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                        </svg>
-                    </button>
-
-                    <!-- Bouton Sauvegarder -->
-                    <button type="submit"
-                            @click="article.status = 'draft'"
-                            class="px-4 py-2 text-sm font-medium text-text-secondary hover:text-text-primary hover:bg-gray-100 rounded-lg transition-colors">
-                        Sauvegarder
-                    </button>
-
-                    <!-- Bouton Publier -->
-                    <button type="submit"
-                            @click="article.status = 'published'"
-                            :disabled="seoScore < 78"
-                            :class="seoScore >= 78 ? 'bg-primary hover:bg-primary-dark text-white' : 'bg-gray-300 text-gray-500 cursor-not-allowed'"
-                            class="px-4 py-2 text-sm font-medium rounded-lg transition-colors">
-                        Publier
-                    </button>
-                </div>
-            </div>
-        </div>
-
         <!-- Contenu principal centré (style Gutenberg) -->
-        <div class="flex-1 overflow-y-auto content-area" :class="settingsSidebarOpen ? 'sidebar-open' : ''">
-            <div class="max-w-[840px] mx-auto px-6 py-12">
+        <div class="flex-1 overflow-y-auto content-area bg-white" :class="settingsSidebarOpen ? 'sidebar-open' : ''">
+            <div class="max-w-[740px] mx-auto px-8 py-16">
                 <!-- Titre -->
-                <div class="mb-6">
+                <div class="mb-2">
                     <input type="text"
                            id="title"
                            name="title"
@@ -206,14 +203,10 @@
                            class="gutenberg-title"
                            placeholder="Ajouter un titre"
                            required>
-                    <div class="mt-2 text-xs text-text-secondary">
-                        <span x-text="article.title.length"></span>/60 caractères
-                        <span x-show="article.title.length >= 30 && article.title.length <= 60" class="text-success ml-2">✓ Optimal</span>
-                    </div>
                 </div>
 
                 <!-- Sous-titre -->
-                <div class="mb-8">
+                <div class="mb-6">
                     <input type="text"
                            id="subtitle"
                            name="subtitle"
@@ -223,7 +216,7 @@
                 </div>
 
                 <!-- Editor.js -->
-                <div id="editorjs"></div>
+                <div id="editorjs" class="mt-8"></div>
             </div>
         </div>
 

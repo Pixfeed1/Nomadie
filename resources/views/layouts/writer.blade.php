@@ -271,80 +271,72 @@
 
         <!-- Contenu principal -->
         <div class="flex-1 overflow-hidden">
-            <!-- Header - Masqué sur pages création/édition article -->
-            @unless(request()->routeIs('writer.articles.create') || request()->routeIs('writer.articles.edit'))
-            <header class="bg-white shadow-sm border-b border-gray-200">
-                <div class="px-6 py-4">
+            <!-- Header unifié -->
+            <header class="sticky top-0 z-40 bg-white border-b border-gray-200">
+                <div class="px-4 py-3">
                     <div class="flex items-center justify-between">
-                        <!-- Menu burger mobile -->
-                        <button @click="sidebarOpen = true" class="lg:hidden p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary">
-                            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
-                            </svg>
-                        </button>
+                        <!-- Gauche : Menu burger + Logo/Navigation -->
+                        <div class="flex items-center space-x-4">
+                            @if(request()->routeIs('writer.articles.create') || request()->routeIs('writer.articles.edit'))
+                                <!-- Mode édition : Logo + Toggle sidebar -->
+                                <button @click="sidebarHidden = !sidebarHidden"
+                                        class="hidden lg:flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-100 transition-colors">
+                                    <svg class="h-5 w-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+                                    </svg>
+                                    <span class="text-sm font-medium text-text-primary">{{ config('app.name') }}</span>
+                                </button>
 
-                        <div class="flex-1 lg:flex-none">
-                            <h1 class="text-2xl font-bold text-text-primary">@yield('page-title', 'Dashboard')</h1>
-                            @hasSection('page-description')
-                                <p class="text-sm text-text-secondary mt-1">@yield('page-description')</p>
+                                <!-- Menu burger mobile -->
+                                <button @click="sidebarOpen = true" class="lg:hidden p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100">
+                                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                                    </svg>
+                                </button>
+
+                                @yield('header-left')
+                            @else
+                                <!-- Mode normal : Menu burger + Titre page -->
+                                <button @click="sidebarOpen = true" class="lg:hidden p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100">
+                                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                                    </svg>
+                                </button>
+
+                                <div>
+                                    <h1 class="text-xl font-bold text-text-primary">@yield('page-title', 'Dashboard')</h1>
+                                    @hasSection('page-description')
+                                        <p class="text-xs text-text-secondary mt-0.5">@yield('page-description')</p>
+                                    @endif
+                                </div>
                             @endif
                         </div>
 
-                        <div class="flex items-center space-x-4">
-                            <!-- Notifications badge -->
+                        <!-- Centre : Zone dynamique (statut article, etc) -->
+                        @yield('header-center')
+
+                        <!-- Droite : Actions -->
+                        <div class="flex items-center space-x-2">
+                            @yield('header-actions')
+
+                            @unless(request()->routeIs('writer.articles.create') || request()->routeIs('writer.articles.edit'))
+                            <!-- Notifications (pages normales uniquement) -->
                             <a href="{{ route('writer.notifications.index') }}" class="relative p-2 text-gray-400 hover:text-primary transition-colors">
-                                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
                                 </svg>
                                 @if(isset($unreadNotifications) && $unreadNotifications > 0)
                                     <span class="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-400"></span>
                                 @endif
                             </a>
-
-                            <!-- Profile -->
-                            <div class="hidden sm:flex items-center">
-                                @if(Auth::user()->avatar)
-                                    <img src="{{ asset('storage/' . Auth::user()->avatar) }}"
-                                         alt="Avatar" class="h-8 w-8 rounded-full object-cover">
-                                @else
-                                    <div class="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center">
-                                        <svg class="h-4 w-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-                                        </svg>
-                                    </div>
-                                @endif
-                            </div>
+                            @endunless
                         </div>
                     </div>
                 </div>
             </header>
-            @endunless
-
-            <!-- Bouton toggle sidebar pour pages création/édition -->
-            @if(request()->routeIs('writer.articles.create') || request()->routeIs('writer.articles.edit'))
-            <div class="sticky top-0 z-10 bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between">
-                <button @click="sidebarHidden = !sidebarHidden"
-                        class="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-100 transition-colors group">
-                    <svg class="h-6 w-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
-                    </svg>
-                    <div class="hidden lg:block">
-                        <span class="text-sm font-bold text-text-primary">{{ config('app.name') }}</span>
-                        <span class="block text-xs text-text-secondary">Cliquer pour toggle le menu</span>
-                    </div>
-                </button>
-
-                <!-- Menu burger mobile pour ouvrir sidebar -->
-                <button @click="sidebarOpen = true" class="lg:hidden p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100">
-                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
-                    </svg>
-                </button>
-            </div>
-            @endif
 
             <!-- Main Content -->
-            <main class="flex-1 overflow-y-auto p-6">
+            <main class="flex-1 overflow-y-auto @unless(request()->routeIs('writer.articles.create') || request()->routeIs('writer.articles.edit')) p-6 @endunless">
                 @if(session('success'))
                     <div class="mb-6 bg-success/10 border-l-4 border-success rounded-r-lg p-4">
                         <div class="flex">
