@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\MaintenanceController;
+use App\Http\Controllers\Admin\NotificationController;
 use App\Http\Controllers\Admin\AdminVendorController;
 use App\Http\Controllers\Admin\AdminDestinationController;
 use App\Http\Controllers\Admin\SubscriptionController;
@@ -247,6 +248,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     // Mode Maintenance
     Route::post('/maintenance/down', [MaintenanceController::class, 'down'])->name('maintenance.down');
     Route::post('/maintenance/up', [MaintenanceController::class, 'up'])->name('maintenance.up');
+
+    // Notifications
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.markAllRead');
 
     // Vendors
     Route::get('/vendors', [AdminVendorController::class, 'index'])->name('vendors.index');

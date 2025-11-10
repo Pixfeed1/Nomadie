@@ -277,14 +277,68 @@
                         </div>
 
                         <!-- Notifications -->
-                        <div class="relative" x-data="{ open: false }">
-                            <button @click="open = !open" class="relative p-2 text-text-secondary hover:text-primary rounded-full hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all">
+                        <div class="relative" x-data="{
+                            open: false,
+                            notifications: [],
+                            unreadCount: 0,
+                            loading: false,
+
+                            async loadNotifications() {
+                                if (this.loading) return;
+                                this.loading = true;
+
+                                try {
+                                    const response = await fetch('{{ route('admin.notifications.index') }}');
+                                    const data = await response.json();
+                                    this.notifications = data.notifications;
+                                    this.unreadCount = data.unread_count;
+                                } catch (error) {
+                                    console.error('Erreur chargement notifications:', error);
+                                } finally {
+                                    this.loading = false;
+                                }
+                            },
+
+                            async markAllAsRead() {
+                                try {
+                                    await fetch('{{ route('admin.notifications.markAllRead') }}', {
+                                        method: 'POST',
+                                        headers: {
+                                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                            'Content-Type': 'application/json'
+                                        }
+                                    });
+                                    this.unreadCount = 0;
+                                } catch (error) {
+                                    console.error('Erreur marquer comme lu:', error);
+                                }
+                            },
+
+                            getIconSvg(type) {
+                                const icons = {
+                                    vendor_pending: '<path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z\" />',
+                                    order_created: '<path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z\" />',
+                                    article_published: '<path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z\" />'
+                                };
+                                return icons[type] || icons.vendor_pending;
+                            },
+
+                            getColorClass(color) {
+                                const colors = {
+                                    accent: 'bg-accent/10 text-accent',
+                                    success: 'bg-success/10 text-success',
+                                    blue: 'bg-blue-100 text-blue-600'
+                                };
+                                return colors[color] || colors.accent;
+                            }
+                        }" x-init="loadNotifications(); setInterval(() => loadNotifications(), 30000)">
+                            <button @click="open = !open; if(open && notifications.length === 0) loadNotifications()" class="relative p-2 text-text-secondary hover:text-primary rounded-full hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all">
                                 <span class="sr-only">Notifications</span>
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                                 </svg>
                                 <!-- Badge avec nombre -->
-                                <span class="absolute top-0 right-0 inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-red-500 rounded-full">3</span>
+                                <span x-show="unreadCount > 0" x-text="unreadCount" class="absolute top-0 right-0 inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-red-500 rounded-full"></span>
                             </button>
 
                             <div x-show="open" @click.away="open = false" x-transition:enter="transition ease-out duration-100" x-transition:enter-start="transform opacity-0 scale-95" x-transition:enter-end="transform opacity-100 scale-100" x-transition:leave="transition ease-in duration-75" x-transition:leave-start="transform opacity-100 scale-100" x-transition:leave-end="transform opacity-0 scale-95" class="origin-top-right absolute right-0 mt-2 w-96 rounded-lg shadow-xl bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-50" x-cloak>
@@ -292,75 +346,47 @@
                                 <div class="px-4 py-3 bg-gradient-to-r from-primary/5 to-accent/5 border-b border-border">
                                     <div class="flex items-center justify-between">
                                         <h3 class="text-sm font-semibold text-text-primary">Notifications</h3>
-                                        <span class="px-2 py-1 text-xs font-semibold bg-primary/20 text-primary rounded-full">3 nouvelles</span>
+                                        <span x-show="unreadCount > 0" x-text="unreadCount + ' nouvelles'" class="px-2 py-1 text-xs font-semibold bg-primary/20 text-primary rounded-full"></span>
                                     </div>
                                 </div>
 
                                 <!-- Liste des notifications -->
                                 <div class="max-h-96 overflow-y-auto divide-y divide-border">
-                                    <!-- Notification: Nouveau vendeur -->
-                                    <a href="{{ route('admin.vendors.pending') }}" class="flex px-4 py-3 hover:bg-gray-50 transition-colors">
-                                        <div class="flex-shrink-0">
-                                            <div class="h-10 w-10 rounded-full bg-accent/10 flex items-center justify-center text-accent relative">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                                                </svg>
-                                                <span class="absolute -top-1 -right-1 h-3 w-3 bg-red-500 rounded-full border-2 border-white"></span>
+                                    <template x-for="notif in notifications" :key="notif.id">
+                                        <a :href="notif.url" class="flex px-4 py-3 hover:bg-gray-50 transition-colors">
+                                            <div class="flex-shrink-0">
+                                                <div :class="'h-10 w-10 rounded-full flex items-center justify-center relative ' + getColorClass(notif.color)">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" x-html="getIconSvg(notif.type)">
+                                                    </svg>
+                                                    <span x-show="!notif.read" class="absolute -top-1 -right-1 h-3 w-3 bg-red-500 rounded-full border-2 border-white"></span>
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div class="ml-3 flex-1">
-                                            <p class="text-sm font-medium text-text-primary">Nouveau vendeur en attente</p>
-                                            <p class="text-xs text-text-secondary mt-1">Voyage by Sarah a demandé à rejoindre la plateforme</p>
-                                            <p class="text-xs text-primary font-medium mt-1">Il y a 2 heures</p>
-                                        </div>
-                                    </a>
-
-                                    <!-- Notification: Nouvelle commande -->
-                                    <a href="{{ route('admin.orders.index') }}" class="flex px-4 py-3 hover:bg-gray-50 transition-colors">
-                                        <div class="flex-shrink-0">
-                                            <div class="h-10 w-10 rounded-full bg-success/10 flex items-center justify-center text-success relative">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                                                </svg>
-                                                <span class="absolute -top-1 -right-1 h-3 w-3 bg-red-500 rounded-full border-2 border-white"></span>
+                                            <div class="ml-3 flex-1">
+                                                <p class="text-sm font-medium text-text-primary" x-text="notif.title"></p>
+                                                <p class="text-xs text-text-secondary mt-1" x-text="notif.message"></p>
+                                                <p class="text-xs text-primary font-medium mt-1" x-text="notif.time"></p>
                                             </div>
-                                        </div>
-                                        <div class="ml-3 flex-1">
-                                            <p class="text-sm font-medium text-text-primary">Nouvelle commande</p>
-                                            <p class="text-xs text-text-secondary mt-1">Commande #38294 confirmée pour Thaïlande (350€)</p>
-                                            <p class="text-xs text-primary font-medium mt-1">Il y a 4 heures</p>
-                                        </div>
-                                    </a>
-
-                                    <!-- Notification: Nouvel article -->
-                                    <a href="#" class="flex px-4 py-3 hover:bg-gray-50 transition-colors">
-                                        <div class="flex-shrink-0">
-                                            <div class="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 relative">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                                </svg>
-                                                <span class="absolute -top-1 -right-1 h-3 w-3 bg-red-500 rounded-full border-2 border-white"></span>
-                                            </div>
-                                        </div>
-                                        <div class="ml-3 flex-1">
-                                            <p class="text-sm font-medium text-text-primary">Nouvel article publié</p>
-                                            <p class="text-xs text-text-secondary mt-1">"Guide complet pour visiter Paris" par Marie</p>
-                                            <p class="text-xs text-primary font-medium mt-1">Il y a 6 heures</p>
-                                        </div>
-                                    </a>
+                                        </a>
+                                    </template>
 
                                     <!-- Message si pas de notifications -->
-                                    <!-- <div class="px-4 py-8 text-center">
+                                    <div x-show="notifications.length === 0 && !loading" class="px-4 py-8 text-center">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-gray-300 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
                                         </svg>
                                         <p class="text-sm text-text-secondary">Aucune notification</p>
-                                    </div> -->
+                                    </div>
+
+                                    <!-- Loading -->
+                                    <div x-show="loading" class="px-4 py-8 text-center">
+                                        <div class="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full mx-auto"></div>
+                                        <p class="text-sm text-text-secondary mt-2">Chargement...</p>
+                                    </div>
                                 </div>
 
                                 <!-- Footer -->
                                 <div class="px-4 py-3 bg-gray-50 border-t border-border flex items-center justify-between">
-                                    <button class="text-xs text-text-secondary hover:text-primary font-medium transition-colors">Tout marquer comme lu</button>
+                                    <button @click="markAllAsRead()" class="text-xs text-text-secondary hover:text-primary font-medium transition-colors">Tout marquer comme lu</button>
                                     <a href="#" class="text-xs text-primary hover:text-primary-dark font-medium transition-colors">Voir tout →</a>
                                 </div>
                             </div>
