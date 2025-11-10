@@ -31,8 +31,9 @@ class NotificationController extends Controller
                 'icon' => 'user',
                 'color' => 'accent',
                 'title' => 'Nouveau vendeur en attente',
-                'message' => $vendor->business_name . ' a demandé à rejoindre la plateforme',
+                'message' => $vendor->company_name . ' a demandé à rejoindre la plateforme',
                 'time' => $vendor->created_at->diffForHumans(),
+                'time_sort' => $vendor->created_at->timestamp,
                 'url' => route('admin.vendors.show', $vendor->id),
                 'read' => false
             ];
@@ -53,6 +54,7 @@ class NotificationController extends Controller
                 'title' => 'Nouvelle commande',
                 'message' => 'Commande #' . $order->id . ' confirmée (' . $order->total . '€)',
                 'time' => $order->created_at->diffForHumans(),
+                'time_sort' => $order->created_at->timestamp,
                 'url' => route('admin.orders.show', $order->id),
                 'read' => false
             ];
@@ -60,21 +62,24 @@ class NotificationController extends Controller
 
         // 3. Nouveaux articles publiés (si table articles existe)
         if (DB::getSchemaBuilder()->hasTable('articles')) {
-            $recentArticles = Article::where('status', 'published')
+            $recentArticles = Article::with('writer')
+                ->where('status', 'published')
                 ->where('created_at', '>=', now()->subDays(7))
                 ->orderBy('created_at', 'desc')
                 ->limit(3)
                 ->get();
 
             foreach ($recentArticles as $article) {
+                $writerName = $article->writer ? $article->writer->name : 'Auteur inconnu';
                 $notifications[] = [
                     'id' => 'article-' . $article->id,
                     'type' => 'article_published',
                     'icon' => 'document',
                     'color' => 'blue',
                     'title' => 'Nouvel article publié',
-                    'message' => '"' . $article->title . '" par ' . $article->writer->name,
+                    'message' => '"' . $article->title . '" par ' . $writerName,
                     'time' => $article->created_at->diffForHumans(),
+                    'time_sort' => $article->created_at->timestamp,
                     'url' => route('blog.show', $article->slug),
                     'read' => false
                 ];
@@ -83,7 +88,7 @@ class NotificationController extends Controller
 
         // Trier par date (plus récent en premier)
         usort($notifications, function($a, $b) {
-            return strtotime($b['time']) - strtotime($a['time']);
+            return $b['time_sort'] - $a['time_sort'];
         });
 
         // Limiter à 10 notifications
