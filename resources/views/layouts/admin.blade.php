@@ -231,30 +231,52 @@
                         <!-- Mode Maintenance Toggle Switch -->
                         <div x-data="{
                             isMaintenanceMode: {{ app()->isDownForMaintenance() ? 'true' : 'false' }},
-                            toggleMaintenance() {
+                            async toggleMaintenance() {
                                 if (this.isMaintenanceMode) {
                                     // Désactiver
-                                    fetch('{{ route('admin.maintenance.up') }}', {
-                                        method: 'POST',
-                                        headers: {
-                                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                                            'Content-Type': 'application/json'
-                                        }
-                                    }).then(() => {
-                                        this.isMaintenanceMode = false;
-                                    });
-                                } else {
-                                    // Activer avec confirmation
-                                    if (confirm('Êtes-vous sûr de vouloir mettre le site en maintenance ?')) {
-                                        fetch('{{ route('admin.maintenance.down') }}', {
+                                    try {
+                                        const response = await fetch('{{ route('admin.maintenance.up') }}', {
                                             method: 'POST',
                                             headers: {
                                                 'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                                                'Content-Type': 'application/json'
+                                                'Content-Type': 'application/json',
+                                                'Accept': 'application/json'
                                             }
-                                        }).then(() => {
-                                            this.isMaintenanceMode = true;
                                         });
+                                        const data = await response.json();
+                                        if (data.success) {
+                                            this.isMaintenanceMode = false;
+                                            console.log('Mode maintenance désactivé');
+                                        } else {
+                                            alert('Erreur: ' + data.message);
+                                        }
+                                    } catch (error) {
+                                        console.error('Erreur:', error);
+                                        alert('Erreur lors de la désactivation du mode maintenance');
+                                    }
+                                } else {
+                                    // Activer avec confirmation
+                                    if (confirm('Êtes-vous sûr de vouloir mettre le site en maintenance ?')) {
+                                        try {
+                                            const response = await fetch('{{ route('admin.maintenance.down') }}', {
+                                                method: 'POST',
+                                                headers: {
+                                                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                                    'Content-Type': 'application/json',
+                                                    'Accept': 'application/json'
+                                                }
+                                            });
+                                            const data = await response.json();
+                                            if (data.success) {
+                                                this.isMaintenanceMode = true;
+                                                console.log('Mode maintenance activé');
+                                            } else {
+                                                alert('Erreur: ' + data.message);
+                                            }
+                                        } catch (error) {
+                                            console.error('Erreur:', error);
+                                            alert('Erreur lors de l\'activation du mode maintenance');
+                                        }
                                     }
                                 }
                             }
