@@ -964,7 +964,7 @@ function articleEditor() {
             this.editor = new EditorJS({
                 holder: 'editorjs',
                 autofocus: true,
-                placeholder: 'Commencez à écrire votre article...',
+                placeholder: '',  // Vide - Editor.js a son propre placeholder par défaut
 
                 // Données initiales vides pour éviter les erreurs de bloc invalide
                 data: {
@@ -1132,14 +1132,16 @@ function articleEditor() {
                     }
                 },
 
-                onChange: () => {
+                onChange: (api, event) => {
+                    console.log('🔄 Changement détecté dans l\'éditeur');
                     this.debounceAnalyze();
                 },
 
                 onReady: () => {
-                    console.log('Editor.js prêt');
+                    console.log('✅ Editor.js prêt et initialisé');
                     // Lancer l'analyse initiale après un court délai pour s'assurer que tout est prêt
                     setTimeout(() => {
+                        console.log('🚀 Lancement de l\'analyse initiale');
                         this.analyzeSEO();
                     }, 300);
                 }
