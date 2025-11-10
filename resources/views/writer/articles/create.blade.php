@@ -958,8 +958,17 @@ function articleEditor() {
         analyzeTimeout: null,
         minDateTime: '',
         editor: null,
+        editorReady: false,  // Flag pour éviter double initialisation
 
         init() {
+            // Éviter double initialisation
+            if (this.editorReady) {
+                console.warn('⚠️ Editor.js déjà initialisé, abandon');
+                return;
+            }
+
+            console.log('🚀 Initialisation Editor.js...');
+
             // Initialiser Editor.js
             this.editor = new EditorJS({
                 holder: 'editorjs',
@@ -1138,12 +1147,13 @@ function articleEditor() {
                 },
 
                 onReady: () => {
+                    this.editorReady = true;
                     console.log('✅ Editor.js prêt et initialisé');
                     // Lancer l'analyse initiale après un court délai pour s'assurer que tout est prêt
                     setTimeout(() => {
                         console.log('🚀 Lancement de l\'analyse initiale');
                         this.analyzeSEO();
-                    }, 300);
+                    }, 500);
                 }
             });
 
@@ -1213,13 +1223,13 @@ function articleEditor() {
 
         async analyzeSEO() {
             try {
-                console.log('📊 Début analyse SEO...');
-
                 // Vérifier que l'éditeur est prêt
-                if (!this.editor || !this.editor.save) {
-                    console.warn('⚠️ Éditeur pas encore prêt');
+                if (!this.editorReady || !this.editor || !this.editor.save) {
+                    console.warn('⚠️ Éditeur pas encore prêt, analyse ignorée');
                     return;
                 }
+
+                console.log('📊 Début analyse SEO...');
 
                 const editorData = await this.editor.save();
                 console.log('📝 Données Editor.js:', editorData);
