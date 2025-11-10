@@ -1096,10 +1096,15 @@ function articleEditor() {
             this.editor = new EditorJS({
                 holder: 'editorjs',
                 autofocus: true,
-                placeholder: 'Commencez à écrire votre article...',
                 minHeight: 0,
 
                 tools: {
+                    paragraph: {
+                        config: {
+                            placeholder: 'Commencez à écrire votre article...'
+                        }
+                    },
+
                     header: {
                         class: Header,
                         config: {
