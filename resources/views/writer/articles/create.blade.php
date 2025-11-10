@@ -1137,8 +1137,11 @@ function articleEditor() {
                 },
 
                 onReady: () => {
-                    // Lancer l'analyse initiale au chargement
-                    this.debounceAnalyze();
+                    console.log('Editor.js prêt');
+                    // Lancer l'analyse initiale après un court délai pour s'assurer que tout est prêt
+                    setTimeout(() => {
+                        this.analyzeSEO();
+                    }, 300);
                 }
             });
 
@@ -1208,13 +1211,16 @@ function articleEditor() {
 
         async analyzeSEO() {
             try {
+                console.log('📊 Début analyse SEO...');
+
                 // Vérifier que l'éditeur est prêt
                 if (!this.editor || !this.editor.save) {
-                    console.warn('Éditeur pas encore prêt');
+                    console.warn('⚠️ Éditeur pas encore prêt');
                     return;
                 }
 
                 const editorData = await this.editor.save();
+                console.log('📝 Données Editor.js:', editorData);
 
                 // Compter les mots et extraire le contenu
                 let textContent = '';
@@ -1274,8 +1280,15 @@ function articleEditor() {
                     this.scores.transitions
                 );
 
+                console.log('✅ Analyse SEO terminée:', {
+                    score: this.seoScore,
+                    wordCount: this.wordCount,
+                    readingTime: this.readingTime,
+                    scores: this.scores
+                });
+
             } catch (error) {
-                console.error('Erreur analyse SEO:', error);
+                console.error('❌ Erreur analyse SEO:', error);
             }
         },
 
@@ -1361,25 +1374,36 @@ function articleEditor() {
             this.seoDetails.transitionsPercentage = sentenceCount > 0 ? (transitionCount / sentenceCount) * 100 : 0;
         },
 
-        // Analyser liens
+        // Analyser liens (Editor.js stocke les liens dans les balises <a> du HTML)
         analyzeLinks(textContent) {
             // Réinitialiser les compteurs
             this.seoDetails.internalLinks = 0;
             this.seoDetails.externalLinks = 0;
 
-            // Compter balises <a> dans le contenu
+            // Compter balises <a> dans le contenu HTML
             const linkMatches = textContent.match(/<a[^>]*href=["']([^"']*)["'][^>]*>/gi);
 
             if (linkMatches) {
-                linkMatches.forEach(link => {
-                    // Liens externes (http/https)
-                    if (link.match(/https?:\/\//i)) {
-                        this.seoDetails.externalLinks++;
-                    } else {
-                        this.seoDetails.internalLinks++;
+                linkMatches.forEach(linkTag => {
+                    // Extraire l'URL du href
+                    const hrefMatch = linkTag.match(/href=["']([^"']*)["']/i);
+                    if (hrefMatch && hrefMatch[1]) {
+                        const url = hrefMatch[1];
+                        // Liens externes (http/https absolus)
+                        if (url.match(/^https?:\/\//i)) {
+                            this.seoDetails.externalLinks++;
+                        } else {
+                            // Liens internes (relatifs ou domaine actuel)
+                            this.seoDetails.internalLinks++;
+                        }
                     }
                 });
             }
+
+            console.log('Liens analysés:', {
+                internal: this.seoDetails.internalLinks,
+                external: this.seoDetails.externalLinks
+            });
         },
 
         // Score mot-clé principal
