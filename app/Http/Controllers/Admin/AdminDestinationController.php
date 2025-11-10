@@ -63,7 +63,7 @@ class AdminDestinationController extends Controller
         ];
         
         // Récupérer tous les vendeurs pour les modales
-        $vendors = Vendor::orderBy('name')->get();
+        $vendors = Vendor::orderBy('company_name')->get();
         
         return view('admin.destinations.index', compact('continents', 'stats', 'vendors'));
     }

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title') - Administration Marketplace Voyages</title>
+    <title>@yield('title') - Administration Nomadie</title>
     
     <!-- Tailwind CSS via CDN pour la démo -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -144,7 +144,7 @@
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    <span class="text-xl font-bold tracking-wide">Marketplace</span>
+                    <span class="text-xl font-bold tracking-wide">Nomadie</span>
                 </div>
                 <button @click="sidebarOpen = !sidebarOpen" class="md:hidden focus:outline-none">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -272,8 +272,8 @@
                                     class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"
                                 ></span>
                             </button>
-                            <span x-show="isMaintenanceMode" class="text-xs font-medium text-green-600">ON</span>
-                            <span x-show="!isMaintenanceMode" class="text-xs font-medium text-gray-400">OFF</span>
+                            <span x-show="isMaintenanceMode" x-cloak class="text-xs font-medium text-green-600">ON</span>
+                            <span x-show="!isMaintenanceMode" x-cloak class="text-xs font-medium text-gray-400">OFF</span>
                         </div>
 
                         <!-- Notifications -->
@@ -401,8 +401,8 @@
                                     </div>
                                 </div>
                                 <div class="hidden md:block text-left">
-                                    <div class="text-sm font-medium">Admin</div>
-                                    <div class="text-xs text-text-secondary">admin@marketplace.fr</div>
+                                    <div class="text-sm font-medium">{{ Auth::user()->name }}</div>
+                                    <div class="text-xs text-text-secondary">{{ Auth::user()->email }}</div>
                                 </div>
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
@@ -410,6 +410,14 @@
                             </button>
                             
                             <div x-show="open" @click.away="open = false" x-transition:enter="transition ease-out duration-100" x-transition:enter-start="transform opacity-0 scale-95" x-transition:enter-end="transform opacity-100 scale-100" x-transition:leave="transition ease-in duration-75" x-transition:leave-start="transform opacity-100 scale-100" x-transition:leave-end="transform opacity-0 scale-95" class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-50" x-cloak>
+                                <a href="{{ route('admin.dashboard.index') }}" class="block px-4 py-2 text-sm text-text-primary hover:bg-gray-50">
+                                    <div class="flex items-center">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                                        </svg>
+                                        Tableau de bord
+                                    </div>
+                                </a>
                                 <a href="#" class="block px-4 py-2 text-sm text-text-primary hover:bg-gray-50">
                                     <div class="flex items-center">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
