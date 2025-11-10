@@ -6,73 +6,91 @@
 @section('page-description', 'Suivez votre progression et débloquez des récompenses')
 
 @section('content')
-<div x-data="{ 
+<div x-data="{
     activeTab: 'all',
-    showBadgeDetails: null 
+    showBadgeDetails: null
 }">
-    <!-- Statistiques en haut -->
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-        <x-stat-card
-            title="Badges débloqués"
-            :value="$stats['unlocked_count'] . '/' . $stats['total_badges']"
-            icon="star"
-            color="primary"
-        />
+    @if(Auth::user()->writer_type !== 'team')
+        <!-- Statistiques en haut (uniquement pour Community Writers et Partners) -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+            <x-stat-card
+                title="Badges débloqués"
+                :value="$stats['unlocked_count'] . '/' . $stats['total_badges']"
+                icon="star"
+                color="primary"
+            />
 
-        <x-stat-card
-            title="Progression globale"
-            :value="$stats['completion_percentage'] . '%'"
-            icon="chart"
-            color="accent"
-        />
+            <x-stat-card
+                title="Progression globale"
+                :value="$stats['completion_percentage'] . '%'"
+                icon="chart"
+                color="accent"
+            />
 
-        <!-- Prochain badge -->
-        <div class="bg-white rounded-lg shadow-sm p-4">
-            <div class="flex items-center justify-between">
-                <div class="flex-1">
-                    <p class="text-xs text-text-secondary uppercase">Prochain badge</p>
-                    @if($stats['next_badge'])
-                        <p class="text-sm font-bold text-text-primary mt-1 truncate">
-                            {{ $stats['next_badge']['badge']->name }}
-                        </p>
-                        <div class="w-full bg-gray-200 rounded-full h-1.5 mt-2">
-                            <div class="bg-primary h-1.5 rounded-full transition-all duration-300" 
-                                 style="width: {{ $stats['next_badge']['progress'] }}%"></div>
-                        </div>
-                    @else
-                        <p class="text-sm text-text-secondary mt-1">Tous débloqués ! 🎉</p>
-                    @endif
+            <!-- Prochain badge -->
+            <div class="bg-white rounded-lg shadow-sm p-4">
+                <div class="flex items-center justify-between">
+                    <div class="flex-1">
+                        <p class="text-xs text-text-secondary uppercase">Prochain badge</p>
+                        @if($stats['next_badge'])
+                            <p class="text-sm font-bold text-text-primary mt-1 truncate">
+                                {{ $stats['next_badge']['badge']->name }}
+                            </p>
+                            <div class="w-full bg-gray-200 rounded-full h-1.5 mt-2">
+                                <div class="bg-primary h-1.5 rounded-full transition-all duration-300"
+                                     style="width: {{ $stats['next_badge']['progress'] }}%"></div>
+                            </div>
+                        @else
+                            <p class="text-sm text-text-secondary mt-1">Tous débloqués ! 🎉</p>
+                        @endif
+                    </div>
+                    <div class="h-10 w-10 rounded-full bg-yellow-100 flex items-center justify-center ml-3">
+                        <svg class="h-5 w-5 text-yellow-600" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                        </svg>
+                    </div>
                 </div>
-                <div class="h-10 w-10 rounded-full bg-yellow-100 flex items-center justify-center ml-3">
-                    <svg class="h-5 w-5 text-yellow-600" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
-                    </svg>
+            </div>
+
+            <!-- Badge en vedette -->
+            <div class="bg-white rounded-lg shadow-sm p-4">
+                <div class="flex items-center justify-between">
+                    <div class="flex-1">
+                        <p class="text-xs text-text-secondary uppercase">Badge en vedette</p>
+                        @if($stats['featured_badge'])
+                            <p class="text-sm font-bold text-text-primary mt-1 truncate">
+                                <span class="text-xl mr-1">{{ $stats['featured_badge']->icon }}</span>
+                                {{ $stats['featured_badge']->name }}
+                            </p>
+                        @else
+                            <p class="text-sm text-text-secondary mt-1">Aucun sélectionné</p>
+                        @endif
+                    </div>
+                    <div class="h-10 w-10 rounded-full bg-success/10 flex items-center justify-center ml-3">
+                        <svg class="h-5 w-5 text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                        </svg>
+                    </div>
                 </div>
             </div>
         </div>
-
-        <!-- Badge en vedette -->
-        <div class="bg-white rounded-lg shadow-sm p-4">
-            <div class="flex items-center justify-between">
-                <div class="flex-1">
-                    <p class="text-xs text-text-secondary uppercase">Badge en vedette</p>
-                    @if($stats['featured_badge'])
-                        <p class="text-sm font-bold text-text-primary mt-1 truncate">
-                            <span class="text-xl mr-1">{{ $stats['featured_badge']->icon }}</span>
-                            {{ $stats['featured_badge']->name }}
-                        </p>
-                    @else
-                        <p class="text-sm text-text-secondary mt-1">Aucun sélectionné</p>
-                    @endif
+    @else
+        <!-- Message pour l'équipe Nomadie -->
+        <div class="bg-gradient-to-r from-primary/10 to-accent/10 rounded-lg shadow-sm p-6 mb-6">
+            <div class="flex items-center space-x-4">
+                <div class="h-16 w-16 rounded-full bg-primary flex items-center justify-center">
+                    <span class="text-3xl">🏆</span>
                 </div>
-                <div class="h-10 w-10 rounded-full bg-success/10 flex items-center justify-center ml-3">
-                    <svg class="h-5 w-5 text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                    </svg>
+                <div class="flex-1">
+                    <h3 class="text-lg font-bold text-text-primary mb-1">Équipe Officielle Nomadie</h3>
+                    <p class="text-sm text-text-secondary">
+                        En tant que membre de l'équipe officielle, vous possédez le badge exclusif Team Nomadie.
+                        Continuez à créer du contenu de qualité pour notre communauté !
+                    </p>
                 </div>
             </div>
         </div>
-    </div>
+    @endif
 
     <!-- Tabs pour filtrer les badges -->
     <div class="bg-white rounded-lg shadow-sm mb-6">
