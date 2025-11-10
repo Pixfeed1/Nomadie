@@ -228,52 +228,116 @@
                     
                     <!-- Right side -->
                     <div class="flex items-center space-x-4">
+                        <!-- Mode Maintenance Toggle -->
+                        @if(app()->isDownForMaintenance())
+                            <form action="{{ route('admin.maintenance.up') }}" method="POST" class="inline">
+                                @csrf
+                                <button type="submit" class="inline-flex items-center px-3 py-2 bg-green-600 hover:bg-green-700 text-white text-xs font-medium rounded-md transition-colors shadow-sm">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                    </svg>
+                                    Réactiver le site
+                                </button>
+                            </form>
+                        @else
+                            <form action="{{ route('admin.maintenance.down') }}" method="POST" class="inline" onsubmit="return confirm('Êtes-vous sûr de vouloir mettre le site en maintenance ?');">
+                                @csrf
+                                <button type="submit" class="inline-flex items-center px-3 py-2 bg-white hover:bg-gray-50 text-text-secondary hover:text-orange-600 text-xs font-medium rounded-md transition-colors border border-gray-200 hover:border-orange-300">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    </svg>
+                                    Maintenance
+                                </button>
+                            </form>
+                        @endif
+
                         <!-- Notifications -->
                         <div class="relative" x-data="{ open: false }">
-                            <button @click="open = !open" class="p-2 text-text-secondary hover:text-primary rounded-full hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all">
+                            <button @click="open = !open" class="relative p-2 text-text-secondary hover:text-primary rounded-full hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all">
                                 <span class="sr-only">Notifications</span>
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                                 </svg>
-                                <span class="absolute top-0 right-0 h-2 w-2 rounded-full bg-accent"></span>
+                                <!-- Badge avec nombre -->
+                                <span class="absolute top-0 right-0 inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-red-500 rounded-full">3</span>
                             </button>
-                            
-                            <div x-show="open" @click.away="open = false" x-transition:enter="transition ease-out duration-100" x-transition:enter-start="transform opacity-0 scale-95" x-transition:enter-end="transform opacity-100 scale-100" x-transition:leave="transition ease-in duration-75" x-transition:leave-start="transform opacity-100 scale-100" x-transition:leave-end="transform opacity-0 scale-95" class="origin-top-right absolute right-0 mt-2 w-80 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-50" x-cloak>
-                                <div class="px-4 py-2 border-b border-border">
-                                    <h3 class="text-sm font-semibold text-text-primary">Notifications</h3>
+
+                            <div x-show="open" @click.away="open = false" x-transition:enter="transition ease-out duration-100" x-transition:enter-start="transform opacity-0 scale-95" x-transition:enter-end="transform opacity-100 scale-100" x-transition:leave="transition ease-in duration-75" x-transition:leave-start="transform opacity-100 scale-100" x-transition:leave-end="transform opacity-0 scale-95" class="origin-top-right absolute right-0 mt-2 w-96 rounded-lg shadow-xl bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-50" x-cloak>
+                                <!-- Header -->
+                                <div class="px-4 py-3 bg-gradient-to-r from-primary/5 to-accent/5 border-b border-border">
+                                    <div class="flex items-center justify-between">
+                                        <h3 class="text-sm font-semibold text-text-primary">Notifications</h3>
+                                        <span class="px-2 py-1 text-xs font-semibold bg-primary/20 text-primary rounded-full">3 nouvelles</span>
+                                    </div>
                                 </div>
-                                <div class="max-h-60 overflow-y-auto">
-                                    <a href="#" class="flex px-4 py-3 hover:bg-gray-50 border-b border-border">
+
+                                <!-- Liste des notifications -->
+                                <div class="max-h-96 overflow-y-auto divide-y divide-border">
+                                    <!-- Notification: Nouveau vendeur -->
+                                    <a href="{{ route('admin.vendors.pending') }}" class="flex px-4 py-3 hover:bg-gray-50 transition-colors">
                                         <div class="flex-shrink-0">
-                                            <div class="h-10 w-10 rounded-full bg-accent/10 flex items-center justify-center text-accent">
+                                            <div class="h-10 w-10 rounded-full bg-accent/10 flex items-center justify-center text-accent relative">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                                                 </svg>
+                                                <span class="absolute -top-1 -right-1 h-3 w-3 bg-red-500 rounded-full border-2 border-white"></span>
                                             </div>
                                         </div>
-                                        <div class="ml-3">
+                                        <div class="ml-3 flex-1">
                                             <p class="text-sm font-medium text-text-primary">Nouveau vendeur en attente</p>
                                             <p class="text-xs text-text-secondary mt-1">Voyage by Sarah a demandé à rejoindre la plateforme</p>
-                                            <p class="text-xs text-accent mt-1">Il y a 2 heures</p>
+                                            <p class="text-xs text-primary font-medium mt-1">Il y a 2 heures</p>
                                         </div>
                                     </a>
-                                    <a href="#" class="flex px-4 py-3 hover:bg-gray-50">
+
+                                    <!-- Notification: Nouvelle commande -->
+                                    <a href="{{ route('admin.orders.index') }}" class="flex px-4 py-3 hover:bg-gray-50 transition-colors">
                                         <div class="flex-shrink-0">
-                                            <div class="h-10 w-10 rounded-full bg-success/10 flex items-center justify-center text-success">
+                                            <div class="h-10 w-10 rounded-full bg-success/10 flex items-center justify-center text-success relative">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                                                 </svg>
+                                                <span class="absolute -top-1 -right-1 h-3 w-3 bg-red-500 rounded-full border-2 border-white"></span>
                                             </div>
                                         </div>
-                                        <div class="ml-3">
+                                        <div class="ml-3 flex-1">
                                             <p class="text-sm font-medium text-text-primary">Nouvelle commande</p>
-                                            <p class="text-xs text-text-secondary mt-1">Commande #38294 confirmée pour Thaïlande</p>
-                                            <p class="text-xs text-accent mt-1">Il y a 5 heures</p>
+                                            <p class="text-xs text-text-secondary mt-1">Commande #38294 confirmée pour Thaïlande (350€)</p>
+                                            <p class="text-xs text-primary font-medium mt-1">Il y a 4 heures</p>
                                         </div>
                                     </a>
+
+                                    <!-- Notification: Nouvel article -->
+                                    <a href="#" class="flex px-4 py-3 hover:bg-gray-50 transition-colors">
+                                        <div class="flex-shrink-0">
+                                            <div class="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 relative">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                                </svg>
+                                                <span class="absolute -top-1 -right-1 h-3 w-3 bg-red-500 rounded-full border-2 border-white"></span>
+                                            </div>
+                                        </div>
+                                        <div class="ml-3 flex-1">
+                                            <p class="text-sm font-medium text-text-primary">Nouvel article publié</p>
+                                            <p class="text-xs text-text-secondary mt-1">"Guide complet pour visiter Paris" par Marie</p>
+                                            <p class="text-xs text-primary font-medium mt-1">Il y a 6 heures</p>
+                                        </div>
+                                    </a>
+
+                                    <!-- Message si pas de notifications -->
+                                    <!-- <div class="px-4 py-8 text-center">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-gray-300 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+                                        </svg>
+                                        <p class="text-sm text-text-secondary">Aucune notification</p>
+                                    </div> -->
                                 </div>
-                                <div class="px-4 py-2 border-t border-border">
-                                    <a href="#" class="text-sm font-medium text-primary hover:text-primary-dark">Voir toutes les notifications</a>
+
+                                <!-- Footer -->
+                                <div class="px-4 py-3 bg-gray-50 border-t border-border flex items-center justify-between">
+                                    <button class="text-xs text-text-secondary hover:text-primary font-medium transition-colors">Tout marquer comme lu</button>
+                                    <a href="#" class="text-xs text-primary hover:text-primary-dark font-medium transition-colors">Voir tout →</a>
                                 </div>
                             </div>
                         </div>

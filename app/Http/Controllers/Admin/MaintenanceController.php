@@ -15,18 +15,16 @@ class MaintenanceController extends Controller
     {
         try {
             // Mettre le site en mode maintenance
-            // L'option --secret permet aux admins d'accéder au site avec un token
-            $secret = config('app.maintenance_secret', 'admin-access-token');
-
+            // Autoriser l'accès au login et à l'espace admin
             Artisan::call('down', [
                 '--refresh' => 15,
-                '--secret' => $secret,
-                '--render' => 'errors::503'
+                '--render' => 'errors::503',
+                '--except' => 'login,admin/*,logout'
             ]);
 
             return redirect()
                 ->route('admin.dashboard.index')
-                ->with('success', 'Le site est maintenant en mode maintenance. Utilisez le lien secret pour y accéder : ' . url("/$secret"));
+                ->with('success', 'Le site est maintenant en mode maintenance. Les administrateurs peuvent toujours se connecter.');
         } catch (\Exception $e) {
             return redirect()
                 ->route('admin.dashboard.index')
