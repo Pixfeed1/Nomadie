@@ -1,6 +1,7 @@
 @extends('layouts.writer')
 
 @section('title', 'Nouvel article')
+{{-- Fichier nettoyé - Version Editor.js --}}
 
 @push('head')
 <!-- Editor.js Scripts - Bundles UMD -->
