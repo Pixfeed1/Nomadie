@@ -270,6 +270,10 @@
                                             if (data.success) {
                                                 this.isMaintenanceMode = true;
                                                 console.log('Mode maintenance activé');
+                                                // Rediriger vers URL avec secret pour bypass
+                                                if (data.bypass_url) {
+                                                    window.location.href = data.bypass_url + '/admin/dashboard';
+                                                }
                                             } else {
                                                 alert('Erreur: ' + data.message);
                                             }
