@@ -15,11 +15,9 @@ class MaintenanceController extends Controller
     {
         try {
             // Mettre le site en mode maintenance
-            // Autoriser l'accès au login et à l'espace admin
             Artisan::call('down', [
                 '--refresh' => 15,
-                '--render' => 'errors::503',
-                '--except' => 'login,admin/*,logout'
+                '--render' => 'errors::503'
             ]);
 
             if ($request->expectsJson() || $request->ajax()) {
@@ -31,7 +29,7 @@ class MaintenanceController extends Controller
 
             return redirect()
                 ->route('admin.dashboard.index')
-                ->with('success', 'Le site est maintenant en mode maintenance. Les administrateurs peuvent toujours se connecter.');
+                ->with('success', 'Le site est maintenant en mode maintenance.');
         } catch (\Exception $e) {
             if ($request->expectsJson() || $request->ajax()) {
                 return response()->json([
