@@ -27,30 +27,26 @@ class PaymentController extends Controller
     }
 
     /**
-     * Récupère la clé Stripe directement depuis le fichier .env
-     * pour contourner les protections du serveur
+     * Récupère la clé Stripe de manière sécurisée
+     *
+     * @throws \Exception Si la clé n'est pas configurée
      */
     private function getStripeSecretKey()
     {
-        // Méthode 1: Essayer config()
         $key = config('stripe.secret');
-        
-        // Méthode 2: Si config() échoue, lire directement le .env
+
         if (empty($key)) {
-            $envPath = base_path('.env');
-            if (file_exists($envPath)) {
-                $envContent = file_get_contents($envPath);
-                if (preg_match('/^STRIPE_SECRET=(.*)$/m', $envContent, $matches)) {
-                    $key = trim($matches[1]);
-                }
-            }
+            Log::error('Stripe secret key not configured', [
+                'config_path' => 'config/stripe.php',
+                'env_variable' => 'STRIPE_SECRET'
+            ]);
+
+            throw new \Exception(
+                'La clé Stripe n\'est pas configurée. ' .
+                'Veuillez définir STRIPE_SECRET dans votre fichier .env'
+            );
         }
-        
-        // Méthode 3: En dernier recours, utiliser la clé directement
-        if (empty($key)) {
-            $key = 'sk_test_51RQll2FTR22qbY6T3t514x0k8gcSPnkheA001aGXJuwKca3gZmkk5AS9UeNjMH01bwc4ZSoNIhap4JD5bMoV0gDq06krs4o53w';
-        }
-        
+
         return $key;
     }
 
