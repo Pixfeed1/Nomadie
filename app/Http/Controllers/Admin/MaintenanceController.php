@@ -50,8 +50,12 @@ class MaintenanceController extends Controller
     public function up(Request $request)
     {
         try {
-            // Sortir du mode maintenance
-            Artisan::call('up');
+            $maintenanceFile = storage_path('framework/down');
+
+            // Vérifier si le fichier de maintenance existe
+            if (file_exists($maintenanceFile)) {
+                unlink($maintenanceFile);
+            }
 
             if ($request->expectsJson() || $request->ajax()) {
                 return response()->json([
