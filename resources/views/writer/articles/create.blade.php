@@ -1016,12 +1016,7 @@ function articleEditor() {
             this.editor = new EditorJS({
                 holder: 'editorjs',
                 autofocus: true,
-                placeholder: '',  // Vide - Editor.js a son propre placeholder par défaut
-
-                // Données initiales vides pour éviter les erreurs de bloc invalide
-                data: {
-                    blocks: []
-                },
+                placeholder: 'Tapez / pour voir les commandes',
 
                 tools: {
                     header: {
