@@ -8,6 +8,8 @@ use App\Models\Vendor;
 use App\Models\Trip;
 use App\Models\Payment;
 use App\Models\Subscription;
+use App\Models\Message;
+use App\Models\Booking;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -38,16 +40,24 @@ class DashboardController extends Controller
             
         // Données pour les graphiques
         $chartData = $this->getChartData();
-        
+
         // Activité récente
         $recentActivity = $this->getRecentActivity();
+
+        // Destinations populaires
+        $popularDestinations = $this->getPopularDestinations();
+
+        // Messages récents
+        $recentMessages = $this->getRecentMessages();
 
         return view('admin.dashboard.index', compact(
             'stats',
             'recentVendors',
             'recentTrips',
             'chartData',
-            'recentActivity'
+            'recentActivity',
+            'popularDestinations',
+            'recentMessages'
         ));
     }
 
@@ -214,5 +224,69 @@ class DashboardController extends Controller
         
         // Trier par date et limiter
         return $activities->sortByDesc('date')->take(5);
+    }
+
+    /**
+     * Obtenir les destinations populaires
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    private function getPopularDestinations()
+    {
+        // Récupérer les destinations les plus réservées ce mois
+        $currentMonth = now()->month;
+        $currentYear = now()->year;
+
+        $destinations = DB::table('trips')
+            ->join('bookings', 'trips.id', '=', 'bookings.trip_id')
+            ->join('destinations', 'trips.destination_id', '=', 'destinations.id')
+            ->whereMonth('bookings.created_at', $currentMonth)
+            ->whereYear('bookings.created_at', $currentYear)
+            ->select(
+                'destinations.name',
+                DB::raw('COUNT(bookings.id) as bookings_count'),
+                DB::raw('SUM(bookings.total_amount) as total_revenue')
+            )
+            ->groupBy('destinations.id', 'destinations.name')
+            ->orderBy('total_revenue', 'desc')
+            ->limit(5)
+            ->get();
+
+        // Calculer le max pour les barres de progression
+        $maxRevenue = $destinations->max('total_revenue') ?: 1;
+
+        return $destinations->map(function ($dest) use ($maxRevenue) {
+            $dest->percentage = round(($dest->total_revenue / $maxRevenue) * 100);
+            $dest->revenue_formatted = number_format($dest->total_revenue, 0, ',', ' ') . ' €';
+            return $dest;
+        });
+    }
+
+    /**
+     * Obtenir les messages récents entre clients et vendeurs
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    private function getRecentMessages()
+    {
+        return Message::with(['sender', 'recipient', 'trip'])
+            ->latest()
+            ->take(10)
+            ->get()
+            ->map(function ($message) {
+                return [
+                    'id' => $message->id,
+                    'sender_name' => $message->sender->name ?? 'Utilisateur supprimé',
+                    'sender_type' => $message->sender_type,
+                    'recipient_name' => $message->recipient->name ?? 'Utilisateur supprimé',
+                    'recipient_type' => $message->recipient_type,
+                    'subject' => $message->subject,
+                    'content_preview' => \Str::limit($message->content, 80),
+                    'trip_title' => $message->trip->title ?? null,
+                    'is_read' => $message->is_read,
+                    'created_at' => $message->created_at,
+                    'time_ago' => $message->created_at->diffForHumans(),
+                ];
+            });
     }
 }
