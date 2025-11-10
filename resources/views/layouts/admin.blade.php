@@ -228,29 +228,53 @@
                     
                     <!-- Right side -->
                     <div class="flex items-center space-x-4">
-                        <!-- Mode Maintenance Toggle -->
-                        @if(app()->isDownForMaintenance())
-                            <form action="{{ route('admin.maintenance.up') }}" method="POST" class="inline">
-                                @csrf
-                                <button type="submit" class="inline-flex items-center px-3 py-2 bg-green-600 hover:bg-green-700 text-white text-xs font-medium rounded-md transition-colors shadow-sm">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                                    </svg>
-                                    Réactiver le site
-                                </button>
-                            </form>
-                        @else
-                            <form action="{{ route('admin.maintenance.down') }}" method="POST" class="inline" onsubmit="return confirm('Êtes-vous sûr de vouloir mettre le site en maintenance ?');">
-                                @csrf
-                                <button type="submit" class="inline-flex items-center px-3 py-2 bg-white hover:bg-gray-50 text-text-secondary hover:text-orange-600 text-xs font-medium rounded-md transition-colors border border-gray-200 hover:border-orange-300">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                    </svg>
-                                    Maintenance
-                                </button>
-                            </form>
-                        @endif
+                        <!-- Mode Maintenance Toggle Switch -->
+                        <div x-data="{
+                            isMaintenanceMode: {{ app()->isDownForMaintenance() ? 'true' : 'false' }},
+                            toggleMaintenance() {
+                                if (this.isMaintenanceMode) {
+                                    // Désactiver
+                                    fetch('{{ route('admin.maintenance.up') }}', {
+                                        method: 'POST',
+                                        headers: {
+                                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                            'Content-Type': 'application/json'
+                                        }
+                                    }).then(() => {
+                                        this.isMaintenanceMode = false;
+                                    });
+                                } else {
+                                    // Activer avec confirmation
+                                    if (confirm('Êtes-vous sûr de vouloir mettre le site en maintenance ?')) {
+                                        fetch('{{ route('admin.maintenance.down') }}', {
+                                            method: 'POST',
+                                            headers: {
+                                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                                'Content-Type': 'application/json'
+                                            }
+                                        }).then(() => {
+                                            this.isMaintenanceMode = true;
+                                        });
+                                    }
+                                }
+                            }
+                        }" class="flex items-center space-x-3">
+                            <span class="text-xs font-medium text-text-secondary">Maintenance</span>
+                            <button
+                                @click="toggleMaintenance()"
+                                type="button"
+                                :class="isMaintenanceMode ? 'bg-green-600' : 'bg-gray-200'"
+                                class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                            >
+                                <span class="sr-only">Toggle maintenance mode</span>
+                                <span
+                                    :class="isMaintenanceMode ? 'translate-x-5' : 'translate-x-0'"
+                                    class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"
+                                ></span>
+                            </button>
+                            <span x-show="isMaintenanceMode" class="text-xs font-medium text-green-600">ON</span>
+                            <span x-show="!isMaintenanceMode" class="text-xs font-medium text-gray-400">OFF</span>
+                        </div>
 
                         <!-- Notifications -->
                         <div class="relative" x-data="{ open: false }">
