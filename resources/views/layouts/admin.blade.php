@@ -277,61 +277,7 @@
                         </div>
 
                         <!-- Notifications -->
-                        <div class="relative" x-data="{
-                            open: false,
-                            notifications: [],
-                            unreadCount: 0,
-                            loading: false,
-
-                            async loadNotifications() {
-                                if (this.loading) return;
-                                this.loading = true;
-
-                                try {
-                                    const response = await fetch('{{ route('admin.notifications.index') }}');
-                                    const data = await response.json();
-                                    this.notifications = data.notifications;
-                                    this.unreadCount = data.unread_count;
-                                } catch (error) {
-                                    console.error('Erreur chargement notifications:', error);
-                                } finally {
-                                    this.loading = false;
-                                }
-                            },
-
-                            async markAllAsRead() {
-                                try {
-                                    await fetch('{{ route('admin.notifications.markAllRead') }}', {
-                                        method: 'POST',
-                                        headers: {
-                                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                                            'Content-Type': 'application/json'
-                                        }
-                                    });
-                                    this.unreadCount = 0;
-                                } catch (error) {
-                                    console.error('Erreur marquer comme lu:', error);
-                                }
-                            },
-
-                            getIconSvg(type) {
-                                const icons = {
-                                    vendor_pending: '<path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z\" />',
-                                    order_created: '<path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z\" />',
-                                    article_published: '<path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z\" />'
-                                };
-                                return icons[type] || icons.vendor_pending;
-                            },
-
-                            getColorClass(color) {
-                                const colors = {
-                                    accent: 'bg-accent/10 text-accent',
-                                    success: 'bg-success/10 text-success',
-                                    blue: 'bg-blue-100 text-blue-600'
-                                };
-                                return colors[color] || colors.accent;
-                            }
-                        }" x-init="loadNotifications(); setInterval(() => loadNotifications(), 30000)">
+                        <div class="relative" x-data="notificationsDropdown()" x-init="loadNotifications(); setInterval(() => loadNotifications(), 30000)">
                             <button @click="open = !open; if(open && notifications.length === 0) loadNotifications()" class="relative p-2 text-text-secondary hover:text-primary rounded-full hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all">
                                 <span class="sr-only">Notifications</span>
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -536,6 +482,65 @@
     </div>
     
     <!-- Scripts spécifiques -->
+    <script>
+        function notificationsDropdown() {
+            return {
+                open: false,
+                notifications: [],
+                unreadCount: 0,
+                loading: false,
+
+                async loadNotifications() {
+                    if (this.loading) return;
+                    this.loading = true;
+
+                    try {
+                        const response = await fetch('{{ route('admin.notifications.index') }}');
+                        const data = await response.json();
+                        this.notifications = data.notifications;
+                        this.unreadCount = data.unread_count;
+                    } catch (error) {
+                        console.error('Erreur chargement notifications:', error);
+                    } finally {
+                        this.loading = false;
+                    }
+                },
+
+                async markAllAsRead() {
+                    try {
+                        await fetch('{{ route('admin.notifications.markAllRead') }}', {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                'Content-Type': 'application/json'
+                            }
+                        });
+                        this.unreadCount = 0;
+                    } catch (error) {
+                        console.error('Erreur marquer comme lu:', error);
+                    }
+                },
+
+                getIconSvg(type) {
+                    const icons = {
+                        vendor_pending: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />',
+                        order_created: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />',
+                        article_published: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />'
+                    };
+                    return icons[type] || icons.vendor_pending;
+                },
+
+                getColorClass(color) {
+                    const colors = {
+                        accent: 'bg-accent/10 text-accent',
+                        success: 'bg-success/10 text-success',
+                        blue: 'bg-blue-100 text-blue-600'
+                    };
+                    return colors[color] || colors.accent;
+                }
+            };
+        }
+    </script>
     @stack('scripts')
 </body>
 </html>
