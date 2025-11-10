@@ -15,6 +15,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@editorjs/delimiter@latest/dist/delimiter.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@editorjs/inline-code@latest/dist/inline-code.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@editorjs/embed@latest/dist/embed.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@editorjs/link@latest/dist/link.umd.min.js"></script>
 
 <!-- Alpine.js Store Global -->
 <script>
@@ -566,6 +567,48 @@ document.addEventListener('alpine:init', () => {
                                 <span class="text-text-secondary">Liens externes</span>
                                 <span :class="seoDetails.externalLinks >= 1 ? 'text-success' : 'text-error'" x-text="seoDetails.externalLinks"></span>
                             </div>
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="border-gray-200">
+
+                <!-- Gestion des liens (NoFollow/DoFollow) -->
+                <div x-data="{ showLinks: false }">
+                    <button @click="showLinks = !showLinks" class="w-full flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                        <div class="flex items-center space-x-2">
+                            <svg class="w-4 h-4 text-text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
+                            </svg>
+                            <h4 class="text-sm font-semibold text-text-primary">Attributs des liens</h4>
+                        </div>
+                        <svg class="w-4 h-4 text-text-secondary transition-transform" :class="showLinks ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                        </svg>
+                    </button>
+
+                    <div x-show="showLinks" x-collapse class="mt-2 space-y-2">
+                        <p class="text-xs text-text-secondary mb-2">
+                            Pour ajouter nofollow/dofollow, sélectionnez le texte du lien dans l'éditeur, puis utilisez les boutons ci-dessous.
+                        </p>
+
+                        <div class="space-y-1">
+                            <button @click="addLinkAttribute('nofollow')"
+                                    class="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-xs font-medium text-text-primary hover:bg-gray-50 transition-colors">
+                                🚫 Ajouter rel="nofollow"
+                            </button>
+                            <button @click="addLinkAttribute('dofollow')"
+                                    class="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-xs font-medium text-text-primary hover:bg-gray-50 transition-colors">
+                                ✅ Ajouter rel="dofollow"
+                            </button>
+                            <button @click="addLinkAttribute('')"
+                                    class="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-xs font-medium text-text-secondary hover:bg-gray-50 transition-colors">
+                                🗑️ Supprimer attribut rel
+                            </button>
+                        </div>
+
+                        <div class="mt-3 p-2 bg-blue-50 border border-blue-200 rounded text-xs text-blue-800">
+                            <strong>💡 Conseil SEO:</strong> Utilisez <code>nofollow</code> pour les liens externes non fiables ou publicitaires, et <code>dofollow</code> pour les liens de qualité.
                         </div>
                     </div>
                 </div>
@@ -1466,6 +1509,65 @@ function articleEditor() {
                 return 3;
             }
             return 0;
+        },
+
+        // Ajouter attribut rel aux liens sélectionnés
+        addLinkAttribute(relValue) {
+            // Récupérer la sélection actuelle
+            const selection = window.getSelection();
+
+            if (!selection || selection.rangeCount === 0) {
+                alert('Veuillez sélectionner un lien d\'abord');
+                return;
+            }
+
+            // Trouver le lien parent de la sélection
+            let node = selection.anchorNode;
+            let linkElement = null;
+
+            // Remonter dans le DOM pour trouver la balise <a>
+            while (node && node.parentElement) {
+                if (node.parentElement.tagName === 'A') {
+                    linkElement = node.parentElement;
+                    break;
+                }
+                node = node.parentElement;
+            }
+
+            if (!linkElement) {
+                alert('Aucun lien trouvé dans la sélection. Veuillez cliquer directement sur le lien.');
+                return;
+            }
+
+            // Appliquer l'attribut rel
+            if (relValue === '') {
+                linkElement.removeAttribute('rel');
+                console.log('✅ Attribut rel supprimé du lien:', linkElement.href);
+            } else {
+                linkElement.setAttribute('rel', relValue);
+                console.log(`✅ Attribut rel="${relValue}" ajouté au lien:`, linkElement.href);
+            }
+
+            // Message de succès
+            const messages = {
+                'nofollow': '🚫 Lien marqué comme nofollow',
+                'dofollow': '✅ Lien marqué comme dofollow',
+                '': '🗑️ Attribut rel supprimé'
+            };
+
+            // Afficher un feedback temporaire
+            const feedback = document.createElement('div');
+            feedback.textContent = messages[relValue];
+            feedback.className = 'fixed top-20 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg z-50 transition-opacity';
+            document.body.appendChild(feedback);
+
+            setTimeout(() => {
+                feedback.style.opacity = '0';
+                setTimeout(() => feedback.remove(), 300);
+            }, 2000);
+
+            // Rafraîchir l'analyse pour mettre à jour les compteurs
+            this.debounceAnalyze();
         },
 
         // Fonction Undo (Annuler)
