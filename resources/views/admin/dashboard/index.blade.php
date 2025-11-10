@@ -6,6 +6,61 @@
 
 @section('content')
 <div x-data="dashboardData" class="space-y-6">
+    <!-- Mode Maintenance Toggle -->
+    <div class="bg-gradient-to-r from-orange-50 to-red-50 border border-orange-200 rounded-lg p-6">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+                <div class="bg-orange-100 rounded-full p-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold text-text-primary">Mode Maintenance</h3>
+                    <p class="text-sm text-text-secondary">
+                        @if(app()->isDownForMaintenance())
+                            <span class="inline-flex items-center text-orange-600 font-medium">
+                                <span class="h-2 w-2 bg-orange-500 rounded-full mr-2 animate-pulse"></span>
+                                Le site est actuellement en maintenance
+                            </span>
+                        @else
+                            <span class="text-green-600 font-medium">
+                                <span class="inline-flex items-center">
+                                    <span class="h-2 w-2 bg-green-500 rounded-full mr-2"></span>
+                                    Le site est en ligne
+                                </span>
+                            </span>
+                        @endif
+                    </p>
+                </div>
+            </div>
+            <div>
+                @if(app()->isDownForMaintenance())
+                    <form action="{{ route('admin.maintenance.up') }}" method="POST" class="inline">
+                        @csrf
+                        <button type="submit" class="px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-colors shadow-md hover:shadow-lg flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                            Réactiver le site
+                        </button>
+                    </form>
+                @else
+                    <form action="{{ route('admin.maintenance.down') }}" method="POST" class="inline" onsubmit="return confirm('Êtes-vous sûr de vouloir mettre le site en maintenance ?');">
+                        @csrf
+                        <button type="submit" class="px-6 py-3 bg-orange-600 hover:bg-orange-700 text-white font-semibold rounded-lg transition-colors shadow-md hover:shadow-lg flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                            </svg>
+                            Activer la maintenance
+                        </button>
+                    </form>
+                @endif
+            </div>
+        </div>
+    </div>
+
     <!-- Stats Cards -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <x-stat-card

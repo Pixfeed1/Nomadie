@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\MaintenanceController;
 use App\Http\Controllers\Admin\AdminVendorController;
 use App\Http\Controllers\Admin\AdminDestinationController;
 use App\Http\Controllers\Admin\SubscriptionController;
@@ -240,9 +241,13 @@ Route::middleware(['vendor_registration'])->group(function () {
 // ==========================================
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(function () {
     // Dashboard
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    Route::get('/', function () { return redirect()->route('admin.dashboard'); });
-    
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
+    Route::get('/', function () { return redirect()->route('admin.dashboard.index'); });
+
+    // Mode Maintenance
+    Route::post('/maintenance/down', [MaintenanceController::class, 'down'])->name('maintenance.down');
+    Route::post('/maintenance/up', [MaintenanceController::class, 'up'])->name('maintenance.up');
+
     // Vendors
     Route::get('/vendors', [AdminVendorController::class, 'index'])->name('vendors.index');
     Route::get('/vendors/pending', [AdminVendorController::class, 'pending'])->name('vendors.pending');

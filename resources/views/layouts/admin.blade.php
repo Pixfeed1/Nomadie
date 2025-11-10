@@ -157,7 +157,7 @@
             <nav class="p-4 space-y-2 overflow-y-auto">
                 <p class="px-4 text-xs font-semibold text-text-secondary uppercase tracking-wider">Principal</p>
                 
-                <a href="{{ route('admin.dashboard') }}" class="sidebar-link flex items-center px-4 py-3 rounded-lg text-text-primary hover:text-primary transition-colors {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
+                <a href="{{ route('admin.dashboard.index') }}" class="sidebar-link flex items-center px-4 py-3 rounded-lg text-text-primary hover:text-primary transition-colors {{ request()->routeIs('admin.dashboard.index') ? 'active' : '' }}">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                     </svg>

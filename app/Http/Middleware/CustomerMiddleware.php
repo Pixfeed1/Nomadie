@@ -30,7 +30,7 @@ class CustomerMiddleware
 
         // Si l'utilisateur est un admin, rediriger vers le dashboard admin
         if ($user->role === 'admin') {
-            return redirect()->route('admin.dashboard');
+            return redirect()->route('admin.dashboard.index');
         }
 
         // Si c'est un client, laisser passer
