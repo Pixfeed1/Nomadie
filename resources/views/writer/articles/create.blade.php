@@ -325,7 +325,34 @@ document.addEventListener('alpine:init', () => {
                 </div>
 
                 <!-- Editor.js -->
-                <div id="editorjs" class="mt-8"></div>
+                <div id="editorjs" class="mt-8" @click="handleEditorClick($event)"></div>
+
+                <!-- Popup contextuel pour les liens -->
+                <div x-show="linkPopup.show"
+                     x-cloak
+                     :style="`top: ${linkPopup.y}px; left: ${linkPopup.x}px;`"
+                     class="fixed bg-white border border-gray-300 rounded-lg shadow-xl p-2 z-50"
+                     @click.away="linkPopup.show = false">
+                    <div class="text-xs font-medium text-text-secondary mb-2 px-2">Attribut du lien:</div>
+                    <div class="space-y-1">
+                        <button @click="setLinkRelFromPopup('dofollow')"
+                                class="w-full px-3 py-1.5 text-xs text-left bg-green-50 hover:bg-green-100 text-green-700 rounded transition-colors">
+                            ✅ DoFollow
+                        </button>
+                        <button @click="setLinkRelFromPopup('nofollow')"
+                                class="w-full px-3 py-1.5 text-xs text-left bg-red-50 hover:bg-red-100 text-red-700 rounded transition-colors">
+                            🚫 NoFollow
+                        </button>
+                        <button @click="setLinkRelFromPopup('sponsored')"
+                                class="w-full px-3 py-1.5 text-xs text-left bg-yellow-50 hover:bg-yellow-100 text-yellow-700 rounded transition-colors">
+                            💰 Sponsored
+                        </button>
+                        <button @click="setLinkRelFromPopup('ugc')"
+                                class="w-full px-3 py-1.5 text-xs text-left bg-blue-50 hover:bg-blue-100 text-blue-700 rounded transition-colors">
+                            💬 UGC
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -575,40 +602,86 @@ document.addEventListener('alpine:init', () => {
 
                 <!-- Gestion des liens (NoFollow/DoFollow) -->
                 <div x-data="{ showLinks: false }">
-                    <button @click="showLinks = !showLinks" class="w-full flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                    <button @click="showLinks = !showLinks; if(showLinks) extractAllLinks();" class="w-full flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
                         <div class="flex items-center space-x-2">
                             <svg class="w-4 h-4 text-text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
                             </svg>
-                            <h4 class="text-sm font-semibold text-text-primary">Attributs des liens</h4>
+                            <h4 class="text-sm font-semibold text-text-primary">Gestion des liens</h4>
+                            <span class="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full" x-text="allLinks.length"></span>
                         </div>
                         <svg class="w-4 h-4 text-text-secondary transition-transform" :class="showLinks ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                         </svg>
                     </button>
 
-                    <div x-show="showLinks" x-collapse class="mt-2 space-y-2">
-                        <p class="text-xs text-text-secondary mb-2">
-                            Pour ajouter nofollow/dofollow, sélectionnez le texte du lien dans l'éditeur, puis utilisez les boutons ci-dessous.
-                        </p>
+                    <div x-show="showLinks" x-collapse class="mt-2 space-y-3">
+                        <!-- Liste des liens dans l'article -->
+                        <div class="space-y-2">
+                            <p class="text-xs font-medium text-text-primary">📋 Liens dans l'article</p>
 
-                        <div class="space-y-1">
-                            <button @click="addLinkAttribute('nofollow')"
-                                    class="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-xs font-medium text-text-primary hover:bg-gray-50 transition-colors">
-                                🚫 Ajouter rel="nofollow"
-                            </button>
-                            <button @click="addLinkAttribute('dofollow')"
-                                    class="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-xs font-medium text-text-primary hover:bg-gray-50 transition-colors">
-                                ✅ Ajouter rel="dofollow"
-                            </button>
-                            <button @click="addLinkAttribute('')"
-                                    class="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-xs font-medium text-text-secondary hover:bg-gray-50 transition-colors">
-                                🗑️ Supprimer attribut rel
+                            <template x-if="allLinks.length === 0">
+                                <p class="text-xs text-text-secondary italic p-3 bg-gray-50 rounded">
+                                    Aucun lien dans l'article pour le moment
+                                </p>
+                            </template>
+
+                            <template x-for="(link, index) in allLinks" :key="index">
+                                <div class="p-3 bg-white border border-gray-200 rounded-lg space-y-2">
+                                    <!-- URL du lien -->
+                                    <div class="flex items-start space-x-2">
+                                        <svg class="w-4 h-4 text-primary flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
+                                        </svg>
+                                        <div class="flex-1 min-w-0">
+                                            <a :href="link.href" target="_blank" class="text-xs text-primary hover:underline break-all" x-text="link.href"></a>
+                                            <p class="text-xs text-text-secondary mt-1" x-text="'Texte: ' + link.text"></p>
+                                        </div>
+                                    </div>
+
+                                    <!-- Attribut actuel -->
+                                    <div class="flex items-center space-x-2">
+                                        <span class="text-xs text-text-secondary">Attribut:</span>
+                                        <span class="text-xs px-2 py-1 rounded"
+                                              :class="{
+                                                  'bg-green-100 text-green-700': link.rel === 'dofollow' || !link.rel,
+                                                  'bg-red-100 text-red-700': link.rel === 'nofollow',
+                                                  'bg-yellow-100 text-yellow-700': link.rel === 'sponsored',
+                                                  'bg-blue-100 text-blue-700': link.rel === 'ugc'
+                                              }"
+                                              x-text="link.rel || 'dofollow'"></span>
+                                    </div>
+
+                                    <!-- Boutons de modification -->
+                                    <div class="grid grid-cols-2 gap-1">
+                                        <button @click="updateLinkRel(index, 'dofollow')"
+                                                class="px-2 py-1 text-xs border border-green-300 bg-green-50 text-green-700 rounded hover:bg-green-100 transition-colors">
+                                            ✅ DoFollow
+                                        </button>
+                                        <button @click="updateLinkRel(index, 'nofollow')"
+                                                class="px-2 py-1 text-xs border border-red-300 bg-red-50 text-red-700 rounded hover:bg-red-100 transition-colors">
+                                            🚫 NoFollow
+                                        </button>
+                                        <button @click="updateLinkRel(index, 'sponsored')"
+                                                class="px-2 py-1 text-xs border border-yellow-300 bg-yellow-50 text-yellow-700 rounded hover:bg-yellow-100 transition-colors">
+                                            💰 Sponsored
+                                        </button>
+                                        <button @click="updateLinkRel(index, 'ugc')"
+                                                class="px-2 py-1 text-xs border border-blue-300 bg-blue-50 text-blue-700 rounded hover:bg-blue-100 transition-colors">
+                                            💬 UGC
+                                        </button>
+                                    </div>
+                                </div>
+                            </template>
+
+                            <button @click="extractAllLinks()"
+                                    class="w-full px-3 py-2 text-xs bg-gray-100 hover:bg-gray-200 text-text-secondary rounded transition-colors">
+                                🔄 Actualiser la liste
                             </button>
                         </div>
 
                         <div class="mt-3 p-2 bg-blue-50 border border-blue-200 rounded text-xs text-blue-800">
-                            <strong>💡 Conseil SEO:</strong> Utilisez <code>nofollow</code> pour les liens externes non fiables ou publicitaires, et <code>dofollow</code> pour les liens de qualité.
+                            <strong>💡 Astuce:</strong> Pour ajouter un lien dans l'éditeur, sélectionnez du texte et cliquez sur l'icône 🔗. Ensuite, modifiez ses attributs ici.
                         </div>
                     </div>
                 </div>
@@ -977,6 +1050,13 @@ function articleEditor() {
         imagePreview: null,
         focusKeyphrase: '',
         seoScore: 0,
+        allLinks: [], // Liste de tous les liens dans l'article
+        linkPopup: {
+            show: false,
+            x: 0,
+            y: 0,
+            targetLink: null
+        },
         scores: {
             title: 0,
             content: 0,
@@ -1580,6 +1660,180 @@ function articleEditor() {
                 // Editor.js n'a pas d'API redo native, on utilise le comportement natif du navigateur
                 document.execCommand('redo');
             }
+        },
+
+        // Extraire tous les liens de l'article
+        async extractAllLinks() {
+            if (!this.editorReady || !this.editor) {
+                console.warn('Éditeur pas prêt pour extraire les liens');
+                return;
+            }
+
+            try {
+                const editorData = await this.editor.save();
+                const links = [];
+
+                // Parcourir tous les blocs pour trouver les liens
+                editorData.blocks.forEach(block => {
+                    if (block.type === 'paragraph' && block.data && block.data.text) {
+                        // Extraire les liens HTML des paragraphes
+                        const tempDiv = document.createElement('div');
+                        tempDiv.innerHTML = block.data.text;
+                        const anchorTags = tempDiv.querySelectorAll('a');
+
+                        anchorTags.forEach(anchor => {
+                            links.push({
+                                href: anchor.href,
+                                text: anchor.textContent || anchor.href,
+                                rel: anchor.getAttribute('rel') || '',
+                                element: anchor // Référence pour modification
+                            });
+                        });
+                    }
+                });
+
+                this.allLinks = links;
+                console.log('🔗 Liens extraits:', links.length);
+            } catch (error) {
+                console.error('Erreur extraction liens:', error);
+            }
+        },
+
+        // Mettre à jour l'attribut rel d'un lien
+        async updateLinkRel(linkIndex, relValue) {
+            if (linkIndex < 0 || linkIndex >= this.allLinks.length) {
+                console.error('Index de lien invalide');
+                return;
+            }
+
+            try {
+                const editorData = await this.editor.save();
+                let linkFound = false;
+                let currentLinkIndex = 0;
+
+                // Parcourir les blocs et mettre à jour le lien
+                editorData.blocks.forEach((block, blockIndex) => {
+                    if (block.type === 'paragraph' && block.data && block.data.text) {
+                        const tempDiv = document.createElement('div');
+                        tempDiv.innerHTML = block.data.text;
+                        const anchorTags = tempDiv.querySelectorAll('a');
+
+                        anchorTags.forEach(anchor => {
+                            if (currentLinkIndex === linkIndex) {
+                                // Mettre à jour l'attribut rel
+                                if (relValue === 'dofollow' || relValue === '') {
+                                    anchor.removeAttribute('rel');
+                                } else {
+                                    anchor.setAttribute('rel', relValue);
+                                }
+                                linkFound = true;
+
+                                // Mettre à jour le HTML du bloc
+                                block.data.text = tempDiv.innerHTML;
+                            }
+                            currentLinkIndex++;
+                        });
+                    }
+                });
+
+                if (linkFound) {
+                    // Recharger l'éditeur avec les données mises à jour
+                    await this.editor.render(editorData);
+
+                    // Mettre à jour la liste affichée
+                    this.allLinks[linkIndex].rel = relValue === 'dofollow' ? '' : relValue;
+
+                    // Feedback visuel
+                    const messages = {
+                        'dofollow': '✅ Lien marqué comme dofollow',
+                        'nofollow': '🚫 Lien marqué comme nofollow',
+                        'sponsored': '💰 Lien marqué comme sponsored',
+                        'ugc': '💬 Lien marqué comme UGC'
+                    };
+
+                    const feedback = document.createElement('div');
+                    feedback.textContent = messages[relValue] || 'Lien mis à jour';
+                    feedback.className = 'fixed top-20 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg z-50 transition-opacity';
+                    document.body.appendChild(feedback);
+
+                    setTimeout(() => {
+                        feedback.style.opacity = '0';
+                        setTimeout(() => feedback.remove(), 300);
+                    }, 2000);
+
+                    console.log(`✅ Lien ${linkIndex} mis à jour avec rel="${relValue}"`);
+
+                    // Rafraîchir l'analyse SEO
+                    this.debounceAnalyze();
+                } else {
+                    console.error('Lien non trouvé');
+                }
+            } catch (error) {
+                console.error('Erreur mise à jour lien:', error);
+            }
+        },
+
+        // Gérer le clic dans l'éditeur pour détecter les liens
+        handleEditorClick(event) {
+            const target = event.target;
+
+            // Vérifier si on a cliqué sur un lien
+            if (target.tagName === 'A' || target.closest('a')) {
+                const link = target.tagName === 'A' ? target : target.closest('a');
+
+                // Position du popup
+                const rect = link.getBoundingClientRect();
+                this.linkPopup.x = rect.left + (rect.width / 2) - 75; // Centrer le popup
+                this.linkPopup.y = rect.bottom + window.scrollY + 5;
+                this.linkPopup.targetLink = link;
+                this.linkPopup.show = true;
+
+                console.log('🔗 Lien cliqué:', link.href);
+            }
+        },
+
+        // Définir l'attribut rel depuis le popup
+        setLinkRelFromPopup(relValue) {
+            if (!this.linkPopup.targetLink) {
+                console.error('Aucun lien sélectionné');
+                return;
+            }
+
+            const link = this.linkPopup.targetLink;
+
+            // Appliquer l'attribut
+            if (relValue === 'dofollow' || relValue === '') {
+                link.removeAttribute('rel');
+            } else {
+                link.setAttribute('rel', relValue);
+            }
+
+            // Feedback visuel
+            const messages = {
+                'dofollow': '✅ Lien marqué comme dofollow',
+                'nofollow': '🚫 Lien marqué comme nofollow',
+                'sponsored': '💰 Lien marqué comme sponsored',
+                'ugc': '💬 Lien marqué comme UGC'
+            };
+
+            const feedback = document.createElement('div');
+            feedback.textContent = messages[relValue];
+            feedback.className = 'fixed top-20 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg z-50 transition-opacity';
+            document.body.appendChild(feedback);
+
+            setTimeout(() => {
+                feedback.style.opacity = '0';
+                setTimeout(() => feedback.remove(), 300);
+            }, 2000);
+
+            // Fermer le popup
+            this.linkPopup.show = false;
+            this.linkPopup.targetLink = null;
+
+            // Rafraîchir la liste des liens
+            this.extractAllLinks();
+
+            console.log(`✅ Attribut rel="${relValue}" appliqué directement au lien`);
         }
     };
 }
