@@ -51,6 +51,8 @@ class AdminMessageController extends Controller
                 ->first();
 
             $conv->last_message = $lastMessage;
+            // Convertir last_message_at en Carbon
+            $conv->last_message_at = \Carbon\Carbon::parse($conv->last_message_at);
             return $conv;
         });
 
