@@ -120,11 +120,11 @@
             </div>
         </div>
 
-        <!-- BANDEAU RÉDACTEURS -->
+        <!-- BANDEAU RÉDACTEURS (Image uniquement) -->
         <div class="bg-white rounded-lg shadow-sm border border-border p-6 space-y-6 mt-8">
             <div class="border-b border-border pb-4">
                 <h3 class="text-xl font-bold text-text-primary">Bandeau Rédacteurs</h3>
-                <p class="text-sm text-text-secondary mt-1">Section "Devenir rédacteur" sur la page d'accueil</p>
+                <p class="text-sm text-text-secondary mt-1">Image de fond de la section "Devenir rédacteur" (textes non modifiables)</p>
             </div>
 
             <!-- Image actuelle du bandeau rédacteurs -->
@@ -156,88 +156,10 @@
                     file:bg-primary file:text-white
                     hover:file:bg-primary-dark
                     file:cursor-pointer cursor-pointer">
-                <p class="mt-2 text-xs text-text-secondary">Format: JPG, PNG. Taille max: 5MB.</p>
+                <p class="mt-2 text-xs text-text-secondary">Format: JPG, PNG. Taille max: 5MB. Les textes du bandeau sont définis directement dans le code.</p>
                 @error('writer_banner_image')
                 <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                 @enderror
-            </div>
-
-            <!-- Titre du bandeau rédacteurs -->
-            <div>
-                <label class="block text-sm font-medium text-text-secondary mb-2">Titre du bandeau rédacteurs *</label>
-                <input type="text" name="writer_banner_title" value="{{ old('writer_banner_title', $writerSettings['title']) }}" required class="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary" placeholder="Partagez votre passion du voyage">
-                @error('writer_banner_title')
-                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                @enderror
-            </div>
-
-            <!-- Sous-titre du bandeau rédacteurs -->
-            <div>
-                <label class="block text-sm font-medium text-text-secondary mb-2">Sous-titre du bandeau rédacteurs</label>
-                <textarea name="writer_banner_subtitle" rows="2" class="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary" placeholder="Rejoignez notre communauté...">{{ old('writer_banner_subtitle', $writerSettings['subtitle']) }}</textarea>
-                @error('writer_banner_subtitle')
-                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                @enderror
-            </div>
-
-            <!-- Features du bandeau rédacteurs -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <!-- Feature 1 -->
-                <div class="space-y-4">
-                    <h4 class="font-semibold text-text-primary">Avantage 1</h4>
-                    <div>
-                        <label class="block text-sm font-medium text-text-secondary mb-2">Titre *</label>
-                        <input type="text" name="writer_banner_feature1_title" value="{{ old('writer_banner_feature1_title', $writerSettings['feature1_title']) }}" required class="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary">
-                        @error('writer_banner_feature1_title')
-                        <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-text-secondary mb-2">Description</label>
-                        <textarea name="writer_banner_feature1_desc" rows="2" class="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary">{{ old('writer_banner_feature1_desc', $writerSettings['feature1_desc']) }}</textarea>
-                        @error('writer_banner_feature1_desc')
-                        <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
-                </div>
-
-                <!-- Feature 2 -->
-                <div class="space-y-4">
-                    <h4 class="font-semibold text-text-primary">Avantage 2</h4>
-                    <div>
-                        <label class="block text-sm font-medium text-text-secondary mb-2">Titre *</label>
-                        <input type="text" name="writer_banner_feature2_title" value="{{ old('writer_banner_feature2_title', $writerSettings['feature2_title']) }}" required class="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary">
-                        @error('writer_banner_feature2_title')
-                        <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-text-secondary mb-2">Description</label>
-                        <textarea name="writer_banner_feature2_desc" rows="2" class="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary">{{ old('writer_banner_feature2_desc', $writerSettings['feature2_desc']) }}</textarea>
-                        @error('writer_banner_feature2_desc')
-                        <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
-                </div>
-
-                <!-- Feature 3 -->
-                <div class="space-y-4">
-                    <h4 class="font-semibold text-text-primary">Avantage 3</h4>
-                    <div>
-                        <label class="block text-sm font-medium text-text-secondary mb-2">Titre *</label>
-                        <input type="text" name="writer_banner_feature3_title" value="{{ old('writer_banner_feature3_title', $writerSettings['feature3_title']) }}" required class="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary">
-                        @error('writer_banner_feature3_title')
-                        <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-text-secondary mb-2">Description</label>
-                        <textarea name="writer_banner_feature3_desc" rows="2" class="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary">{{ old('writer_banner_feature3_desc', $writerSettings['feature3_desc']) }}</textarea>
-                        @error('writer_banner_feature3_desc')
-                        <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
-                </div>
             </div>
         </div>
 

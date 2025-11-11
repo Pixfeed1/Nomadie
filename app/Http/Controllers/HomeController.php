@@ -192,18 +192,8 @@ class HomeController extends Controller
             'subtitle' => SiteSetting::get('hero_banner_subtitle', 'Voyages, circuits, séjours, hébergements et activités uniques dans le monde entier. Réservez directement auprès d\'organisateurs locaux experts.'),
         ];
 
-        // Paramètres pour le bandeau rédacteurs
-        $writerBannerSettings = [
-            'image' => SiteSetting::get('writer_banner_image', 'images/writer-bg.jpg'),
-            'title' => SiteSetting::get('writer_banner_title', 'Partagez votre passion du voyage'),
-            'subtitle' => SiteSetting::get('writer_banner_subtitle', 'Rejoignez notre communauté de rédacteurs et partagez vos plus belles découvertes'),
-            'feature1_title' => SiteSetting::get('writer_banner_feature1_title', 'Rémunération'),
-            'feature1_desc' => SiteSetting::get('writer_banner_feature1_desc', 'Valorisez vos contenus de qualité'),
-            'feature2_title' => SiteSetting::get('writer_banner_feature2_title', 'Large audience'),
-            'feature2_desc' => SiteSetting::get('writer_banner_feature2_desc', 'Des milliers de lecteurs passionnés'),
-            'feature3_title' => SiteSetting::get('writer_banner_feature3_title', 'Liberté créative'),
-            'feature3_desc' => SiteSetting::get('writer_banner_feature3_desc', 'Écrivez sur vos sujets préférés'),
-        ];
+        // Image du bandeau rédacteurs (textes en dur dans la vue)
+        $writerBannerImage = SiteSetting::get('writer_banner_image', 'images/writer-bg.jpg');
 
         return view('home', compact(
             'continents',
@@ -217,7 +207,7 @@ class HomeController extends Controller
             'offerTypeStats',
             'promotionalOffers',
             'heroSettings',
-            'writerBannerSettings'
+            'writerBannerImage'
         ));
     }
 
