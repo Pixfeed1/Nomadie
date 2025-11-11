@@ -195,7 +195,7 @@
     <div id="destinations" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div class="text-center mb-12">
             <h2 class="text-3xl font-bold text-text-primary">Destinations populaires</h2>
-            <p class="mt-4 text-lg text-text-secondary">Découvrez nos destinations les plus appréciées par nos voyageurs</p>
+            <p class="mt-4 text-lg text-text-secondary">Nos destinations avec le plus d'expériences disponibles</p>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -427,35 +427,34 @@
     <div class="relative text-white" style="background: linear-gradient(135deg, #1d5554 0%, #2a7573 100%);">
         <div class="absolute inset-0 overflow-hidden">
             <div class="absolute inset-0 bg-black opacity-40"></div>
-            <img src="{{ asset('images/writer-bg.jpg') }}" alt="Devenir rédacteur" class="w-full h-full object-cover" onerror="this.style.display='none'">
+            <img src="{{ asset($writerBannerSettings['image']) }}" alt="Devenir rédacteur" class="w-full h-full object-cover" onerror="this.style.display='none'">
         </div>
         <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
             <div class="text-center">
-                <h2 class="text-3xl md:text-4xl font-bold text-white mb-6">Partagez vos expériences de voyage</h2>
-                <p class="text-xl text-white mb-8 max-w-3xl mx-auto">Rejoignez notre communauté de rédacteurs passionnés et obtenez des backlinks dofollow pour votre contenu de qualité.</p>
+                <h2 class="text-3xl md:text-4xl font-bold text-white mb-6">{{ $writerBannerSettings['title'] }}</h2>
+                <p class="text-xl text-white mb-8 max-w-3xl mx-auto">{{ $writerBannerSettings['subtitle'] }}</p>
 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto mb-10">
                     <div class="flex flex-col items-center">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-white mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
-                        <p class="text-white font-semibold mb-1">Backlinks dofollow</p>
-                        <p class="text-white/80 text-sm">Après 3-5 articles de qualité</p>
+                        <p class="text-white font-semibold mb-1">{{ $writerBannerSettings['feature1_title'] }}</p>
+                        <p class="text-white/80 text-sm">{{ $writerBannerSettings['feature1_desc'] }}</p>
                     </div>
                     <div class="flex flex-col items-center">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-white mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                         </svg>
-                        <p class="text-white font-semibold mb-1">Outil SEO gratuit</p>
-                        <p class="text-white/80 text-sm">NomadSEO pour optimiser vos articles</p>
+                        <p class="text-white font-semibold mb-1">{{ $writerBannerSettings['feature2_title'] }}</p>
+                        <p class="text-white/80 text-sm">{{ $writerBannerSettings['feature2_desc'] }}</p>
                     </div>
                     <div class="flex flex-col items-center">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-white mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                         </svg>
-                        <p class="text-white font-semibold mb-1">Visibilité maximale</p>
-                        <p class="text-white/80 text-sm">Milliers de lecteurs passionnés</p>
+                        <p class="text-white font-semibold mb-1">{{ $writerBannerSettings['feature3_title'] }}</p>
+                        <p class="text-white/80 text-sm">{{ $writerBannerSettings['feature3_desc'] }}</p>
                     </div>
                 </div>
 
