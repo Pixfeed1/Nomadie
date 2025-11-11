@@ -275,6 +275,15 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
         Route::delete('/{trip}', [\App\Http\Controllers\Admin\AdminTripController::class, 'destroy'])->name('destroy');
     });
 
+    // Messages
+    Route::prefix('messages')->name('messages.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\AdminMessageController::class, 'index'])->name('index');
+        Route::get('/search', [\App\Http\Controllers\Admin\AdminMessageController::class, 'search'])->name('search');
+        Route::get('/{conversationId}', [\App\Http\Controllers\Admin\AdminMessageController::class, 'show'])->name('show');
+        Route::post('/{conversationId}/mark-read', [\App\Http\Controllers\Admin\AdminMessageController::class, 'markAsRead'])->name('markAsRead');
+        Route::post('/{conversationId}/archive', [\App\Http\Controllers\Admin\AdminMessageController::class, 'archive'])->name('archive');
+    });
+
     // Writers (Rédacteurs) - Validation des candidatures
     Route::prefix('writers')->name('writers.')->group(function () {
         Route::get('/', [\App\Http\Controllers\Admin\AdminWriterController::class, 'index'])->name('index');
