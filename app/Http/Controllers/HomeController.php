@@ -9,6 +9,7 @@ use App\Models\Trip;
 use App\Models\Vendor;
 use App\Models\Review;
 use App\Models\Booking;
+use App\Models\SiteSetting;
 use Illuminate\Support\Facades\DB;
 
 class HomeController extends Controller
@@ -184,6 +185,13 @@ class HomeController extends Controller
             'average_rating' => round(Trip::where('rating', '>', 0)->avg('rating'), 1) ?: 4.8
         ];
 
+        // Paramètres du site pour le bandeau d'accueil
+        $heroSettings = [
+            'image' => SiteSetting::get('hero_banner_image', 'images/hero-bg.jpg'),
+            'title' => SiteSetting::get('hero_banner_title', 'Organisez et vivez des expériences authentiques'),
+            'subtitle' => SiteSetting::get('hero_banner_subtitle', 'Voyages, circuits, séjours, hébergements et activités uniques dans le monde entier. Réservez directement auprès d\'organisateurs locaux experts.'),
+        ];
+
         return view('home', compact(
             'continents',
             'featuredDestinations',
@@ -194,7 +202,8 @@ class HomeController extends Controller
             'latestOrganizedTrips',
             'latestActivities',
             'offerTypeStats',
-            'promotionalOffers'
+            'promotionalOffers',
+            'heroSettings'
         ));
     }
 

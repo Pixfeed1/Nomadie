@@ -8,12 +8,20 @@
     <div class="relative bg-gradient-to-r from-primary to-primary-dark text-white">
         <div class="absolute inset-0 overflow-hidden">
             <div class="absolute inset-0 bg-black opacity-40"></div>
-            <img src="{{ asset('images/hero-bg.jpg') }}" alt="Voyage" class="w-full h-full object-cover" onerror="this.src='/api/placeholder/1600/800';this.onerror=null;">
+            @if($heroSettings['image'])
+                @if(str_starts_with($heroSettings['image'], 'images/'))
+                    <img src="{{ asset($heroSettings['image']) }}" alt="Voyage" class="w-full h-full object-cover" onerror="this.src='/api/placeholder/1600/800';this.onerror=null;">
+                @else
+                    <img src="{{ Storage::url($heroSettings['image']) }}" alt="Voyage" class="w-full h-full object-cover" onerror="this.src='/api/placeholder/1600/800';this.onerror=null;">
+                @endif
+            @else
+                <img src="{{ asset('images/hero-bg.jpg') }}" alt="Voyage" class="w-full h-full object-cover" onerror="this.src='/api/placeholder/1600/800';this.onerror=null;">
+            @endif
         </div>
         <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 md:py-32">
             <div class="max-w-3xl space-y-6">
-                <h1 class="text-4xl md:text-5xl font-bold text-white">Organisez et vivez des expériences authentiques</h1>
-                <p class="text-xl text-white/90">Voyages, circuits, séjours, hébergements et activités uniques dans le monde entier. Réservez directement auprès d'organisateurs locaux experts.</p>
+                <h1 class="text-4xl md:text-5xl font-bold text-white">{{ $heroSettings['title'] }}</h1>
+                <p class="text-xl text-white/90">{{ $heroSettings['subtitle'] }}</p>
                 <div class="pt-4 flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
                     <a href="#experiences" class="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-accent hover:bg-accent-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent transition-colors">
                         Découvrir nos offres

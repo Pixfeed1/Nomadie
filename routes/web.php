@@ -284,6 +284,19 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
         Route::post('/{conversationId}/archive', [\App\Http\Controllers\Admin\AdminMessageController::class, 'archive'])->name('archive');
     });
 
+    // Pays (gestion des images)
+    Route::prefix('countries')->name('countries.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\AdminCountryController::class, 'index'])->name('index');
+        Route::get('/{country}/edit', [\App\Http\Controllers\Admin\AdminCountryController::class, 'edit'])->name('edit');
+        Route::put('/{country}', [\App\Http\Controllers\Admin\AdminCountryController::class, 'update'])->name('update');
+    });
+
+    // Paramètres du site
+    Route::prefix('settings')->name('settings.')->group(function () {
+        Route::get('/hero-banner', [\App\Http\Controllers\Admin\AdminSiteSettingsController::class, 'heroBanner'])->name('hero-banner');
+        Route::post('/hero-banner', [\App\Http\Controllers\Admin\AdminSiteSettingsController::class, 'updateHeroBanner'])->name('hero-banner.update');
+    });
+
     // Writers (Rédacteurs) - Validation des candidatures
     Route::prefix('writers')->name('writers.')->group(function () {
         Route::get('/', [\App\Http\Controllers\Admin\AdminWriterController::class, 'index'])->name('index');
