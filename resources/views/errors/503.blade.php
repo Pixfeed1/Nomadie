@@ -138,7 +138,7 @@
 
         <!-- Message -->
         <p class="text-base text-[#8b949e] leading-relaxed mb-10">
-            Nomadie est actuellement en maintenance programmée. Nous mettons à jour nos systèmes pour vous offrir une meilleure plateforme de découverte d'expériences uniques : yoga, trekking et voyages d'exception.
+            Nomadie est actuellement en maintenance programmée. Nous améliorons notre plateforme pour mieux connecter voyageurs et organisateurs autour d'expériences authentiques : retraites yoga, treks immersifs, séjours culturels et activités locales uniques.
         </p>
 
         <!-- Info Section -->
