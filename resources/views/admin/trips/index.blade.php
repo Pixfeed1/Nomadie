@@ -141,7 +141,11 @@
                         </td>
                         <td class="px-6 py-4">
                             <span class="px-2 py-1 text-xs rounded-full {{ $trip->offer_type === 'organized_trip' ? 'bg-blue-100 text-blue-800' : ($trip->offer_type === 'activity' ? 'bg-green-100 text-green-800' : 'bg-purple-100 text-purple-800') }}">
-                                {{ ucfirst(str_replace('_', ' ', $trip->offer_type)) }}
+                                @if($trip->offer_type === 'organized_trip') Séjour
+                                @elseif($trip->offer_type === 'activity') Activité
+                                @elseif($trip->offer_type === 'accommodation') Hébergement
+                                @else {{ ucfirst($trip->offer_type) }}
+                                @endif
                             </span>
                         </td>
                         <td class="px-6 py-4 text-center text-sm text-text-primary font-medium">
@@ -160,8 +164,12 @@
                             {{ number_format($trip->price, 0, ',', ' ') }} €
                         </td>
                         <td class="px-6 py-4 text-center">
-                            <span class="px-2 py-1 text-xs rounded-full {{ $trip->status === 'active' ? 'bg-success/10 text-success' : 'bg-gray-100 text-gray-600' }}">
-                                {{ ucfirst($trip->status) }}
+                            <span class="px-2 py-1 text-xs rounded-full {{ $trip->status === 'active' ? 'bg-success/10 text-success' : ($trip->status === 'inactive' ? 'bg-gray-100 text-gray-600' : 'bg-yellow-100 text-yellow-800') }}">
+                                @if($trip->status === 'active') Actif
+                                @elseif($trip->status === 'inactive') Inactif
+                                @elseif($trip->status === 'draft') Brouillon
+                                @else {{ ucfirst($trip->status) }}
+                                @endif
                             </span>
                         </td>
                         <td class="px-6 py-4 text-center">

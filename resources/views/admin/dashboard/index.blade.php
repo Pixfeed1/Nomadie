@@ -266,7 +266,7 @@
                 </thead>
                 <tbody class="bg-white divide-y divide-border">
                     @foreach($recentMessages as $message)
-                    <tr class="hover:bg-gray-50 transition-colors">
+                    <tr class="hover:bg-gray-50 transition-colors cursor-pointer" onclick="window.location='{{ route('admin.messages.show', $message['conversation_id']) }}'">
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="flex items-center">
                                 <div class="flex-shrink-0 h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
@@ -332,6 +332,14 @@
                 <p class="text-sm text-text-secondary mt-4">Aucun message récent</p>
             </div>
             @endif
+        </div>
+        <div class="px-6 py-4 bg-bg-alt border-t border-border">
+            <a href="{{ route('admin.messages.index') }}" class="text-sm text-primary hover:text-primary-dark font-medium flex items-center">
+                Voir tous les messages
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+            </a>
         </div>
     </div>
 </div>

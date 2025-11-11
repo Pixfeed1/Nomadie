@@ -58,7 +58,13 @@
                     </div>
                     <div>
                         <p class="text-sm text-text-secondary">Statut</p>
-                        <p class="text-sm font-medium text-text-primary mt-1">{{ ucfirst($trip->status) }}</p>
+                        <p class="text-sm font-medium text-text-primary mt-1">
+                            @if($trip->status === 'active') Actif
+                            @elseif($trip->status === 'inactive') Inactif
+                            @elseif($trip->status === 'draft') Brouillon
+                            @else {{ ucfirst($trip->status) }}
+                            @endif
+                        </p>
                     </div>
                     <div>
                         <p class="text-sm text-text-secondary">Destination</p>
@@ -90,8 +96,13 @@
                         </div>
                         <div class="text-right">
                             <p class="text-sm font-medium text-text-primary">{{ number_format($booking->total_amount, 0, ',', ' ') }} €</p>
-                            <span class="text-xs px-2 py-1 rounded-full {{ $booking->status === 'confirmed' ? 'bg-success/10 text-success' : 'bg-yellow-100 text-yellow-800' }}">
-                                {{ ucfirst($booking->status) }}
+                            <span class="text-xs px-2 py-1 rounded-full {{ $booking->status === 'confirmed' ? 'bg-success/10 text-success' : ($booking->status === 'pending' ? 'bg-yellow-100 text-yellow-800' : 'bg-gray-100 text-gray-600') }}">
+                                @if($booking->status === 'confirmed') Confirmé
+                                @elseif($booking->status === 'pending') En attente
+                                @elseif($booking->status === 'cancelled') Annulé
+                                @elseif($booking->status === 'completed') Terminé
+                                @else {{ ucfirst($booking->status) }}
+                                @endif
                             </span>
                         </div>
                     </div>

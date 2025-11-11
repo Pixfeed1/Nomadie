@@ -271,11 +271,12 @@ class DashboardController extends Controller
     {
         return Message::with(['sender', 'recipient', 'trip'])
             ->latest()
-            ->take(10)
+            ->take(8)
             ->get()
             ->map(function ($message) {
                 return [
                     'id' => $message->id,
+                    'conversation_id' => $message->conversation_id,
                     'sender_name' => $message->sender->name ?? 'Utilisateur supprimé',
                     'sender_type' => $message->sender_type,
                     'recipient_name' => $message->recipient->name ?? 'Utilisateur supprimé',
