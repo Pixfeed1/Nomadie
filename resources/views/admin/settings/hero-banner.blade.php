@@ -122,7 +122,7 @@
 
         <!-- Actions -->
         <div class="flex justify-end space-x-4 mt-6">
-            <a href="{{ route('admin.dashboard') }}" class="px-6 py-2 border border-border rounded-lg text-text-primary hover:bg-gray-50 transition-colors">
+            <a href="{{ route('admin.dashboard.index') }}" class="px-6 py-2 border border-border rounded-lg text-text-primary hover:bg-gray-50 transition-colors">
                 Annuler
             </a>
             <button type="submit" class="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors">
