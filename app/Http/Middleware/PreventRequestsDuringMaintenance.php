@@ -15,6 +15,12 @@ class PreventRequestsDuringMaintenance extends Middleware
         'admin',
         'admin/*',
         'login',
+        'login/*',
         'logout',
+        'password/*',
+        'register',
+        'register/*',
+        'devenir-organisateur',
+        'devenir-organisateur/*',
     ];
 }
