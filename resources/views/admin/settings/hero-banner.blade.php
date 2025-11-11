@@ -1,10 +1,10 @@
 @extends('layouts.admin')
 
-@section('title', 'Bandeau d\'Accueil')
+@section('title', 'Gestion des Bandeaux')
 
 @section('header-left')
-    <h1 class="text-2xl font-bold text-text-primary">Bandeau de la Page d'Accueil</h1>
-    <p class="text-sm text-text-secondary mt-1">Gérez l'image et les textes du bandeau principal</p>
+    <h1 class="text-2xl font-bold text-text-primary">Gestion des Bandeaux</h1>
+    <p class="text-sm text-text-secondary mt-1">Configurez le bandeau de la page d'accueil (images des pays dans "Pays")</p>
 @endsection
 
 @section('content')
