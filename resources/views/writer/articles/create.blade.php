@@ -1086,6 +1086,8 @@ function articleEditor() {
         wordCount: 0,
         readingTime: 0,
         analyzeTimeout: null,
+        analyzingInProgress: false,  // Flag pour éviter analyses parallèles
+        initialAnalyzeDone: false,  // Flag pour l'analyse initiale
         minDateTime: '',
         editor: null,
         editorReady: false,  // Flag pour éviter double initialisation
@@ -1268,8 +1270,11 @@ function articleEditor() {
                 },
 
                 onChange: (api, event) => {
-                    console.log('🔄 Changement détecté dans l\'éditeur');
-                    this.debounceAnalyze();
+                    // Ne déclencher l'analyse que si l'initialisation est complète
+                    if (this.initialAnalyzeDone) {
+                        console.log('🔄 Changement détecté dans l\'éditeur');
+                        this.debounceAnalyze();
+                    }
                 },
 
                 onReady: () => {
@@ -1277,9 +1282,12 @@ function articleEditor() {
                     console.log('✅ Editor.js prêt et initialisé');
                     // Lancer l'analyse initiale après un court délai pour s'assurer que tout est prêt
                     setTimeout(() => {
-                        console.log('🚀 Lancement de l\'analyse initiale');
-                        this.analyzeSEO();
-                    }, 500);
+                        if (!this.initialAnalyzeDone) {
+                            console.log('🚀 Lancement de l\'analyse initiale');
+                            this.analyzeSEO();
+                            this.initialAnalyzeDone = true;
+                        }
+                    }, 800);
                 }
             });
 
@@ -1355,6 +1363,13 @@ function articleEditor() {
                     return;
                 }
 
+                // Éviter les analyses parallèles
+                if (this.analyzingInProgress) {
+                    console.warn('⚠️ Analyse déjà en cours, analyse ignorée');
+                    return;
+                }
+
+                this.analyzingInProgress = true;
                 console.log('📊 Début analyse SEO...');
 
                 const editorData = await this.editor.save();
@@ -1427,6 +1442,9 @@ function articleEditor() {
 
             } catch (error) {
                 console.error('❌ Erreur analyse SEO:', error);
+            } finally {
+                // Réinitialiser le flag pour permettre la prochaine analyse
+                this.analyzingInProgress = false;
             }
         },
 
