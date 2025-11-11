@@ -266,6 +266,15 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::post('/vendors/{id}/activate', [AdminVendorController::class, 'activate'])->name('vendors.activate');
     Route::delete('/vendors/{id}', [AdminVendorController::class, 'destroy'])->name('vendors.destroy');
 
+    // Expériences (Trips)
+    Route::prefix('experiences')->name('trips.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\AdminTripController::class, 'index'])->name('index');
+        Route::get('/{trip}', [\App\Http\Controllers\Admin\AdminTripController::class, 'show'])->name('show');
+        Route::post('/{trip}/toggle-status', [\App\Http\Controllers\Admin\AdminTripController::class, 'toggleStatus'])->name('toggleStatus');
+        Route::post('/{trip}/toggle-featured', [\App\Http\Controllers\Admin\AdminTripController::class, 'toggleFeatured'])->name('toggleFeatured');
+        Route::delete('/{trip}', [\App\Http\Controllers\Admin\AdminTripController::class, 'destroy'])->name('destroy');
+    });
+
     // Writers (Rédacteurs) - Validation des candidatures
     Route::prefix('writers')->name('writers.')->group(function () {
         Route::get('/', [\App\Http\Controllers\Admin\AdminWriterController::class, 'index'])->name('index');
